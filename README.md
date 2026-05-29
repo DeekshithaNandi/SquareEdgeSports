@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ⚡ SquareEdgeSports — Full-Stack Platform
 
 A secure, scalable indoor sports court booking platform with advanced authentication, role-based admin control, and a polished modern UI.
@@ -190,3 +191,6 @@ Create `frontend/.env`:
 ```
 VITE_API_URL=http://localhost:8080/api
 ```
+=======
+# SquareEdgeSports
+>>>>>>> 91101c92b5fd32e1cd7dc40554081f15816cb5b6
