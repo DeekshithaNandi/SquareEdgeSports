@@ -1,0 +1,20 @@
+
+> squareedgesports-frontend@1.0.0 dev
+> vite
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m1631[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m6:59:58 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/user/MyBookings.jsx, /src/index.css[22m
+[2m7:00:14 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/AddressAutocomplete.jsx, /src/index.css[22m
+[2m8:40:59 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminPayments.jsx, /src/index.css[22m
+[2m8:40:59 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminPayments.jsx, /src/index.css[22m
+[2m8:41:05 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminPayments.jsx, /src/index.css[22m
+[2m8:43:16 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminBookings.jsx, /src/index.css[22m
+[2m8:43:22 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminPayments.jsx, /src/index.css[22m
+[2m8:43:29 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminPayments.jsx, /src/index.css[22m
+[2m10:49:59 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin/AdminUsers.jsx, /src/index.css[22m
+[2m11:10:11 pm[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/public/LandingPage.jsx, /src/index.css[22m

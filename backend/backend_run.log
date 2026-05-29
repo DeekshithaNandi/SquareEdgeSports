@@ -1,0 +1,132 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------< com.squareedgesports:squareedgesports-backend >------------
+[INFO] Building SquareEdgeSports Backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.3:run (default-cli) > test-compile @ squareedgesports-backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ squareedgesports-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ squareedgesports-backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 52 source files with javac [debug release 17] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/Court.java:[35,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/OtpVerification.java:[23,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/CmsContent.java:[24,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/CmsContent.java:[25,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/CmsContent.java:[27,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/CmsContent.java:[29,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/EmployeePermission.java:[17,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/EmployeePermission.java:[18,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/EmployeePermission.java:[19,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/EmployeePermission.java:[20,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/EmployeePermission.java:[21,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/Payment.java:[30,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/Feedback.java:[31,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/Booking.java:[48,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/PasswordResetToken.java:[23,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[36,18] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[39,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[42,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[44,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[45,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/deeks/Downloads/SquareEdgeSports-Full/SquareEdgeSports/backend/src/main/java/com/squareedgesports/entity/User.java:[46,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ squareedgesports-backend ---
+[INFO] skip non existing resourceDirectory C:\Users\deeks\Downloads\SquareEdgeSports-Full\SquareEdgeSports\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ squareedgesports-backend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.2.3:run (default-cli) < test-compile @ squareedgesports-backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.3:run (default-cli) @ squareedgesports-backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+2026-05-18T19:01:40.352+05:30  INFO 7592 --- [SquareEdgeSports] [           main] c.s.SquareEdgeSportsApplication          : Starting SquareEdgeSportsApplication using Java 21.0.1 with PID 7592 (C:\Users\deeks\Downloads\SquareEdgeSports-Full\SquareEdgeSports\backend\target\classes started by Deekshitha in C:\Users\deeks\Downloads\SquareEdgeSports-Full\SquareEdgeSports\backend)
+2026-05-18T19:01:40.354+05:30  INFO 7592 --- [SquareEdgeSports] [           main] c.s.SquareEdgeSportsApplication          : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T19:01:43.224+05:30  INFO 7592 --- [SquareEdgeSports] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-18T19:01:43.418+05:30  INFO 7592 --- [SquareEdgeSports] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 173 ms. Found 10 JPA repository interfaces.
+2026-05-18T19:01:45.418+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-18T19:01:45.452+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-18T19:01:45.452+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2026-05-18T19:01:45.668+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-18T19:01:45.668+05:30  INFO 7592 --- [SquareEdgeSports] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5117 ms
+2026-05-18T19:01:46.139+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-18T19:01:46.283+05:30  INFO 7592 --- [SquareEdgeSports] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-18T19:01:46.389+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-18T19:01:47.153+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-18T19:01:47.244+05:30  INFO 7592 --- [SquareEdgeSports] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-18T19:01:47.758+05:30  INFO 7592 --- [SquareEdgeSports] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@64b73e0a
+2026-05-18T19:01:47.766+05:30  INFO 7592 --- [SquareEdgeSports] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-18T19:01:52.555+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-18T19:01:52.901+05:30  INFO 7592 --- [SquareEdgeSports] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T19:01:54.443+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-18T19:01:58.869+05:30  INFO 7592 --- [SquareEdgeSports] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@11f237b3, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1c22aae1, org.springframework.security.web.context.SecurityContextHolderFilter@2b686050, org.springframework.security.web.header.HeaderWriterFilter@794f2bdf, org.springframework.web.filter.CorsFilter@9129682, org.springframework.security.web.authentication.logout.LogoutFilter@2f193a75, com.squareedgesports.security.JwtAuthFilter@7f9b851c, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6aef91e6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@722713da, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@58cce034, org.springframework.security.web.session.SessionManagementFilter@34f3448a, org.springframework.security.web.access.ExceptionTranslationFilter@202001a4, org.springframework.security.web.access.intercept.AuthorizationFilter@68cca23e]
+2026-05-18T19:01:59.956+05:30  WARN 7592 --- [SquareEdgeSports] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-18T19:01:59.964+05:30  INFO 7592 --- [SquareEdgeSports] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T19:01:59.971+05:30  INFO 7592 --- [SquareEdgeSports] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-18T19:01:59.996+05:30  INFO 7592 --- [SquareEdgeSports] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-05-18T19:02:00.053+05:30  INFO 7592 --- [SquareEdgeSports] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-05-18T19:02:00.116+05:30 ERROR 7592 --- [SquareEdgeSports] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:01 min
+[INFO] Finished at: 2026-05-18T19:02:00+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.3:run (default-cli) on project squareedgesports-backend: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  33:33 min
+[INFO] Finished at: 2026-05-18T19:10:52+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.3:run (default-cli) on project squareedgesports-backend: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

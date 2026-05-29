@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  select { color-scheme: dark; }
+  select option { background: #0d0f14; color: #f0f2f5; }
+  body {
+    background: #0d0f14;
+    color: #f0f2f5;
+    font-family: 'Barlow', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4 { font-family: 'Barlow Condensed', sans-serif; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,107,53,0.35); border-radius: 4px; }
+}
+
+@layer components {
+  .inp {
+    @apply w-full border rounded-xl px-4 py-3 text-sm text-white placeholder-muted outline-none transition-all;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.10);
+    &:focus { border-color: rgba(255,107,53,0.5); background: rgba(255,255,255,0.08); }
+  }
+  .btn-primary {
+    @apply w-full py-3 rounded-xl font-bold text-sm text-white transition-all;
+    background: #ff6b35;
+    &:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,107,53,.35); }
+    &:active { transform: translateY(0); }
+  }
+  .card { @apply bg-s2 border border-white/[0.07] rounded-2xl; }
+  .stat-card { @apply card p-5 relative overflow-hidden; }
+  .badge-green  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30; }
+  .badge-red    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30; }
+  .badge-yellow { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-400/20 text-yellow-200 border border-yellow-400/30; }
+  .badge-blue   { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+  .badge-purple { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30; }
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl cursor-pointer transition-all text-muted text-sm font-medium;
+    &:hover { @apply bg-white/10 text-white; }
+    &.active { background: rgba(255,107,53,0.12); color: #ff6b35; border: 0.5px solid rgba(255,107,53,0.3); @apply font-semibold; }
+  }
+  .data-table { @apply w-full; }
+  .data-table th { @apply px-4 py-3 text-left text-xs font-bold text-muted uppercase tracking-widest border-b border-white/[0.07]; }
+  .data-table td { @apply px-4 py-3 text-sm border-b border-white/[0.06]; }
+  .data-table tr:hover td { @apply bg-white/[0.03]; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .modal-overlay { @apply fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/60 backdrop-blur-sm; }
+  .modal-box { @apply bg-surface border border-white/[0.10] rounded-2xl p-7 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto; }
+  .page-wrap { @apply p-7; }
+  .section-title { font-family: 'Barlow Condensed', sans-serif; @apply text-xl font-bold mb-1 tracking-wide; }
+  .section-sub   { @apply text-xs text-muted; }
+  .otp-input { @apply w-12 h-14 text-center text-xl font-bold border-2 rounded-xl text-white outline-none transition-all; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); &:focus { border-color: #ff6b35; } }
+}
+
+@layer utilities {
+  .fade-in { animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+}
