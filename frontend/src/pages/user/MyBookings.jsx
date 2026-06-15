@@ -139,7 +139,7 @@ export default function MyBookings() {
             } catch (e) { reject(e) }
           },
           prefill:  { email: user?.email, name: user?.fullName },
-          theme:    { color: '#ff6b35' },
+          theme:    { color: '#1352c9' },
           modal:    { ondismiss: () => reject(new Error('dismissed')) },
         }
         const rzp = new window.Razorpay(options)
@@ -207,7 +207,7 @@ export default function MyBookings() {
                          `Court ${b.courtNumber}`)
                       : 'Check your email for assignment'
                   }
-                  <span className="text-white/40 font-normal ml-2">· {fmtTime(b.startTime?.toString())}</span>
+                  <span className="text-[#5a6a8a] font-normal ml-2">· {fmtTime(b.startTime?.toString())}</span>
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function MyBookings() {
       )}
 
       {/* -- Tabs --------------------------------------------------------------- */}
-      <div className="flex gap-1.5 bg-white/5 rounded-xl p-1 w-fit mb-5">
+      <div className="flex gap-1.5 bg-[#f8faff] rounded-xl p-1 w-fit mb-5">
         {[
           ['active',    `Active (${active.length})`],
           ['history',   `History (${history.length})`],
@@ -300,7 +300,7 @@ export default function MyBookings() {
                   </span>
                   <Badge value={b.status} />
                   {b.memberDiscountApplied && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-orange-500/10 border border-orange-500/20 text-orange-400 font-bold">MEMBER</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-blue-600/10 border border-blue-600/20 text-blue-400 font-bold">MEMBER</span>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
@@ -371,7 +371,7 @@ export default function MyBookings() {
       {/* -- Cancel modal ------------------------------------------------------- */}
       <Modal open={!!target} onClose={() => setTarget(null)} title="⚠️ Cancel Booking"
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all"
             onClick={() => setTarget(null)}>Keep Booking</button>
           <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2"
             onClick={doCancel} disabled={cancelling}>

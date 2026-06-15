@@ -37,7 +37,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-5"
-      style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(255,107,53,0.08) 0%, #0d0f14 55%)' }}
+      style={{ background: '#f0f5ff' }}
     >
       <div className="w-full max-w-[420px]">
         <div className="text-center mb-8">
@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="text-xs text-muted uppercase tracking-widest">Indoor Sports Booking Platform</div>
         </div>
 
-        <div className="bg-surface/90 backdrop-blur border border-white/10 rounded-2xl p-8 shadow-2xl">
+        <div className="rounded-2xl p-8 shadow-lg" style={{ background: '#ffffff', border: '1px solid #dde8f8' }}>
           <h2 className="font-display text-2xl font-bold mb-1">Welcome back</h2>
           <p className="text-sm text-muted mb-7">Sign in to your account</p>
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
                   placeholder="Enter password" value={form.password}
                   onChange={e => set('password', e.target.value)} required />
                 <button type="button" onClick={() => setShowPw(s => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-m2 transition-colors">
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>

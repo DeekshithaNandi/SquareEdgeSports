@@ -47,6 +47,7 @@ export const publicAPI = {
   availability: (date, type, boxGroup) =>
     API.get('/public/availability', { params: { date, type, ...(boxGroup ? { boxGroup } : {}) } }),
   liveView:     () => API.get('/public/live-view'),
+  contact:      (data) => API.post('/public/contact', data),
 }
 
 // ── Admin ─────────────────────────────────────────────────────────────────

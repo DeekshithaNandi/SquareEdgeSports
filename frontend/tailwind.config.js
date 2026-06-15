@@ -4,16 +4,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg:      '#0d0f14',
-        surface: '#151820',
-        s2:      '#1b1e27',
-        s3:      '#1e222e',
-        card:    '#1b1e27',
-        accent:  '#ff6b35',
-        a2:      '#ff8c60',
+        bg:      '#f0f5ff',
+        surface: '#ffffff',
+        s2:      '#f8faff',
+        s3:      '#f0f5ff',
+        card:    '#ffffff',
+        accent:  '#1352c9',
+        a2:      '#4a7ee8',
         gold:    '#f5c842',
-        muted:   '#8a94a6',
-        m2:      '#f0f2f5',
+        muted:   '#4a5978',
+        m2:      '#0a1428',
       },
       fontFamily: {
         display: ['Barlow Condensed', 'sans-serif'],

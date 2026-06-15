@@ -44,7 +44,7 @@ const SPORTS = ['ALL', 'PICKLEBALL', 'CRICKET_LANE', 'BOX_CRICKET']
 
 function SportPill({ value, onChange }) {
   return (
-    <div className="flex gap-1 bg-white/5 rounded-xl p-1 flex-wrap">
+    <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1 flex-wrap">
       {SPORTS.map(s => (
         <button key={s} onClick={() => onChange(s)}
           className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
@@ -228,7 +228,7 @@ export default function AdminBookings() {
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Tabs */}
-          <div className="flex gap-1 bg-white/5 rounded-xl p-1">
+          <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
             <button onClick={() => handleTab('date')}
               className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'date' ? 'bg-accent text-white' : 'text-muted hover:text-white'}`}>
               Bookings
@@ -244,7 +244,7 @@ export default function AdminBookings() {
             <div className="flex items-center gap-2">
               <label className="text-xs text-muted font-bold">Date:</label>
               <input type="date" value={date} onChange={handleDate}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
             </div>
           )}
 
@@ -253,7 +253,7 @@ export default function AdminBookings() {
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
               showFilters || hasFilters
                 ? 'bg-accent/15 border-accent/40 text-accent'
-                : 'bg-white/5 border-white/10 text-muted hover:text-white'
+                : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:text-white'
             }`}>
             <SlidersHorizontal size={13} />
             Filters
@@ -271,7 +271,7 @@ export default function AdminBookings() {
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search by player name or email…"
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
+                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white">
                   <X size={12} />
@@ -284,7 +284,7 @@ export default function AdminBookings() {
               <ArrowUpDown size={13} className="text-muted" />
               <div className="relative">
                 <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}
-                  className="appearance-none bg-white/5 border border-white/10 rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent [color-scheme:dark] cursor-pointer">
+                  className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent [color-scheme:dark] cursor-pointer">
                   <option value="newest">↓ Newest First</option>
                   <option value="oldest">↑ Oldest First</option>
                 </select>
@@ -308,14 +308,14 @@ export default function AdminBookings() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] text-muted font-bold">Slot Date From</span>
               <input type="date" value={cancelFromDate} onChange={e => setCancelFromDate(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
               <span className="text-[11px] text-muted font-bold">To</span>
               <input type="date" value={cancelToDate} onChange={e => setCancelToDate(e.target.value)}
                 min={cancelFromDate || undefined}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
               {(cancelFromDate || cancelToDate) && (
                 <button onClick={() => { setCancelFromDate(''); setCancelToDate('') }}
-                  className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                  className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8]">
                   <X size={11} />
                 </button>
               )}
@@ -327,7 +327,7 @@ export default function AdminBookings() {
             <div className="flex flex-wrap gap-1.5 pt-1">
               {search         && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-accent/15 text-accent border border-accent/30">Search: "{search}"</span>}
               {sportFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/15 text-green-300 border border-green-500/30">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
-              {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/10 text-white/60 border border-white/20">Sort: Oldest First</span>}
+              {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f0f5ff] text-[#5a6a8a] border border-[#dde8f8]">Sort: Oldest First</span>}
               {tab === 'cancelled' && (cancelFromDate || cancelToDate) && (
                 <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
                   Slot: {cancelFromDate || '…'} → {cancelToDate || '…'}
@@ -415,7 +415,7 @@ export default function AdminBookings() {
                           </span>
                         ) : <span className="italic opacity-50">—</span>}
                         {b.cancellationReason && (
-                          <div className="text-[10px] text-white/40 mt-0.5 max-w-[120px] truncate" title={b.cancellationReason}>
+                          <div className="text-[10px] text-[#5a6a8a] mt-0.5 max-w-[120px] truncate" title={b.cancellationReason}>
                             {b.cancellationReason}
                           </div>
                         )}
@@ -433,13 +433,13 @@ export default function AdminBookings() {
                       <div className="flex gap-2 flex-wrap">
                         {b.status === 'CONFIRMED' && !label && (
                           <button onClick={() => openAssign(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-orange-500/10 border border-orange-500/25 text-orange-400 hover:bg-orange-500/20 transition-all">
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-blue-600/10 border border-blue-600/25 text-blue-400 hover:bg-blue-600/20 transition-all">
                             <MapPin size={10} /> Assign
                           </button>
                         )}
                         {b.status === 'CONFIRMED' && label && (
                           <button onClick={() => openAssign(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 transition-all">
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
                             <MapPin size={10} /> Reassign
                           </button>
                         )}
@@ -465,7 +465,7 @@ export default function AdminBookings() {
                         {b.status === 'CANCELLED' && b.paymentStatus === 'PAID' &&
                           b.refundPolicy === 'NONE' && !isPast(b.bookingDate, b.startTime) && (
                           <button onClick={() => setRefundTarget(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white/5 border border-white/15 text-white/50 hover:bg-white/10 transition-all">
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
                             <Bell size={10} /> No Refund
                           </button>
                         )}
@@ -501,7 +501,7 @@ export default function AdminBookings() {
         footer={
           refundTarget?.refundPolicy === 'NONE' ? (
             <>
-              <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10"
+              <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]"
                 onClick={() => setRefundTarget(null)}>Close</button>
               <button disabled={notifying} onClick={doNotifyNoRefund}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300 hover:bg-blue-500/25 disabled:opacity-60">
@@ -511,7 +511,7 @@ export default function AdminBookings() {
             </>
           ) : (
             <>
-              <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10"
+              <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]"
                 onClick={() => setRefundTarget(null)}>Cancel</button>
               <button disabled={refunding} onClick={doRefund}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-green-500/15 border border-green-500/30 text-green-300 hover:bg-green-500/25 disabled:opacity-60">
@@ -526,7 +526,7 @@ export default function AdminBookings() {
           const amount = refundTarget.refundAmount
           return (
             <div className="space-y-4">
-              <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 text-xs space-y-2">
+              <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-4 text-xs space-y-2">
                 <div className="flex justify-between"><span className="text-muted">Player</span><span className="font-semibold">{refundTarget.userName}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Sport</span><span className="font-semibold">{refundTarget.bookingType?.replace(/_/g,' ')}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Session</span><span className="font-semibold">{refundTarget.bookingDate} · {refundTarget.startTime?.toString().slice(0,5)}</span></div>
@@ -560,7 +560,7 @@ export default function AdminBookings() {
       {assignTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setAssignTarget(null)} />
-          <div className="relative w-full max-w-sm bg-[#1a1a30] border border-white/[0.12] rounded-2xl p-6 shadow-2xl">
+          <div className="relative w-full max-w-sm bg-[#1a1a30] border border-[#dde8f8] rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="font-bold text-sm">Assign Court / Lane</div>
@@ -568,12 +568,12 @@ export default function AdminBookings() {
                   #{assignTarget.id} · {assignTarget.userName} · {assignTarget.bookingType?.replace(/_/g, ' ')}
                 </div>
               </div>
-              <button onClick={() => setAssignTarget(null)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/40">
+              <button onClick={() => setAssignTarget(null)} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a]">
                 <X size={15} />
               </button>
             </div>
 
-            <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-3.5 mb-4 text-xs text-white/60 space-y-1">
+            <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-xl p-3.5 mb-4 text-xs text-[#5a6a8a] space-y-1">
               <div className="flex justify-between"><span>Time</span><span className="font-semibold text-white">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
               <div className="flex justify-between"><span>Date</span><span className="font-semibold text-white">{assignTarget.bookingDate}</span></div>
               {assignTarget.boxGroup && <div className="flex justify-between"><span>Box</span><span className="font-semibold text-white">{assignTarget.boxGroup.replace('_', ' ')}</span></div>}
@@ -583,24 +583,24 @@ export default function AdminBookings() {
               <>
                 {assignTarget.bookingType === 'CRICKET_LANE' && (
                   <div className="mb-3">
-                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">Select Box</label>
+                    <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">Select Box</label>
                     <div className="grid grid-cols-2 gap-2">
                       {['BOX_A', 'BOX_B'].map(bg => (
                         <button key={bg} type="button"
                           onClick={() => { setAssignBoxGroup(bg); setAssignValue(''); setAssignConflict(null) }}
                           className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all ${
                             assignBoxGroup === bg
-                              ? 'bg-orange-500/15 border-orange-500/40 text-orange-300'
-                              : 'bg-white/[0.03] border-white/[0.08] text-white/55 hover:border-white/20'
+                              ? 'bg-blue-600/15 border-blue-600/40 text-blue-300'
+                              : 'bg-[#f8faff] border-[#dde8f8] text-[#5a6a8a] hover:border-[#dde8f8]'
                           }`}>
                           {bg.replace('_', ' ')}
-                          <div className="text-[10px] font-normal mt-0.5 text-white/35">{bg === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
+                          <div className="text-[10px] font-normal mt-0.5 text-[#9aaac8]">{bg === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
-                <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">
+                <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">
                   {assignLabel(assignTarget)}
                 </label>
                 <input
@@ -610,8 +610,8 @@ export default function AdminBookings() {
                   value={assignValue}
                   onChange={e => { setAssignValue(e.target.value); checkConflictLocally(e.target.value) }}
                   placeholder={assignTarget.bookingType === 'PICKLEBALL' ? '1, 2 or 3' : assignTarget.bookingType === 'CRICKET_LANE' ? (assignBoxGroup === 'BOX_A' ? '1–4' : '5–8') : '1–8'}
-                  className={`w-full bg-white/[0.05] border rounded-xl px-4 py-3 text-sm text-white focus:outline-none mb-2 transition-all ${
-                    assignConflict ? 'border-red-500/60 focus:border-red-500' : 'border-white/[0.1] focus:border-orange-500/50'
+                  className={`w-full bg-[#f8faff] border rounded-xl px-4 py-3 text-sm text-white focus:outline-none mb-2 transition-all ${
+                    assignConflict ? 'border-red-500/60 focus:border-red-500' : 'border-[#dde8f8] focus:border-blue-600/50'
                   }`}
                   onKeyDown={e => e.key === 'Enter' && submitAssign()}
                 />
@@ -633,7 +633,7 @@ export default function AdminBookings() {
                 ) : <div className="mb-4" />}
               </>
             ) : (
-              <div className="bg-orange-500/[0.07] border border-orange-500/20 rounded-xl p-3.5 text-xs text-orange-300 mb-4">
+              <div className="bg-blue-600/[0.07] border border-blue-600/20 rounded-xl p-3.5 text-xs text-blue-300 mb-4">
                 Box group is already set to <strong>{assignTarget.boxGroup?.replace('_', ' ')}</strong>. Confirming will send the assignment email.
               </div>
             )}
@@ -641,8 +641,8 @@ export default function AdminBookings() {
             <button onClick={submitAssign} disabled={assigning || !!assignConflict}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
                 assignConflict
-                  ? 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-600 to-orange-600 hover:from-orange-500 hover:to-orange-500'
+                  ? 'bg-[#f8faff] border border-[#dde8f8] text-[#9aaac8] cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500'
               }`}>
               {assigning ? 'Assigning…' : assignConflict ? '⛔ Resolve conflict to continue' : '✅ Confirm Assignment & Notify User'}
             </button>

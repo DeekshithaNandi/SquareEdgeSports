@@ -109,7 +109,7 @@ export default function FeedbackPage() {
                     className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
                       active
                         ? 'bg-accent/20 border-accent text-accent'
-                        : 'bg-white/[0.03] border-white/[0.10] text-muted hover:border-white/30 hover:text-white'
+                        : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:border-[#dde8f8] hover:text-white'
                     }`}>
                     {active && <span className="mr-1.5">✓</span>}
                     {cat}
@@ -139,14 +139,14 @@ export default function FeedbackPage() {
           {/* Actions */}
           <div className="flex gap-3">
             <button type="button"
-              className="flex-1 py-3 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+              className="flex-1 py-3 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all"
               onClick={reset}>
               Clear
             </button>
             <button type="submit" disabled={loading}
               className="flex-[2] btn-primary flex items-center justify-center gap-2">
               {loading
-                ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" />Submitting…</>
+                ? <><span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" />Submitting…</>
                 : 'Submit Feedback ⭐'}
             </button>
           </div>

@@ -43,14 +43,14 @@ export default function AdminPricing() {
             </div>
             <button onClick={()=>save(r.id)} disabled={saving[r.id]}
               className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90 transition-all flex items-center justify-center gap-2">
-              {saving[r.id] ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full spin"/>Saving…</> : "Save Price"}
+              {saving[r.id] ? <><span className="w-3.5 h-3.5 border-2 border-[#dde8f8] border-t-white rounded-full spin"/>Saving…</> : "Save Price"}
             </button>
           </div>
         ))}
       </div>
 
       <div className="card overflow-hidden mt-6">
-        <div className="p-5 border-b border-white/[0.07] font-display font-bold text-sm">Pricing Summary</div>
+        <div className="p-5 border-b border-[#dde8f8] font-display font-bold text-sm">Pricing Summary</div>
         <table className="data-table">
           <thead><tr><th>Rule Key</th><th>Description</th><th>Price</th><th>Last Updated</th></tr></thead>
           <tbody>

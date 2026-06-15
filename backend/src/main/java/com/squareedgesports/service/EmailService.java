@@ -163,6 +163,44 @@ public class EmailService {
     }
 
     @Async
+    public void sendContactEmail(String senderName, String senderEmail, String subject, String message) {
+        if (!emailEnabled) {
+            log.info("Email disabled – contact from {} ({}): {}", senderName, senderEmail, subject);
+            return;
+        }
+        String html = header("New Contact Message 📩") +
+            "<h2 style='color:#eeeef8;font-size:20px;margin:0 0 8px;'>New message from your website</h2>" +
+            "<div style='background:#1a1a2e;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;margin:20px 0;'>" +
+            "<table style='width:100%;font-size:14px;border-collapse:collapse;'>" +
+            "<tr><td style='color:#6b6b8a;padding:8px 0;width:100px;'>Name</td>" +
+            "<td style='color:#eeeef8;font-weight:700;padding:8px 0;'>" + senderName + "</td></tr>" +
+            "<tr><td style='color:#6b6b8a;padding:8px 0;'>Email</td>" +
+            "<td style='padding:8px 0;'><a href='mailto:" + senderEmail + "' style='color:#7c5cfc;font-weight:700;text-decoration:none;'>" + senderEmail + "</a></td></tr>" +
+            "<tr><td style='color:#6b6b8a;padding:8px 0;'>Subject</td>" +
+            "<td style='color:#eeeef8;font-weight:700;padding:8px 0;'>" + (subject != null && !subject.isBlank() ? subject : "(no subject)") + "</td></tr>" +
+            "</table></div>" +
+            "<div style='background:#12122a;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;margin:0 0 20px;'>" +
+            "<p style='color:#9090b0;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;'>Message</p>" +
+            "<p style='color:#eeeef8;font-size:14px;line-height:1.7;margin:0;white-space:pre-wrap;'>" + message + "</p></div>" +
+            "<p style='color:#6b6b8a;font-size:12px;'>Reply directly to this email to respond to " + senderName + ".</p>" +
+            footer();
+        // Send to admin email (fromEmail), reply-to set to sender
+        try {
+            var msg    = mailSender.createMimeMessage();
+            var helper = new MimeMessageHelper(msg, true);
+            helper.setFrom(fromEmail);
+            helper.setTo(fromEmail);
+            helper.setReplyTo(senderEmail);
+            helper.setSubject("📩 Contact: " + (subject != null && !subject.isBlank() ? subject : "Message from " + senderName));
+            helper.setText(html, true);
+            mailSender.send(msg);
+            log.info("Contact email sent from {} ({})", senderName, senderEmail);
+        } catch (Exception e) {
+            log.error("Failed to send contact email from {}", senderEmail, e);
+        }
+    }
+
+    @Async
     public void sendEmailChangeOtp(String to, String name, String otp) {
         if (!emailEnabled) { log.info("Email change OTP for {}: {}", to, otp); return; }
         sendHtml(to, "SquareEdgeSports – Verify Your New Email", buildEmailChangeOtpHtml(name, otp));

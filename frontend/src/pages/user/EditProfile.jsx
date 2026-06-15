@@ -124,7 +124,7 @@ export default function EditProfile() {
       </div>
 
       {/* ── Profile Photo ──────────────────────────────────────────────── */}
-      <div className="bg-surface border border-white/[0.07] rounded-2xl p-6">
+      <div className="bg-surface border border-[#dde8f8] rounded-2xl p-6">
         <h2 className="font-semibold text-xs uppercase tracking-wider text-muted mb-4">Profile Photo</h2>
         <div className="flex items-center gap-5">
           <div className="relative flex-shrink-0">
@@ -159,11 +159,11 @@ export default function EditProfile() {
       </div>
 
       {/* ── Basic Info + Address ───────────────────────────────────────── */}
-      <div className="bg-surface border border-white/[0.07] rounded-2xl p-6">
+      <div className="bg-surface border border-[#dde8f8] rounded-2xl p-6">
         <h2 className="font-semibold text-xs uppercase tracking-wider text-muted mb-4">Basic Information</h2>
 
         {/* Read-only email */}
-        <div className="mb-4 p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+        <div className="mb-4 p-3 bg-[#f8faff] rounded-xl border border-[#dde8f8]">
           <div className="text-xs text-muted mb-0.5">Email Address</div>
           <div className="text-sm font-medium">{user?.email}</div>
         </div>
@@ -193,7 +193,7 @@ export default function EditProfile() {
           </div>
 
           {/* ── Address ─────────────────────────────────────────────────── */}
-          <div className="border-t border-white/[0.06] pt-5 space-y-4">
+          <div className="border-t border-[#dde8f8] pt-5 space-y-4">
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-accent" />
               <span className="text-xs font-bold text-white uppercase tracking-wider">Address</span>
@@ -295,7 +295,7 @@ export default function EditProfile() {
           <button type="submit" disabled={saving}
             className="btn-primary flex items-center gap-2 mt-2">
             {saving
-              ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" />Saving…</>
+              ? <><span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" />Saving…</>
               : 'Save Changes'}
           </button>
         </form>

@@ -174,7 +174,7 @@ export default function AdminUsers() {
   const toggleMember = key => setMemberForm(m => ({ ...m, [key]: !m[key] }))
 
   const roleGradient = role => ({
-    SUPER_ADMIN:   'from-red-500 to-orange-500',
+    SUPER_ADMIN:   'from-red-500 to-red-700',
     ADMINISTRATOR: 'from-purple-500 to-accent',
     EMPLOYEE:      'from-blue-500 to-cyan-500',
     PLAYER:        'from-green-500 to-emerald-500',
@@ -210,7 +210,7 @@ export default function AdminUsers() {
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all w-56"
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all w-56"
               placeholder="Search users…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <button onClick={() => setInvite(true)}
@@ -221,14 +221,14 @@ export default function AdminUsers() {
       </div>
 
       {/* Role filter tabs */}
-      <div className="flex gap-1.5 bg-white/5 rounded-xl p-1 w-fit mb-5 flex-wrap">
+      <div className="flex gap-1.5 bg-[#f8faff] rounded-xl p-1 w-fit mb-5 flex-wrap">
         {FILTER_TABS.map(tab => (
           <button key={tab.value} onClick={() => switchTab(tab.value)}
             className={'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ' +
               (roleFilter === tab.value ? 'bg-accent text-white' : 'text-muted hover:text-white')}>
             {tab.label}
             <span className={'px-1.5 py-0.5 rounded-full text-[10px] font-bold ' +
-              (roleFilter === tab.value ? 'bg-white/20' : 'bg-white/10')}>
+              (roleFilter === tab.value ? 'bg-[#f0f5ff]' : 'bg-[#f0f5ff]')}>
               {countFor(tab.value)}
             </span>
           </button>
@@ -267,9 +267,9 @@ export default function AdminUsers() {
                     <td><Badge value={u.active ? 'active' : 'inactive'} /></td>
                     <td>
                       <div className="flex gap-1.5 flex-wrap items-center">
-                        <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                        <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all"
                           onClick={() => setView(u)}>View</button>
-                        <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                        <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all"
                           onClick={() => { setEdit(u); setEf({ fullName: u.fullName, phone: u.phone || '', addressLine1: u.addressLine1 || '', city: u.city || '', state: u.state || '', country: u.country || '', zipCode: u.zipCode || '', active: u.active, role: u.role }) }}>
                           Edit
                         </button>
@@ -294,12 +294,12 @@ export default function AdminUsers() {
                             className={`p-1.5 rounded-lg text-xs border transition-all ${
                               allowed
                                 ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20 cursor-pointer'
-                                : 'bg-white/[0.02] border-white/[0.05] text-white/20 cursor-not-allowed'
+                                : 'bg-[#f8faff] border-[#dde8f8] text-[#9aaac8] cursor-not-allowed'
                             }`}>
                             <Trash2 size={12} />
                           </button>
                           {!allowed && tip && (
-                            <div className="absolute bottom-8 right-0 z-50 hidden group-hover/del:block whitespace-nowrap bg-s2 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-muted shadow-xl pointer-events-none">
+                            <div className="absolute bottom-8 right-0 z-50 hidden group-hover/del:block whitespace-nowrap bg-s2 border border-[#dde8f8] rounded-xl px-3 py-2 text-[11px] text-muted shadow-xl pointer-events-none">
                               {tip}
                             </div>
                           )}
@@ -323,7 +323,7 @@ export default function AdminUsers() {
       <Modal open={!!view} onClose={() => setView(null)} title="Profile"
         footer={
           <div className="flex gap-2">
-            <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10"
+            <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]"
               onClick={() => setView(null)}>Close</button>
             {view && me && ROLE_RANK[me.role] > ROLE_RANK[view.role] && (
               <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90"
@@ -344,7 +344,7 @@ export default function AdminUsers() {
           return (
             <div className="space-y-5">
               {/* ── Header ── */}
-              <div className="flex items-center gap-4 pb-5 border-b border-white/[0.07]">
+              <div className="flex items-center gap-4 pb-5 border-b border-[#dde8f8]">
                 {view.profilePicture
                   ? <img src={view.profilePicture} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 ring-2 ring-white/10" />
                   : <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${roleGradient(view.role)} flex items-center justify-center text-xl font-bold text-white flex-shrink-0`}>
@@ -372,14 +372,14 @@ export default function AdminUsers() {
               <div>
                 <div className="text-[10px] font-bold text-muted uppercase tracking-wider mb-2.5">Contact Information</div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-3">
+                  <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3">
                     <div className="text-[10px] text-muted font-semibold mb-1">Email</div>
                     <div className="text-xs font-semibold break-all">{view.email}</div>
                     <div className={`text-[10px] mt-1 font-semibold ${view.emailVerified ? 'text-green-400' : 'text-yellow-400'}`}>
                       {view.emailVerified ? '✓ Verified' : '⚠ Not verified'}
                     </div>
                   </div>
-                  <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-3">
+                  <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3">
                     <div className="text-[10px] text-muted font-semibold mb-1">Phone</div>
                     <div className="text-xs font-semibold">{view.phone || <span className="text-muted italic">Not set</span>}</div>
                   </div>
@@ -389,7 +389,7 @@ export default function AdminUsers() {
               {/* ── Address ── */}
               <div>
                 <div className="text-[10px] font-bold text-muted uppercase tracking-wider mb-2.5">Address</div>
-                <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-3 text-xs">
+                <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3 text-xs">
                   {fullAddress
                     ? <div className="space-y-0.5">
                         {view.addressLine1 && <div className="font-semibold">{view.addressLine1}</div>}
@@ -418,12 +418,12 @@ export default function AdminUsers() {
                           className={`rounded-xl p-2.5 border text-center transition-all ${
                             view.permissions[p.key]
                               ? 'bg-green-500/10 border-green-500/25'
-                              : 'bg-white/[0.02] border-white/[0.06]'
+                              : 'bg-[#f8faff] border-[#dde8f8]'
                           }`}>
                           <div className={`text-[10px] font-bold mb-1 ${view.permissions[p.key] ? 'text-green-400' : 'text-muted'}`}>
                             {view.permissions[p.key] ? '✓' : '✗'}
                           </div>
-                          <div className={`text-[9px] font-semibold leading-tight ${view.permissions[p.key] ? 'text-green-300' : 'text-white/30'}`}>
+                          <div className={`text-[9px] font-semibold leading-tight ${view.permissions[p.key] ? 'text-green-300' : 'text-[#9aaac8]'}`}>
                             {p.label}
                           </div>
                         </div>
@@ -453,10 +453,10 @@ export default function AdminUsers() {
                       { key: 'boxCricketMember',  label: 'Box Cricket',  emoji: '🏟️' },
                       { key: 'pickleballMember',  label: 'Pickleball',   emoji: '🏓' },
                     ].map(s => (
-                      <div key={s.key} className={`rounded-xl p-3 border text-center ${view[s.key] ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-white/[0.02] border-white/[0.06]'}`}>
+                      <div key={s.key} className={`rounded-xl p-3 border text-center ${view[s.key] ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-[#f8faff] border-[#dde8f8]'}`}>
                         <div className="text-lg mb-1">{s.emoji}</div>
                         <div className={`text-[10px] font-bold ${view[s.key] ? 'text-yellow-300' : 'text-muted'}`}>{s.label}</div>
-                        <div className={`text-[9px] mt-0.5 ${view[s.key] ? 'text-green-400' : 'text-white/25'}`}>{view[s.key] ? '✓ Active' : 'Inactive'}</div>
+                        <div className={`text-[9px] mt-0.5 ${view[s.key] ? 'text-green-400' : 'text-[#9aaac8]'}`}>{view[s.key] ? '✓ Active' : 'Inactive'}</div>
                       </div>
                     ))}
                   </div>
@@ -475,7 +475,7 @@ export default function AdminUsers() {
       {/* Edit Modal */}
       <Modal open={!!edit} onClose={() => setEdit(null)} title="✏️ Edit User"
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10" onClick={() => setEdit(null)}>Cancel</button>
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]" onClick={() => setEdit(null)}>Cancel</button>
           <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90" onClick={saveEdit}>Save Changes</button>
         </>}>
         {edit && (
@@ -506,7 +506,7 @@ export default function AdminUsers() {
                     className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${
                       ef.active === (s === 'active')
                         ? s === 'active' ? 'bg-green-500/25 border-green-500 text-green-400' : 'bg-red-500/25 border-red-500 text-red-400'
-                        : 'bg-white/5 border-white/10 text-muted opacity-60 hover:opacity-90'
+                        : 'bg-[#f8faff] border-[#dde8f8] text-muted opacity-60 hover:opacity-90'
                     }`}>
                     {s.charAt(0).toUpperCase() + s.slice(1)}
                   </button>
@@ -524,10 +524,10 @@ export default function AdminUsers() {
       {/* Invite Modal */}
       <Modal open={invite} onClose={() => setInvite(false)} title="✉️ Invite New User"
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10" onClick={() => setInvite(false)}>Cancel</button>
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]" onClick={() => setInvite(false)}>Cancel</button>
           <button disabled={invLoading} onClick={sendInvite}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90 disabled:opacity-60">
-            {invLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" /> : <Send size={13} />}
+            {invLoading ? <span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" /> : <Send size={13} />}
             Send Invitation
           </button>
         </>}>
@@ -562,22 +562,22 @@ export default function AdminUsers() {
       {/* Permissions Modal */}
       <Modal open={!!permUser} onClose={() => setPermUser(null)} title={`🔐 Permissions — ${permUser?.fullName || ''}`}
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10" onClick={() => setPermUser(null)}>Cancel</button>
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]" onClick={() => setPermUser(null)}>Cancel</button>
           <button disabled={permLoading} onClick={savePermissions}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90 disabled:opacity-60">
-            {permLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" /> : 'Save Permissions'}
+            {permLoading ? <span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" /> : 'Save Permissions'}
           </button>
         </>}>
         <div className="space-y-2">
           <p className="text-xs text-muted mb-3">Toggle module access for this employee. Changes take effect immediately.</p>
           {PERM_LABELS.map(p => (
             <button key={p.key} onClick={() => togglePerm(p.key)}
-              className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${perms[p.key] ? 'bg-accent/10 border-accent/30' : 'bg-white/[0.03] border-white/[0.07] hover:bg-white/[0.06]'}`}>
+              className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${perms[p.key] ? 'bg-accent/10 border-accent/30' : 'bg-[#f8faff] border-[#dde8f8] hover:bg-[#f8faff]'}`}>
               <div className="text-left">
                 <div className={`text-sm font-bold ${perms[p.key] ? 'text-accent' : 'text-white'}`}>{p.label}</div>
                 <div className="text-xs text-muted">{p.desc}</div>
               </div>
-              <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${perms[p.key] ? 'bg-accent' : 'bg-white/20'}`}>
+              <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${perms[p.key] ? 'bg-accent' : 'bg-[#f0f5ff]'}`}>
                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${perms[p.key] ? 'left-5' : 'left-0.5'}`} />
               </div>
             </button>
@@ -588,10 +588,10 @@ export default function AdminUsers() {
       {/* Membership Modal */}
       <Modal open={!!memberUser} onClose={() => setMemberUser(null)} title={`👑 Membership — ${memberUser?.fullName || ''}`}
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10" onClick={() => setMemberUser(null)}>Cancel</button>
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]" onClick={() => setMemberUser(null)}>Cancel</button>
           <button disabled={memberLoading} onClick={saveMembership}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:opacity-90 disabled:opacity-60 flex items-center gap-2">
-            {memberLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" /> : <Crown size={13} />}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-700 to-blue-600 text-white hover:opacity-90 disabled:opacity-60 flex items-center gap-2">
+            {memberLoading ? <span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" /> : <Crown size={13} />}
             Save Membership
           </button>
         </>}>
@@ -606,7 +606,7 @@ export default function AdminUsers() {
               className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${
                 memberForm[sport.key]
                   ? 'bg-yellow-500/10 border-yellow-500/30'
-                  : 'bg-white/[0.03] border-white/[0.07] hover:bg-white/[0.06]'
+                  : 'bg-[#f8faff] border-[#dde8f8] hover:bg-[#f8faff]'
               }`}>
               <div className="flex items-center gap-3">
                 <span className="text-xl">{sport.emoji}</span>
@@ -615,13 +615,13 @@ export default function AdminUsers() {
                   <div className="text-xs text-muted">{sport.desc}</div>
                 </div>
               </div>
-              <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${memberForm[sport.key] ? 'bg-yellow-500' : 'bg-white/20'}`}>
+              <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${memberForm[sport.key] ? 'bg-yellow-500' : 'bg-[#f0f5ff]'}`}>
                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${memberForm[sport.key] ? 'left-5' : 'left-0.5'}`} />
               </div>
             </button>
           ))}
           {memberUser && (
-            <div className="mt-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.07]">
+            <div className="mt-3 p-3 rounded-xl bg-[#f8faff] border border-[#dde8f8]">
               <div className="text-xs text-muted font-semibold mb-1.5">Current Membership Status</div>
               <div className="flex gap-2 flex-wrap">
                 {[
@@ -630,7 +630,7 @@ export default function AdminUsers() {
                   { key: 'pickleballMember',  label: 'Pickleball'   },
                 ].map(s => (
                   <span key={s.key} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    memberUser[s.key] ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/5 text-muted'
+                    memberUser[s.key] ? 'bg-yellow-500/20 text-yellow-300' : 'bg-[#f8faff] text-muted'
                   }`}>
                     {s.label}: {memberUser[s.key] ? '✓ Active' : '✗ None'}
                   </span>
@@ -649,7 +649,7 @@ export default function AdminUsers() {
       {/* Delete confirmation modal */}
       <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="🗑️ Delete User"
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all"
             onClick={() => setDeleteTarget(null)}>Cancel</button>
           <button disabled={deleting} onClick={doDelete}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2">

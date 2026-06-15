@@ -60,7 +60,7 @@ export default function AdminCourts() {
                 <span className="text-xs text-muted">Cap: {c.capacity||"—"}</span>
               </div>
               <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-white/5 border border-white/10 hover:bg-white/10 transition-all" onClick={()=>openEdit(c)}><Pencil size={11}/>Edit</button>
+                <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all" onClick={()=>openEdit(c)}><Pencil size={11}/>Edit</button>
                 <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all" onClick={()=>del(c.id)}><Trash2 size={11}/>Delete</button>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function AdminCourts() {
 
       <Modal open={showAdd||!!editItem} onClose={()=>{setShowAdd(false);setEditItem(null)}} title={(editItem?"Edit — ":"+  Add ")+(editItem?.name||"Court")} size="md"
         footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all" onClick={()=>{setShowAdd(false);setEditItem(null)}}>Cancel</button>
+          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all" onClick={()=>{setShowAdd(false);setEditItem(null)}}>Cancel</button>
           <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90 transition-all" onClick={save}>{editItem?"Save Changes":"Add Court"}</button>
         </>}>
         <div className="space-y-4">

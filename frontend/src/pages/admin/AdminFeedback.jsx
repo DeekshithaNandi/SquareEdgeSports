@@ -41,7 +41,7 @@ export default function AdminFeedback() {
                   <td className="text-xs text-muted max-w-[220px] truncate">{f.comment}</td>
                   <td className="text-xs text-muted">{f.createdAt?.slice(0,10)}</td>
                   <td>{f.reviewed ? <span className="badge-green">Reviewed</span> : <span className="badge-yellow">Pending</span>}</td>
-                  <td>{!f.reviewed && <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-white/10 hover:bg-white/10 transition-all" onClick={()=>markReviewed(f.id)}>Mark Reviewed</button>}</td>
+                  <td>{!f.reviewed && <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all" onClick={()=>markReviewed(f.id)}>Mark Reviewed</button>}</td>
                 </tr>
               ))}
             </tbody>

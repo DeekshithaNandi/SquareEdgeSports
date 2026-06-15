@@ -23,7 +23,7 @@ export default function StatCard({ title, label, value, icon, color, sub }) {
         style={{ background: resolvedColor }}
       />
       <div
-        className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-lg"
+        className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-[#f8faff] flex items-center justify-center text-lg"
         style={{ color: resolvedColor }}
       >
         {Icon ? <Icon size={18} /> : icon}

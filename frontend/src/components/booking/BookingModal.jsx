@@ -5,9 +5,9 @@ import { X, ChevronLeft, ChevronRight, CheckCircle, Clock, Loader, Calendar, Eye
 import toast from 'react-hot-toast'
 
 const TYPES = {
-  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', prices: [500, 400], memberKey: 'cricketLaneMember',  color: 'green',  bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-400' },
-  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', prices: [1500, 1200], memberKey: 'boxCricketMember', color: 'violet', bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-400' },
-  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', prices: [500, 400], memberKey: 'pickleballMember',   color: 'orange', bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-400' },
+  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', prices: [500, 400], memberKey: 'cricketLaneMember',  color: 'green',  bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', prices: [1500, 1200], memberKey: 'boxCricketMember', color: 'violet', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', prices: [500, 400], memberKey: 'pickleballMember',   color: 'orange', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
 }
 
 function today() { return new Date().toISOString().split('T')[0] }
@@ -246,7 +246,7 @@ export default function BookingModal({ initialType, onClose }) {
             }
           },
           prefill: { email: user?.email, name: user?.fullName },
-          theme:   { color: '#ff6b35' },
+          theme:   { color: '#1352c9' },
           modal:   {
             // ondismiss fires when the user closes the modal WITHOUT paying.
             // It also fires after a successful payment when the modal closes —
@@ -327,23 +327,23 @@ export default function BookingModal({ initialType, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={step < 4 ? onClose : undefined} />
 
-      <div className="relative w-full max-w-lg bg-bg border border-white/[0.1] rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-lg bg-bg border border-[#dde8f8] rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#dde8f8] flex-shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{typeInfo.emoji}</span>
             <div>
               <div className="font-bold text-sm">
                 {step === 5 ? 'Booking Confirmed!' : step === 'auth' ? 'Sign In to Book' : 'Book ' + typeInfo.label}
               </div>
-              <div className="text-[10px] text-white/35">
+              <div className="text-[10px] text-[#9aaac8]">
                 {step === 5 ? 'All done!' : `Step ${numericStep} of 4`}
               </div>
             </div>
           </div>
           {step !== 5 && (
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all">
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-[#0a1428] transition-all">
               <X size={15} />
             </button>
           )}
@@ -356,16 +356,16 @@ export default function BookingModal({ initialType, onClose }) {
               {stepLabels.map((label, i) => (
                 <div key={label} className="flex items-center gap-1 flex-1">
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold transition-all ${
-                    numericStep > i + 1 ? 'bg-orange-500 text-white' :
-                    numericStep === i + 1 ? 'bg-orange-500/20 border border-orange-500 text-orange-300' :
-                    'bg-white/5 border border-white/10 text-white/25'
+                    numericStep > i + 1 ? 'bg-blue-600 text-white' :
+                    numericStep === i + 1 ? 'bg-blue-600/20 border border-blue-600 text-blue-300' :
+                    'bg-[#f8faff] border border-[#dde8f8] text-[#9aaac8]'
                   }`}>{numericStep > i + 1 ? '✓' : i + 1}</div>
-                  {i < 3 && <div className={`flex-1 h-px ${numericStep > i + 1 ? 'bg-orange-500' : 'bg-white/10'}`} />}
+                  {i < 3 && <div className={`flex-1 h-px ${numericStep > i + 1 ? 'bg-blue-600' : 'bg-[#f0f5ff]'}`} />}
                 </div>
               ))}
             </div>
             <div className="flex justify-between mt-1">
-              {stepLabels.map(l => <span key={l} className="text-[9px] text-white/25 flex-1 text-center">{l}</span>)}
+              {stepLabels.map(l => <span key={l} className="text-[9px] text-[#9aaac8] flex-1 text-center">{l}</span>)}
             </div>
           </div>
         )}
@@ -376,18 +376,18 @@ export default function BookingModal({ initialType, onClose }) {
           {/* ── Step 1: Sport ── */}
           {step === 1 && (
             <div className="space-y-2.5">
-              <p className="text-xs text-white/40 mb-3">Select one sport per booking. You can book multiple slots of the same sport.</p>
+              <p className="text-xs text-[#5a6a8a] mb-3">Select one sport per booking. You can book multiple slots of the same sport.</p>
               {Object.entries(TYPES).map(([key, info]) => (
                 <button key={key} onClick={() => changeType(key)}
                   className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${
                     type === key
                       ? `${info.bg} ${info.border}`
-                      : 'bg-white/[0.03] border-white/[0.07] hover:border-white/20'
+                      : 'bg-[#f8faff] border-[#dde8f8] hover:border-[#dde8f8]'
                   }`}>
                   <span className="text-3xl">{info.emoji}</span>
                   <div className="flex-1">
                     <div className="font-semibold text-sm">{info.label}</div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
+                    <div className="text-[11px] text-[#5a6a8a] mt-0.5">
                       {key === 'CRICKET_LANE' ? `8 individual lanes · ₹${info.prices[0]}/session` :
                        key === 'BOX_CRICKET'  ? `Full box (4 lanes) · ₹${info.prices[0]}/session` :
                        `3 courts · ₹${info.prices[0]}/session`}
@@ -405,27 +405,28 @@ export default function BookingModal({ initialType, onClose }) {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">
+                <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">
                   <Calendar size={10} className="inline mr-1" /> Booking Date
                 </label>
                 <input type="date" value={date} min={today()} max={maxDate()}
                   onChange={e => { setDate(e.target.value); setSelSlots([]) }}
-                  className="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500/50 [color-scheme:dark]" />
+                  className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50 [color-scheme:light] cursor-pointer"
+                  style={{ color: '#0a1428' }} />
               </div>
 
               {type === 'BOX_CRICKET' && (
                 <div>
-                  <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">Select Box</label>
+                  <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">Select Box</label>
                   <div className="grid grid-cols-2 gap-3">
                     {['BOX_A', 'BOX_B'].map(b => (
                       <button key={b} onClick={() => { setBoxGroup(b); setSelSlots([]) }}
                         className={`p-3.5 rounded-xl border text-center transition-all ${
                           boxGroup === b
-                            ? 'bg-orange-500/15 border-orange-500/40 text-orange-300'
-                            : 'bg-white/[0.03] border-white/[0.08] text-white/55 hover:border-white/20'
+                            ? 'bg-blue-600/15 border-blue-600/40 text-blue-300'
+                            : 'bg-[#f8faff] border-[#dde8f8] text-[#5a6a8a] hover:border-[#dde8f8]'
                         }`}>
                         <div className="font-bold text-sm">{b.replace('_', ' ')}</div>
-                        <div className="text-[10px] mt-0.5 text-white/35">{b === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
+                        <div className="text-[10px] mt-0.5 text-[#9aaac8]">{b === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
                       </button>
                     ))}
                   </div>
@@ -433,13 +434,13 @@ export default function BookingModal({ initialType, onClose }) {
               )}
 
               {type === 'CRICKET_LANE' && (
-                <div className="bg-orange-500/[0.05] border border-orange-500/15 rounded-xl p-3.5 text-xs text-white/45 leading-relaxed">
-                  <strong className="text-orange-400">Lane Assignment:</strong> Your specific lane and box will be assigned by our team and confirmed via email.
+                <div className="bg-blue-600/[0.05] border border-blue-600/15 rounded-xl p-3.5 text-xs text-[#5a6a8a] leading-relaxed">
+                  <strong className="text-blue-400">Lane Assignment:</strong> Your specific lane and box will be assigned by our team and confirmed via email.
                 </div>
               )}
 
-              <div className="bg-orange-500/[0.05] border border-orange-500/15 rounded-xl p-3.5 text-xs text-white/45 leading-relaxed">
-                <strong className="text-orange-400">Note:</strong> Sessions are 55 minutes. Your exact lane/court will be assigned by our team and sent to your email.
+              <div className="bg-blue-600/[0.05] border border-blue-600/15 rounded-xl p-3.5 text-xs text-[#5a6a8a] leading-relaxed">
+                <strong className="text-blue-400">Note:</strong> Sessions are 55 minutes. Your exact lane/court will be assigned by our team and sent to your email.
               </div>
             </div>
           )}
@@ -450,19 +451,19 @@ export default function BookingModal({ initialType, onClose }) {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <div className="text-sm font-semibold">{date}</div>
-                  <div className="text-[10px] text-white/35">{typeInfo.label}{type === 'BOX_CRICKET' ? ` · ${boxGroup.replace('_', ' ')}` : ''}</div>
+                  <div className="text-[10px] text-[#9aaac8]">{typeInfo.label}{type === 'BOX_CRICKET' ? ` · ${boxGroup.replace('_', ' ')}` : ''}</div>
                 </div>
-                <button onClick={() => setStep(2)} className="text-[11px] text-orange-400 hover:text-orange-300 flex items-center gap-1">
+                <button onClick={() => setStep(2)} className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1">
                   <ChevronLeft size={11} /> Change
                 </button>
               </div>
 
-              <div className="text-[10px] text-white/35 mb-2.5 flex items-center gap-1.5">
-                <CheckCircle size={10} className="text-orange-400" /> Tap to select multiple slots (same sport only)
+              <div className="text-[10px] text-[#9aaac8] mb-2.5 flex items-center gap-1.5">
+                <CheckCircle size={10} className="text-blue-400" /> Tap to select multiple slots (same sport only)
               </div>
 
               {loadSlots ? (
-                <div className="flex justify-center py-10"><Loader size={22} className="text-orange-400 spin" /></div>
+                <div className="flex justify-center py-10"><Loader size={22} className="text-blue-400 spin" /></div>
               ) : (
                 <>
                   <div className="grid grid-cols-3 gap-2 mb-3">
@@ -476,11 +477,11 @@ export default function BookingModal({ initialType, onClose }) {
                           onClick={() => toggleSlot(slot)}
                           className={`p-2.5 rounded-xl border text-center transition-all text-xs ${
                             slotPast
-                              ? 'bg-white/[0.02] border-white/[0.05] text-white/20 cursor-not-allowed'
+                              ? 'bg-[#f8faff] border-[#dde8f8] text-[#9aaac8] cursor-not-allowed'
                               : !slot.available
                                 ? 'bg-red-500/[0.05] border-red-500/15 text-red-400/40 cursor-not-allowed'
                                 : selected
-                                  ? `${typeInfo.bg} ${typeInfo.border} ${typeInfo.text} font-bold ring-1 ring-orange-500/40`
+                                  ? `${typeInfo.bg} ${typeInfo.border} ${typeInfo.text} font-bold ring-1 ring-blue-600/40`
                                   : 'bg-green-500/[0.05] border-green-500/20 text-green-300 hover:bg-green-500/10'
                           }`}>
                           <Clock size={9} className="mx-auto mb-0.5" />
@@ -503,17 +504,17 @@ export default function BookingModal({ initialType, onClose }) {
                       </div>
                       <div className="space-y-1">
                         {selSlots.map(s => (
-                          <div key={s.startTime} className="text-xs font-semibold text-white/90">
+                          <div key={s.startTime} className="text-xs font-semibold text-m2">
                             {fmtTime(s.startTime)} – {fmtTime(s.endTime)}
                           </div>
                         ))}
                       </div>
-                      <div className="border-t border-white/10 mt-2 pt-2 space-y-1">
+                      <div className="border-t border-[#dde8f8] mt-2 pt-2 space-y-1">
                         {discountedTotal < totalAmount && (
                           <>
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] text-white/40">Original</span>
-                              <span className="text-xs text-white/40 line-through">₹{totalAmount}</span>
+                              <span className="text-[10px] text-[#5a6a8a]">Original</span>
+                              <span className="text-xs text-[#5a6a8a] line-through">₹{totalAmount}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-green-400 font-bold">
@@ -524,12 +525,12 @@ export default function BookingModal({ initialType, onClose }) {
                           </>
                         )}
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] text-white/40">Total to Pay</span>
-                          <span className="font-extrabold text-white text-sm">₹{discountedTotal}</span>
+                          <span className="text-[10px] text-[#5a6a8a]">Total to Pay</span>
+                          <span className="font-extrabold text-sm" style={{ color: '#0a1428' }}>₹{discountedTotal}</span>
                         </div>
                       </div>
                       {getUnitPrice().isMember && (
-                        <div className="text-[9px] text-orange-400 mt-0.5">✓ Member discount applied</div>
+                        <div className="text-[9px] text-blue-400 mt-0.5">✓ Member discount applied</div>
                       )}
                     </div>
                   )}
@@ -542,32 +543,33 @@ export default function BookingModal({ initialType, onClose }) {
           {step === 'auth' && (
             <div>
               <div className="text-center mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-orange-500/15 border border-orange-500/25 flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">
                   🔐
                 </div>
                 <div className="font-bold text-base mb-1">Sign in to complete booking</div>
-                <p className="text-xs text-white/40 leading-relaxed">
+                <p className="text-xs text-[#5a6a8a] leading-relaxed">
                   You've selected {selSlots.length} slot{selSlots.length > 1 ? 's' : ''} — sign in to confirm.
                 </p>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1.5">Email</label>
+                  <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
                   <input type="email" value={signInEmail} onChange={e => setSignInEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 focus:outline-none focus:border-orange-500/50" />
+                    className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50"
+                  style={{ color: '#0a1428' }} />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1.5">Password</label>
+                  <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Password</label>
                   <div className="relative">
                     <input type={showPw ? 'text' : 'password'} value={signInPassword}
                       onChange={e => setSignInPassword(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleGuestSignIn()}
                       placeholder="Your password"
-                      className="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-white/25 focus:outline-none focus:border-orange-500/50" />
+                      className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-white/25 focus:outline-none focus:border-blue-600/50" />
                     <button type="button" onClick={() => setShowPw(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/35 hover:text-white/70">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
                       {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
@@ -581,14 +583,14 @@ export default function BookingModal({ initialType, onClose }) {
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
                     !signInLoading && signInEmail && signInPassword
                       ? 'bg-accent hover:opacity-90 shadow-lg'
-                      : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
                   }`}>
                   {signInLoading ? <><Loader size={13} className="spin" /> Signing in…</> : 'Sign In & Confirm Booking'}
                 </button>
 
-                <p className="text-center text-[11px] text-white/35">
+                <p className="text-center text-[11px] text-[#9aaac8]">
                   No account?{' '}
-                  <a href="/register" className="text-orange-400 hover:text-orange-300" target="_blank" rel="noreferrer">Register here</a>
+                  <a href="/register" className="text-blue-400 hover:text-blue-300" target="_blank" rel="noreferrer">Register here</a>
                 </p>
               </div>
             </div>
@@ -600,16 +602,16 @@ export default function BookingModal({ initialType, onClose }) {
               <div className={`p-4 rounded-2xl border ${typeInfo.bg} ${typeInfo.border}`}>
                 <div className={`text-[10px] font-bold ${typeInfo.text} uppercase tracking-wider mb-3`}>Booking Summary</div>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-white/45">Sport</span><span className="font-semibold">{typeInfo.emoji} {typeInfo.label}</span></div>
-                  <div className="flex justify-between"><span className="text-white/45">Date</span><span className="font-semibold">{createdBookings[0]?.bookingDate}</span></div>
+                  <div className="flex justify-between"><span className="text-[#5a6a8a]">Sport</span><span className="font-semibold">{typeInfo.emoji} {typeInfo.label}</span></div>
+                  <div className="flex justify-between"><span className="text-[#5a6a8a]">Date</span><span className="font-semibold">{createdBookings[0]?.bookingDate}</span></div>
                   {createdBookings.map((b, i) => (
                     <div key={b.id} className="flex justify-between">
-                      <span className="text-white/45">Slot {i + 1}</span>
+                      <span className="text-[#5a6a8a]">Slot {i + 1}</span>
                       <span className="font-semibold">{fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}</span>
                     </div>
                   ))}
                   <div className="flex justify-between">
-                    <span className="text-white/45">Court / Lane</span>
+                    <span className="text-[#5a6a8a]">Court / Lane</span>
                     <span className="text-yellow-400 font-semibold text-xs">Assigned by admin via email</span>
                   </div>
                   {(() => {
@@ -619,18 +621,18 @@ export default function BookingModal({ initialType, onClose }) {
                     const actualTotal = createdBookings.reduce((s, b) => s + parseFloat(b.amountPaid || 0), 0)
                     const savings = Math.round(baseTotal - actualTotal)
                     return (
-                      <div className="border-t border-white/10 pt-2 mt-1 space-y-1.5">
+                      <div className="border-t border-[#dde8f8] pt-2 mt-1 space-y-1.5">
                         {memberApplied && (
                           <div className="flex justify-between items-center">
-                            <span className="text-[10px] text-orange-400 font-bold">✓ Member price</span>
-                            <span className="text-xs text-orange-400">₹{unitBase}/slot</span>
+                            <span className="text-[10px] text-blue-400 font-bold">✓ Member price</span>
+                            <span className="text-xs text-blue-400">₹{unitBase}/slot</span>
                           </div>
                         )}
                         {savings > 0 && (
                           <>
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] text-white/40">Original</span>
-                              <span className="text-xs text-white/40 line-through">₹{baseTotal}</span>
+                              <span className="text-[10px] text-[#5a6a8a]">Original</span>
+                              <span className="text-xs text-[#5a6a8a] line-through">₹{baseTotal}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-green-400 font-bold">🎉 CMS Discount</span>
@@ -639,7 +641,7 @@ export default function BookingModal({ initialType, onClose }) {
                           </>
                         )}
                         <div className="flex justify-between items-center">
-                          <span className="text-white/45 font-semibold">Total Due</span>
+                          <span className="text-[#5a6a8a] font-semibold">Total Due</span>
                           <span className="text-xl font-extrabold">₹{Math.round(actualTotal)}</span>
                         </div>
                       </div>
@@ -648,7 +650,7 @@ export default function BookingModal({ initialType, onClose }) {
                 </div>
               </div>
 
-              <div className="bg-orange-500/[0.05] border border-orange-500/15 rounded-xl p-3.5 text-xs text-orange-300 leading-relaxed">
+              <div className="bg-blue-600/[0.05] border border-blue-600/15 rounded-xl p-3.5 text-xs text-blue-300 leading-relaxed">
                 <strong>Secure Payment:</strong> You'll be redirected to Razorpay's secure checkout. UPI, cards, net banking accepted.
               </div>
 
@@ -656,8 +658,8 @@ export default function BookingModal({ initialType, onClose }) {
                 <strong>Lane/Court Assignment:</strong> Our team will assign your specific lane or court and notify you by email.
               </div>
 
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3.5 text-xs text-white/35 leading-relaxed">
-                <strong className="text-white/50">Cancellation:</strong> · 24+ hrs → Full refund · 1–24 hrs → 50% refund · &lt;1 hr → No refund
+              <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3.5 text-xs text-[#9aaac8] leading-relaxed">
+                <strong className="text-[#5a6a8a]">Cancellation:</strong> · 24+ hrs → Full refund · 1–24 hrs → 50% refund · &lt;1 hr → No refund
               </div>
 
               {/* ── Test Mode Credentials ── */}
@@ -669,33 +671,33 @@ export default function BookingModal({ initialType, onClose }) {
                 {/* UPI — easiest */}
                 <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
                   <div className="text-[10px] text-green-400 font-bold mb-0.5">✅ Easiest — UPI</div>
-                  <div className="font-mono font-bold text-white/90">success@razorpay</div>
+                  <div className="font-mono font-bold text-m2">success@razorpay</div>
                 </div>
 
                 {/* Domestic card */}
-                <div className="bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 space-y-1.5">
-                  <div className="text-[10px] text-white/40 font-bold">💳 Domestic Mastercard</div>
+                <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-lg px-3 py-2 space-y-1.5">
+                  <div className="text-[10px] text-[#5a6a8a] font-bold">💳 Domestic Mastercard</div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
                     <div>
-                      <div className="text-white/30 mb-0.5">Card Number</div>
-                      <div className="font-mono font-bold text-white/80">5267 3181 8797 5449</div>
+                      <div className="text-[#9aaac8] mb-0.5">Card Number</div>
+                      <div className="font-mono font-bold text-m2">5267 3181 8797 5449</div>
                     </div>
                     <div>
-                      <div className="text-white/30 mb-0.5">Expiry / CVV</div>
-                      <div className="font-mono font-bold text-white/80">12/29 · 123</div>
+                      <div className="text-[#9aaac8] mb-0.5">Expiry / CVV</div>
+                      <div className="font-mono font-bold text-m2">12/29 · 123</div>
                     </div>
                     <div>
-                      <div className="text-white/30 mb-0.5">Name</div>
-                      <div className="font-mono font-bold text-white/80">Any name</div>
+                      <div className="text-[#9aaac8] mb-0.5">Name</div>
+                      <div className="font-mono font-bold text-m2">Any name</div>
                     </div>
                     <div>
-                      <div className="text-white/30 mb-0.5">OTP</div>
-                      <div className="font-mono font-bold text-white/80">Any 6 digits</div>
+                      <div className="text-[#9aaac8] mb-0.5">OTP</div>
+                      <div className="font-mono font-bold text-m2">Any 6 digits</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="text-[10px] text-white/30 pt-0.5">
+                <div className="text-[10px] text-[#9aaac8] pt-0.5">
                   Net banking: select any bank → proceed → success
                 </div>
               </div>
@@ -709,15 +711,15 @@ export default function BookingModal({ initialType, onClose }) {
                 <CheckCircle size={30} className="text-green-400" />
               </div>
               <h3 className="text-xl font-extrabold mb-2">Booking Confirmed!</h3>
-              <p className="text-white/45 text-sm mb-5 leading-relaxed">
+              <p className="text-[#5a6a8a] text-sm mb-5 leading-relaxed">
                 Your {selSlots.length} slot{selSlots.length > 1 ? 's are' : ' is'} booked. We'll assign your lane/court and email you shortly.
               </p>
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-xs text-left space-y-2 mb-5">
-                <div className="flex justify-between"><span className="text-white/40">Sport</span><span>{typeInfo.emoji} {typeInfo.label}</span></div>
-                <div className="flex justify-between"><span className="text-white/40">Date</span><span>{createdBookings[0]?.bookingDate}</span></div>
+              <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-4 text-xs text-left space-y-2 mb-5">
+                <div className="flex justify-between"><span className="text-[#5a6a8a]">Sport</span><span>{typeInfo.emoji} {typeInfo.label}</span></div>
+                <div className="flex justify-between"><span className="text-[#5a6a8a]">Date</span><span>{createdBookings[0]?.bookingDate}</span></div>
                 {createdBookings.map((b, i) => (
                   <div key={b.id} className="flex justify-between">
-                    <span className="text-white/40">Slot {i + 1}</span>
+                    <span className="text-[#5a6a8a]">Slot {i + 1}</span>
                     <span className="font-mono text-[10px]">{fmtTime(b.startTime?.toString())} · Ref: {b.paymentReference?.slice(0, 12)}</span>
                   </div>
                 ))}
@@ -729,16 +731,16 @@ export default function BookingModal({ initialType, onClose }) {
 
         {/* Footer navigation */}
         {step !== 5 && step !== 'auth' && step !== 4 && (
-          <div className="px-6 py-4 border-t border-white/[0.07] flex items-center justify-between gap-3 flex-shrink-0">
+          <div className="px-6 py-4 border-t border-[#dde8f8] flex items-center justify-between gap-3 flex-shrink-0">
             <button onClick={goBack}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all">
               <ChevronLeft size={13} /> {step === 1 ? 'Cancel' : 'Back'}
             </button>
             <button onClick={goNext} disabled={!canGoNext() || creating}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
                 canGoNext() && !creating
                   ? 'bg-accent hover:opacity-90 text-white shadow-lg'
-                  : 'bg-white/5 text-white/25 cursor-not-allowed'
+                  : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
               }`}>
               {creating && <Loader size={12} className="spin" />}
               {step === 3 ? (user ? 'Review Booking' : 'Continue to Sign In') : 'Continue'}
@@ -748,18 +750,18 @@ export default function BookingModal({ initialType, onClose }) {
         )}
 
         {step === 'auth' && (
-          <div className="px-6 py-3 border-t border-white/[0.07] flex-shrink-0">
+          <div className="px-6 py-3 border-t border-[#dde8f8] flex-shrink-0">
             <button onClick={() => setStep(3)}
-              className="flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors">
+              className="flex items-center gap-1.5 text-xs text-[#9aaac8] hover:text-[#5a6a8a] transition-colors">
               <ChevronLeft size={11} /> Back to slot selection
             </button>
           </div>
         )}
 
         {step === 4 && (
-          <div className="px-6 py-4 border-t border-white/[0.07] flex-shrink-0">
+          <div className="px-6 py-4 border-t border-[#dde8f8] flex-shrink-0">
             <button onClick={confirmAllPayments} disabled={paying}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm bg-accent hover:opacity-90 transition-all shadow-2xl shadow-orange-500/20 disabled:opacity-60">
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm bg-accent hover:opacity-90 transition-all shadow-2xl shadow-blue-600/20 disabled:opacity-60">
               {paying
                 ? <><Loader size={14} className="spin" /> Processing…</>
                 : <>🔐 Pay ₹{createdBookings.reduce((s, b) => s + parseFloat(b.amountPaid || 0), 0).toFixed(0)} via Razorpay</>

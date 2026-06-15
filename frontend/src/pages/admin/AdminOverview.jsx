@@ -42,7 +42,7 @@ export default function AdminOverview() {
       </div>
 
       <div className="card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#dde8f8]">
           <div className="flex items-center gap-2">
             <CalendarDays size={16} className="text-accent" />
             <span className="font-bold text-sm">Today's Bookings</span>
@@ -97,7 +97,7 @@ export default function AdminOverview() {
             { label: 'All Employees', to: '/admin/users?role=EMPLOYEE', icon: UserCheck, color: 'text-purple-400'},
           ].map(({ label, to, icon: Icon, color }) => (
             <Link key={label} to={to}
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:bg-white/[0.06] hover:border-accent/30 transition-all cursor-pointer group">
+              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f8faff] hover:border-accent/30 transition-all cursor-pointer group">
               <Icon size={20} className={`${color} group-hover:scale-110 transition-transform`} />
               <span className="text-xs font-semibold text-center">{label}</span>
             </Link>

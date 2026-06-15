@@ -24,7 +24,7 @@ function CmsBlock({ item, onDismiss }) {
           <img src={item.imageUrl} alt={item.title}
             className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
         )}
-        <div className="relative px-6 py-5 border border-white/[0.08] rounded-2xl"
+        <div className="relative px-6 py-5 border border-[#dde8f8] rounded-2xl"
           style={{ background: item.imageUrl ? 'linear-gradient(135deg,rgba(124,92,252,0.25),rgba(79,142,247,0.15))' : '' }}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
@@ -36,7 +36,7 @@ function CmsBlock({ item, onDismiss }) {
               )}
             </div>
             <button onClick={() => onDismiss(item.id)}
-              className="p-1 rounded-lg text-muted hover:text-white hover:bg-white/10 transition-all flex-shrink-0">
+              className="p-1 rounded-lg text-muted hover:text-white hover:bg-[#f0f5ff] transition-all flex-shrink-0">
               <X size={14} />
             </button>
           </div>
@@ -58,7 +58,7 @@ function CmsBlock({ item, onDismiss }) {
           )}
         </div>
         <button onClick={() => onDismiss(item.id)}
-          className="p-1 rounded-lg text-muted hover:text-white hover:bg-white/10 transition-all flex-shrink-0 mt-0.5">
+          className="p-1 rounded-lg text-muted hover:text-white hover:bg-[#f0f5ff] transition-all flex-shrink-0 mt-0.5">
           <X size={12} />
         </button>
       </div>
@@ -126,7 +126,7 @@ export default function UserDashboard() {
             }
           },
           prefill: { email: user?.email, name: user?.fullName },
-          theme: { color: '#ff6b35' },
+          theme: { color: '#1352c9' },
           modal: { ondismiss: () => reject(new Error('dismissed')) },
         }
         new window.Razorpay(options).open()
@@ -158,7 +158,7 @@ export default function UserDashboard() {
           <p className="text-sm text-muted">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all" onClick={() => navigate('/bookings')}>My Bookings</button>
+          <button className="px-4 py-2 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all" onClick={() => navigate('/bookings')}>My Bookings</button>
           <button className="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-accent to-a2 text-white hover:opacity-90 transition-all" onClick={() => navigate('/feedback')}>+ Feedback</button>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function UserDashboard() {
               <div key={sport.key} className={`card p-4 border ${
                 isMember
                   ? 'border-green-500/30 bg-green-500/[0.04]'
-                  : 'border-white/[0.07]'
+                  : 'border-[#dde8f8]'
               }`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -216,7 +216,7 @@ export default function UserDashboard() {
                       <CheckCircle size={9} /> MEMBER
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[10px] font-bold uppercase">
+                    <span className="px-2 py-0.5 rounded-full bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] text-[10px] font-bold uppercase">
                       NON-MEMBER
                     </span>
                   )}
@@ -238,16 +238,16 @@ export default function UserDashboard() {
                   <button
                     onClick={() => handleGetMembership(sport)}
                     disabled={buyingMembership === sport.key}
-                    className="w-full py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-600 to-orange-600 hover:opacity-90 transition-all text-white flex items-center justify-center gap-1.5">
+                    className="w-full py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-700 to-blue-600 hover:opacity-90 transition-all text-white flex items-center justify-center gap-1.5">
                     {buyingMembership === sport.key
-                      ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing…</>
+                      ? <><span className="w-3 h-3 border-2 border-[#dde8f8] border-t-white rounded-full animate-spin" />Processing…</>
                       : <><Crown size={11} /> Get Membership — ₹{sport.fee}</>}
                   </button>
                 ) : (
                   <button
                     onClick={() => handleGetMembership(sport)}
                     disabled={buyingMembership === sport.key}
-                    className="w-full py-2 rounded-xl text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white/60">
+                    className="w-full py-2 rounded-xl text-xs font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all text-[#5a6a8a]">
                     {buyingMembership === sport.key ? 'Processing…' : '↻ Renew (+30 days)'}
                   </button>
                 )}

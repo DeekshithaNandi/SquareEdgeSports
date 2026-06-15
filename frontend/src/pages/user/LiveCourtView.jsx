@@ -38,8 +38,8 @@ function fmtTime(t) {
 
 function typeColor(t) {
   if (t === 'CRICKET_LANE') return { badge: 'bg-green-500/15 text-green-300 border-green-500/25', dot: 'bg-green-400' }
-  if (t === 'BOX_CRICKET')  return { badge: 'bg-orange-500/15 text-orange-300 border-orange-500/25', dot: 'bg-orange-400' }
-  return { badge: 'bg-orange-500/15 text-orange-300 border-orange-500/25', dot: 'bg-orange-400' }
+  if (t === 'BOX_CRICKET')  return { badge: 'bg-blue-600/15 text-blue-300 border-blue-600/25', dot: 'bg-blue-400' }
+  return { badge: 'bg-blue-600/15 text-blue-300 border-blue-600/25', dot: 'bg-blue-400' }
 }
 
 function typeLabel(t) {
@@ -94,16 +94,16 @@ export default function LiveCourtView() {
   })
 
   return (
-    <div className="min-h-screen bg-bg text-white">
+    <div className="min-h-screen bg-bg">
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-xl border-b border-white/[0.07] px-4 sm:px-6 py-4">
+      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-xl border-b border-[#dde8f8] px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="p-2 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-all">
+            <Link to="/" className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-white transition-all">
               <ArrowLeft size={16} />
             </Link>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center">
               <Zap size={14} className="text-white" />
             </div>
             <div>
@@ -114,16 +114,16 @@ export default function LiveCourtView() {
                   LIVE
                 </span>
               </div>
-              <div className="text-[11px] text-white/40">SquareEdgeSports · Updates every 30s</div>
+              <div className="text-[11px] text-[#5a6a8a]">SquareEdgeSports · Updates every 30s</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <div className="text-sm font-bold font-mono">{time}</div>
-              {lastSync && <div className="text-[10px] text-white/30">Synced {lastSync}</div>}
+              {lastSync && <div className="text-[10px] text-[#9aaac8]">Synced {lastSync}</div>}
             </div>
             <button onClick={load} disabled={loading}
-              className="p-2 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-all">
+              className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-white transition-all">
               <RefreshCw size={15} className={loading ? 'spin' : ''} />
             </button>
           </div>
@@ -137,12 +137,12 @@ export default function LiveCourtView() {
           {[
             { label: 'Active Now', val: active.length, icon: <Activity size={16} />, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
             { label: 'Upcoming',   val: upcoming.length, icon: <Clock size={16} />,    color: 'text-blue-400',  bg: 'bg-blue-500/10 border-blue-500/20' },
-            { label: "Today's Total", val: bookings.length, icon: <Users size={16} />, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+            { label: "Today's Total", val: bookings.length, icon: <Users size={16} />, color: 'text-blue-400', bg: 'bg-blue-600/10 border-blue-600/20' },
           ].map(s => (
             <div key={s.label} className={`border rounded-2xl p-4 text-center ${s.bg}`}>
               <div className={`${s.color} flex justify-center mb-1`}>{s.icon}</div>
               <div className={`text-2xl font-extrabold ${s.color}`}>{s.val}</div>
-              <div className="text-xs text-white/40 mt-0.5">{s.label}</div>
+              <div className="text-xs text-[#5a6a8a] mt-0.5">{s.label}</div>
             </div>
           ))}
         </div>
@@ -153,39 +153,39 @@ export default function LiveCourtView() {
           <>
             {/* -- Cricket Lane Grid -------------------------------------------- */}
             <div>
-              <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-[#5a6a8a] uppercase tracking-wider mb-4 flex items-center gap-2">
                 🏏 Cricket Courts
-                <span className="text-[10px] font-normal text-white/30 normal-case">8 lanes across 2 boxes</span>
+                <span className="text-[10px] font-normal text-[#9aaac8] normal-case">8 lanes across 2 boxes</span>
               </h2>
 
               {['BOX_A', 'BOX_B'].map(box => (
                 <div key={box} className="mb-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="text-xs font-bold text-white/40 uppercase">{box.replace('_', ' ')}</div>
-                    <div className="flex-1 h-px bg-white/[0.06]" />
-                    <div className="text-[10px] text-white/30">{box === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
+                    <div className="text-xs font-bold text-[#5a6a8a] uppercase">{box.replace('_', ' ')}</div>
+                    <div className="flex-1 h-px bg-[#f8faff]" />
+                    <div className="text-[10px] text-[#9aaac8]">{box === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {laneGrid.filter(l => l.box === box).map(({ lane, booking: b }) => (
                       <div key={lane} className={`rounded-2xl border p-4 transition-all ${
                         b
                           ? 'bg-green-500/[0.08] border-green-500/25'
-                          : 'bg-white/[0.03] border-white/[0.06]'
+                          : 'bg-[#f8faff] border-[#dde8f8]'
                       }`}>
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-xs font-bold text-white/50">Lane {lane}</span>
-                          <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-green-400 animate-pulse' : 'bg-white/20'}`} />
+                          <span className="text-xs font-bold text-[#5a6a8a]">Lane {lane}</span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-green-400 animate-pulse' : 'bg-[#f0f5ff]'}`} />
                         </div>
                         {b ? (
                           <>
                             <div className="text-xs font-semibold truncate">{b.userName}</div>
-                            <div className="text-[10px] text-white/40 mt-0.5">
+                            <div className="text-[10px] text-[#5a6a8a] mt-0.5">
                               {fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}
                             </div>
                             <div className="text-[10px] text-green-400 mt-1 font-semibold">● Playing</div>
                           </>
                         ) : (
-                          <div className="text-xs text-white/25 mt-1">Available</div>
+                          <div className="text-xs text-[#9aaac8] mt-1">Available</div>
                         )}
                       </div>
                     ))}
@@ -196,31 +196,31 @@ export default function LiveCourtView() {
 
             {/* -- Pickleball Courts -------------------------------------------- */}
             <div>
-              <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-[#5a6a8a] uppercase tracking-wider mb-4 flex items-center gap-2">
                 🏓 Pickleball Courts
-                <span className="text-[10px] font-normal text-white/30 normal-case">3 courts</span>
+                <span className="text-[10px] font-normal text-[#9aaac8] normal-case">3 courts</span>
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 {pickleGrid.map(({ court, booking: b }) => (
                   <div key={court} className={`rounded-2xl border p-4 transition-all ${
                     b
-                      ? 'bg-orange-500/[0.08] border-orange-500/25'
-                      : 'bg-white/[0.03] border-white/[0.06]'
+                      ? 'bg-blue-600/[0.08] border-blue-600/25'
+                      : 'bg-[#f8faff] border-[#dde8f8]'
                   }`}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold text-white/50">Court {court}</span>
-                      <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-orange-400 animate-pulse' : 'bg-white/20'}`} />
+                      <span className="text-xs font-bold text-[#5a6a8a]">Court {court}</span>
+                      <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-blue-400 animate-pulse' : 'bg-[#f0f5ff]'}`} />
                     </div>
                     {b ? (
                       <>
                         <div className="text-xs font-semibold truncate">{b.userName}</div>
-                        <div className="text-[10px] text-white/40 mt-0.5">
+                        <div className="text-[10px] text-[#5a6a8a] mt-0.5">
                           {fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}
                         </div>
-                        <div className="text-[10px] text-orange-400 mt-1 font-semibold">● Playing</div>
+                        <div className="text-[10px] text-blue-400 mt-1 font-semibold">● Playing</div>
                       </>
                     ) : (
-                      <div className="text-xs text-white/25 mt-1">Available</div>
+                      <div className="text-xs text-[#9aaac8] mt-1">Available</div>
                     )}
                   </div>
                 ))}
@@ -230,7 +230,7 @@ export default function LiveCourtView() {
             {/* -- Upcoming next 2 hrs ------------------------------------------ */}
             {upcoming.length > 0 && (
               <div>
-                <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-4">
+                <h2 className="text-sm font-bold text-[#5a6a8a] uppercase tracking-wider mb-4">
                   🕐 Upcoming (Next 2 Hours)
                 </h2>
                 <div className="space-y-2">
@@ -241,7 +241,7 @@ export default function LiveCourtView() {
                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${c.dot}`} />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold truncate">{b.userName}</div>
-                          <div className="text-[11px] text-white/40">{typeLabel(b.bookingType)}
+                          <div className="text-[11px] text-[#5a6a8a]">{typeLabel(b.bookingType)}
                             {b.laneNumber ? ` · Lane ${b.laneNumber}` : ''}
                             {b.boxGroup   ? ` · ${b.boxGroup.replace('_',' ')}` : ''}
                             {b.courtNumber ? ` · Court ${b.courtNumber}` : ''}
@@ -249,7 +249,7 @@ export default function LiveCourtView() {
                         </div>
                         <div className="text-right flex-shrink-0">
                           <div className="text-xs font-bold">{fmtTime(b.startTime?.toString())}</div>
-                          <div className="text-[10px] text-white/40">{fmtTime(b.endTime?.toString())}</div>
+                          <div className="text-[10px] text-[#5a6a8a]">{fmtTime(b.endTime?.toString())}</div>
                         </div>
                       </div>
                     )
@@ -259,10 +259,10 @@ export default function LiveCourtView() {
             )}
 
             {active.length === 0 && upcoming.length === 0 && (
-              <div className="text-center py-14 text-white/30">
+              <div className="text-center py-14 text-[#9aaac8]">
                 <Activity size={32} className="mx-auto mb-3 opacity-30" />
                 <div className="text-sm">No active or upcoming sessions right now</div>
-                <Link to="/" className="mt-4 inline-flex items-center gap-1.5 text-xs text-orange-400 hover:text-orange-300">
+                <Link to="/" className="mt-4 inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300">
                   Book a session →
                 </Link>
               </div>

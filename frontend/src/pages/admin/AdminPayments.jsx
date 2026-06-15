@@ -29,7 +29,7 @@ function Select({ value, onChange, options, label }) {
   return (
     <div className="relative">
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="appearance-none bg-white/5 border border-white/10 rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent transition-all cursor-pointer [color-scheme:dark]">
+        className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent transition-all cursor-pointer [color-scheme:dark]">
         {options.map(o => (
           <option key={o.value ?? o} value={o.value ?? o}>
             {o.label ?? (o === 'ALL' ? `All ${label}` : o.replace(/_/g, ' '))}
@@ -153,7 +153,7 @@ export default function AdminPayments() {
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search by player name or email…"
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
+              className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white">
                 <X size={12} />
@@ -162,7 +162,7 @@ export default function AdminPayments() {
           </div>
 
           {/* Status pills */}
-          <div className="flex gap-1 bg-white/5 rounded-xl p-1 flex-wrap">
+          <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1 flex-wrap">
             {STATUSES.map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
@@ -183,18 +183,18 @@ export default function AdminPayments() {
           <Select value={methodFilter} onChange={setMethodFilter} label="Methods"
             options={METHODS.map(m => ({ value: m, label: m === 'ALL' ? 'All Methods' : m.replace(/_/g, ' ') }))} />
 
-          <div className="w-px h-5 bg-white/10" />
+          <div className="w-px h-5 bg-[#f0f5ff]" />
 
           {/* Date type toggle */}
-          <div className="flex gap-1 bg-white/5 rounded-xl p-1">
+          <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
             <button onClick={() => setDateType('slot')}
               className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-                (dateType === 'slot' ? 'bg-white/15 text-white' : 'text-muted hover:text-white')}>
+                (dateType === 'slot' ? 'bg-[#f8faff] text-white' : 'text-muted hover:text-white')}>
               📅 Slot Date
             </button>
             <button onClick={() => setDateType('booking')}
               className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-                (dateType === 'booking' ? 'bg-white/15 text-white' : 'text-muted hover:text-white')}>
+                (dateType === 'booking' ? 'bg-[#f8faff] text-white' : 'text-muted hover:text-white')}>
               🕐 Booked On
             </button>
           </div>
@@ -203,20 +203,20 @@ export default function AdminPayments() {
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-muted font-bold">From</span>
             <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
             <span className="text-[11px] text-muted font-bold">To</span>
             <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
               min={fromDate || undefined}
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
             {(fromDate || toDate) && (
               <button onClick={() => { setFromDate(''); setToDate('') }}
-                className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 transition-all">
+                className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8] transition-all">
                 <X size={11} />
               </button>
             )}
           </div>
 
-          <div className="w-px h-5 bg-white/10" />
+          <div className="w-px h-5 bg-[#f0f5ff]" />
 
           {/* Sort */}
           <div className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export default function AdminPayments() {
             {sportFilter  !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/15 text-green-300 border border-green-500/30">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
             {methodFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-500/15 text-yellow-300 border border-yellow-500/30">Method: {methodFilter}</span>}
             {(fromDate || toDate)   && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">{dateType === 'slot' ? 'Slot' : 'Booked'}: {fromDate || '…'} → {toDate || '…'}</span>}
-            {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/10 text-white/60 border border-white/20">Sort: Oldest First</span>}
+            {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f0f5ff] text-[#5a6a8a] border border-[#dde8f8]">Sort: Oldest First</span>}
           </div>
         )}
       </div>

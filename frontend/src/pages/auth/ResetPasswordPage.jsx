@@ -1,8 +1,10 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { authAPI } from '../../api'
 import toast from 'react-hot-toast'
 import { Zap, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
+
+const cardStyle = { background: '#ffffff', border: '1px solid #dde8f8' }
 
 export default function ResetPasswordPage() {
   const [params]         = useSearchParams()
@@ -40,30 +42,30 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-5"
-      className="min-h-screen" style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(255,107,53,0.08) 0%, #0d0f14 55%)' }}>
+    <div className="min-h-screen flex items-center justify-center p-5" style={{ background: '#f0f5ff' }}>
       <div className="w-full max-w-[420px]">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-a2 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#1352c9' }}>
               <Zap size={18} className="text-white" fill="white" />
             </div>
-            <div className="font-display text-2xl font-bold bg-gradient-to-r from-accent to-a2 bg-clip-text text-transparent">
+            <div className="font-display text-2xl font-bold" style={{ color: '#1352c9' }}>
               SquareEdgeSports
             </div>
           </div>
         </div>
 
-        <div className="bg-surface/90 backdrop-blur border border-white/10 rounded-2xl p-8 shadow-2xl">
+        <div className="rounded-2xl p-8 shadow-lg" style={cardStyle}>
           {!done ? (
             <>
-              <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4">
-                <Lock size={22} className="text-accent" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+                style={{ background: 'rgba(19,82,201,.10)', border: '1px solid rgba(19,82,201,.20)' }}>
+                <Lock size={22} style={{ color: '#1352c9' }} />
               </div>
-              <h2 className="font-display text-2xl font-bold mb-1">
+              <h2 className="font-display text-2xl font-bold mb-1" style={{ color: '#0a1428' }}>
                 {isInvite ? 'Set up your account' : 'Reset password'}
               </h2>
-              <p className="text-sm text-muted mb-7">
+              <p className="text-sm mb-7" style={{ color: '#5a6a8a' }}>
                 {isInvite
                   ? 'Welcome! Create a secure password to activate your account.'
                   : 'Enter a new password for your account.'}
@@ -71,29 +73,28 @@ export default function ResetPasswordPage() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">New Password</label>
+                  <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#5a6a8a' }}>New Password</label>
                   <div className="relative">
                     <input className="inp pr-10" type={showPw ? 'text' : 'password'}
                       placeholder="Min. 8 characters" value={form.newPassword}
                       onChange={e => { setForm(f => ({ ...f, newPassword: e.target.value })); setErr('') }} required />
                     <button type="button" onClick={() => setShowPw(s => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: '#5a6a8a' }}>
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Confirm Password</label>
+                  <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#5a6a8a' }}>Confirm Password</label>
                   <input className="inp" type="password" placeholder="Repeat new password"
                     value={form.confirm} onChange={e => { setForm(f => ({ ...f, confirm: e.target.value })); setErr('') }} required />
                 </div>
 
-                {/* Password strength checks */}
                 {(form.newPassword || form.confirm) && (
-                  <div className="space-y-1.5 bg-white/[0.03] rounded-xl p-3">
+                  <div className="space-y-1.5 rounded-xl p-3" style={{ background: '#f8faff', border: '1px solid #dde8f8' }}>
                     {checks.map(c => (
-                      <div key={c.label} className={`flex items-center gap-2 text-xs ${c.ok ? 'text-green-400' : 'text-muted'}`}>
+                      <div key={c.label} className={`flex items-center gap-2 text-xs ${c.ok ? 'text-green-600' : 'text-[#9aaac8]'}`}>
                         {c.ok ? <CheckCircle size={12} /> : <XCircle size={12} />}
                         {c.label}
                       </div>
@@ -101,7 +102,7 @@ export default function ResetPasswordPage() {
                   </div>
                 )}
 
-                {err && <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-xs text-red-400">{err}</div>}
+                {err && <div className="rounded-xl px-4 py-3 text-xs" style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#dc2626' }}>{err}</div>}
 
                 <button type="submit" disabled={loading} className="btn-primary flex items-center justify-center gap-2">
                   {loading
@@ -112,18 +113,18 @@ export default function ResetPasswordPage() {
             </>
           ) : (
             <div className="text-center py-4">
-              <div className="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle size={28} className="text-green-400" />
+              <div className="w-14 h-14 rounded-full bg-green-100 border border-green-300 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle size={28} className="text-green-600" />
               </div>
-              <h2 className="font-display text-xl font-bold mb-2">
+              <h2 className="font-display text-xl font-bold mb-2" style={{ color: '#0a1428' }}>
                 {isInvite ? 'Account activated!' : 'Password updated!'}
               </h2>
-              <p className="text-sm text-muted">Redirecting you to sign in…</p>
+              <p className="text-sm" style={{ color: '#5a6a8a' }}>Redirecting you to sign in…</p>
             </div>
           )}
 
-          <div className="mt-6 pt-5 border-t border-white/[0.06] text-center">
-            <Link to="/login" className="text-sm text-muted hover:text-white transition-colors">
+          <div className="mt-6 pt-5 text-center" style={{ borderTop: '1px solid #dde8f8' }}>
+            <Link to="/login" className="text-sm hover:text-accent transition-colors" style={{ color: '#5a6a8a' }}>
               Back to Sign In
             </Link>
           </div>

@@ -3,11 +3,13 @@ package com.squareedgesports.controller;
 import com.squareedgesports.entity.Court;
 import com.squareedgesports.repository.*;
 import com.squareedgesports.service.BookingService;
+import com.squareedgesports.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController @RequestMapping("/api/public") @RequiredArgsConstructor
 public class PublicController {
@@ -16,6 +18,7 @@ public class PublicController {
     private final PricingRuleRepository pricingRepo;
     private final CmsContentRepository  cmsRepo;
     private final BookingService        bookingService;
+    private final EmailService          emailService;
 
     @GetMapping("/courts")
     public ResponseEntity<?> courts() {
@@ -48,5 +51,20 @@ public class PublicController {
     @GetMapping("/live-view")
     public ResponseEntity<?> liveView() {
         return ResponseEntity.ok(bookingService.getLiveView(LocalDate.now()));
+    }
+
+    @PostMapping("/contact")
+    public ResponseEntity<?> contact(@RequestBody Map<String, String> body) {
+        String name    = body.getOrDefault("name",    "").trim();
+        String email   = body.getOrDefault("email",   "").trim();
+        String subject = body.getOrDefault("subject", "").trim();
+        String message = body.getOrDefault("message", "").trim();
+
+        if (name.isEmpty() || email.isEmpty() || message.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Name, email and message are required."));
+        }
+
+        emailService.sendContactEmail(name, email, subject, message);
+        return ResponseEntity.ok(Map.of("message", "Message sent successfully!"));
     }
 }

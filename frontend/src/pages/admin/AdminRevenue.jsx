@@ -7,7 +7,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-s2 border border-white/10 rounded-xl px-4 py-3 text-xs">
+    <div className="bg-s2 border border-[#dde8f8] rounded-xl px-4 py-3 text-xs">
       <div className="font-bold mb-1 text-white">{label}</div>
       {payload.map(p => (
         <div key={p.name} style={{ color: p.color }} className="font-semibold">

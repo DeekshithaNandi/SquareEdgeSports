@@ -206,9 +206,9 @@ export default function AddressAutocomplete({
       </div>
 
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1.5 bg-bg border border-white/[0.12] rounded-xl shadow-2xl overflow-hidden">
+        <div className="absolute z-50 w-full mt-1.5 bg-bg border border-[#dde8f8] rounded-xl shadow-2xl overflow-hidden">
 
-          <div className="px-4 py-2.5 bg-accent/[0.06] border-b border-white/[0.07]">
+          <div className="px-4 py-2.5 bg-accent/[0.06] border-b border-[#dde8f8]">
             <div className="text-[10px] text-muted uppercase tracking-wider mb-0.5">
               Your address line 1 (door no. preserved)
             </div>
@@ -225,8 +225,8 @@ export default function AddressAutocomplete({
               type="button"
               onMouseDown={e => { e.preventDefault(); handleSelect(item) }}
               onMouseEnter={() => setHighlighted(i)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left border-t border-white/[0.04] transition-colors ${
-                highlighted === i ? 'bg-accent/10' : 'hover:bg-white/[0.04]'
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left border-t border-[#dde8f8] transition-colors ${
+                highlighted === i ? 'bg-accent/10' : 'hover:bg-[#f8faff]'
               }`}
             >
               <MapPin size={12} className={`flex-shrink-0 ${highlighted === i ? 'text-accent' : 'text-muted'}`} />
@@ -240,7 +240,7 @@ export default function AddressAutocomplete({
             </button>
           ))}
 
-          <div className="px-4 py-1.5 border-t border-white/[0.05] bg-white/[0.02] text-[10px] text-muted">
+          <div className="px-4 py-1.5 border-t border-[#dde8f8] bg-[#f8faff] text-[10px] text-muted">
             🗺 Powered by Google Maps · Door number preserved as typed
           </div>
         </div>
