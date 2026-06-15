@@ -21,38 +21,47 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
-@Configuration @EnableWebSecurity @EnableMethodSecurity @RequiredArgsConstructor
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthFilter           jwtFilter;
+    private final JwtAuthFilter jwtFilter;
     private final CustomUserDetailsService uds;
 
-    @Value("${app.cors.allowed-origins}") private String allowedOrigins;
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(c -> c.configurationSource(corsConfigurationSource()))
-            .csrf(c -> c.disable())
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(a -> a
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/api/public/**",
-                    "/uploads/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
+                .csrf(c -> c.disable())
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(a -> a
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/public/**",
+                                "/uploads/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Allow any localhost port so dev server port changes don't break CORS
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://localhost:*"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        List<String> origins = new java.util.ArrayList<>();
+        origins.add("http://localhost:5173");
+        origins.add("http://localhost:5174");
+        // Add production frontend URL from env var
+        String prodOrigin = System.getenv("FRONTEND_URL");
+        if (prodOrigin != null && !prodOrigin.isBlank())
+            origins.add(prodOrigin);
+        config.setAllowedOrigins(origins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -60,6 +69,28 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean public PasswordEncoder passwordEncoder()     { return new BCryptPasswordEncoder(); }
-    @Bean public AuthenticationManager authManager(AuthenticationConfiguration c) throws Exception { return c.getAuthenticationManager(); }
+    // @Bean
+    // public CorsConfigurationSource corsConfigurationSource() {
+    // CorsConfiguration config = new CorsConfiguration();
+    // // Allow any localhost port so dev server port changes don't break CORS
+    // config.setAllowedOriginPatterns(List.of("http://localhost:*",
+    // "https://localhost:*"));
+    // config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+    // config.setAllowedHeaders(List.of("*"));
+    // config.setAllowCredentials(true);
+    // UrlBasedCorsConfigurationSource source = new
+    // UrlBasedCorsConfigurationSource();
+    // source.registerCorsConfiguration("/**", config);
+    // return source;
+    // }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authManager(AuthenticationConfiguration c) throws Exception {
+        return c.getAuthenticationManager();
+    }
 }
