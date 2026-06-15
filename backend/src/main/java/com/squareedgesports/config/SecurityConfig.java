@@ -57,7 +57,7 @@ public class SecurityConfig {
         origins.add("http://localhost:5173");
         origins.add("http://localhost:5174");
         // Add production frontend URL from env var
-        String prodOrigin = System.getenv("FRONTEND_URL");
+        String prodOrigin = System.getenv("https://squareedgesports-frontend.onrender.com");
         if (prodOrigin != null && !prodOrigin.isBlank())
             origins.add(prodOrigin);
         config.setAllowedOrigins(origins);
