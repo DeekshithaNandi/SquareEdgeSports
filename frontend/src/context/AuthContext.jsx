@@ -4,7 +4,11 @@ import { authAPI } from '../api'
 const Ctx = createContext(null)
 const TOKEN_KEY  = 'ses_token'
 const USER_KEY   = 'ses_user'
-const BACKEND    = 'http://localhost:8080'
+// const BACKEND    = 'http://localhost:8080'
+const BACKEND = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace('/api', '')
+  : 'http://localhost:8080'
+
 
 // Resolve relative photo path → absolute URL
 // Called once when user object is received, so ALL components just use user.profilePicture
