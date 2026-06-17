@@ -64,60 +64,6 @@ public class SecurityConfig {
         return source;
     }
 
-    // @Bean
-    // public CorsConfigurationSource corsConfigurationSource() {
-    // CorsConfiguration config = new CorsConfiguration();
-    // config.setAllowedOrigins(List.of(
-    // "http://localhost:5173",
-    // "http://localhost:5174",
-    // "https://squareedgesports-frontend.onrender.com"));
-    // config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE",
-    // "OPTIONS"));
-    // config.setAllowedHeaders(List.of("*"));
-    // config.setAllowCredentials(true);
-    // UrlBasedCorsConfigurationSource source = new
-    // UrlBasedCorsConfigurationSource();
-    // source.registerCorsConfiguration("/**", config);
-    // return source;
-    // }
-
-    // @Bean
-    // public CorsConfigurationSource corsConfigurationSource() {
-    // CorsConfiguration config = new CorsConfiguration();
-    // List<String> origins = new java.util.ArrayList<>();
-    // origins.add("http://localhost:5173");
-    // origins.add("http://localhost:5174");
-    // // Add production frontend URL from env var
-    // String prodOrigin =
-    // System.getenv("https://squareedgesports-frontend.onrender.com");
-    // if (prodOrigin != null && !prodOrigin.isBlank())
-    // origins.add(prodOrigin);
-    // config.setAllowedOrigins(origins);
-    // config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE",
-    // "OPTIONS"));
-    // config.setAllowedHeaders(List.of("*"));
-    // config.setAllowCredentials(true);
-    // UrlBasedCorsConfigurationSource source = new
-    // UrlBasedCorsConfigurationSource();
-    // source.registerCorsConfiguration("/**", config);
-    // return source;
-    // }
-
-    // @Bean
-    // public CorsConfigurationSource corsConfigurationSource() {
-    // CorsConfiguration config = new CorsConfiguration();
-    // // Allow any localhost port so dev server port changes don't break CORS
-    // config.setAllowedOriginPatterns(List.of("http://localhost:*",
-    // "https://localhost:*"));
-    // config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-    // config.setAllowedHeaders(List.of("*"));
-    // config.setAllowCredentials(true);
-    // UrlBasedCorsConfigurationSource source = new
-    // UrlBasedCorsConfigurationSource();
-    // source.registerCorsConfiguration("/**", config);
-    // return source;
-    // }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
