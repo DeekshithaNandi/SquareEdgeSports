@@ -53,9 +53,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "https://*.onrender.com"));
+        List<String> origins = new java.util.ArrayList<>();
+        origins.add("http://localhost:*");
+        origins.add("https://*.pages.dev");
+        origins.add("https://*.railway.app");
+        origins.add("https://*.onrender.com");
+        if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+            origins.addAll(java.util.Arrays.stream(allowedOrigins.split(","))
+                    .map(String::trim)
+                    .filter(origin -> !origin.isBlank())
+                    .toList());
+        }
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
