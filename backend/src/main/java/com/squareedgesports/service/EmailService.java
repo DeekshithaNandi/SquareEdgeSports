@@ -27,10 +27,43 @@ public class EmailService {
     @Value("${app.frontend.url:http://localhost:5174}")
     private String frontendUrl;
 
+    // @Async
+    // public void sendOtp(String to, String otp, String name) {
+    // if (!emailEnabled) {
+    // log.info("Email disabled - OTP for {}: {}", to, otp);
+    // return;
+    // }
+    // sendHtml(to, "SquareEdgeSports - Email Verification Code", buildOtpHtml(name,
+    // otp));
+    // }
+
+    // @Async
+    // public void sendPasswordResetEmail(String to, String name, String token) {
+    // if (!emailEnabled) {
+    // log.info("Email disabled - password reset token for {}: {}", to, token);
+    // return;
+    // }
+    // String resetLink = frontendUrl + "/reset-password?token=" + token;
+    // sendHtml(to, "SquareEdgeSports - Password Reset Request",
+    // buildPasswordResetHtml(name, resetLink));
+    // }
+
+    // @Async
+    // public void sendAdminInviteEmail(String to, String name, String token, String
+    // role) {
+    // if (!emailEnabled) {
+    // log.info("Email disabled - invite token for {}: {}", to, token);
+    // return;
+    // }
+    // String setupLink = frontendUrl + "/reset-password?token=" + token +
+    // "&invite=true";
+    // sendHtml(to, "SquareEdgeSports - You've Been Invited", buildInviteHtml(name,
+    // role, setupLink));
+    // }
     @Async
     public void sendOtp(String to, String otp, String name) {
         if (!emailEnabled) {
-            log.info("Email disabled - OTP for {}: {}", to, otp);
+            log.info("=== OTP for {} : {} ===", to, otp);
             return;
         }
         sendHtml(to, "SquareEdgeSports - Email Verification Code", buildOtpHtml(name, otp));
@@ -39,7 +72,7 @@ public class EmailService {
     @Async
     public void sendPasswordResetEmail(String to, String name, String token) {
         if (!emailEnabled) {
-            log.info("Email disabled - password reset token for {}: {}", to, token);
+            log.info("=== PASSWORD RESET token for {} : {} ===", to, token);
             return;
         }
         String resetLink = frontendUrl + "/reset-password?token=" + token;
@@ -49,11 +82,20 @@ public class EmailService {
     @Async
     public void sendAdminInviteEmail(String to, String name, String token, String role) {
         if (!emailEnabled) {
-            log.info("Email disabled - invite token for {}: {}", to, token);
+            log.info("=== INVITE token for {} : {} ===", to, token);
             return;
         }
         String setupLink = frontendUrl + "/reset-password?token=" + token + "&invite=true";
         sendHtml(to, "SquareEdgeSports - You've Been Invited", buildInviteHtml(name, role, setupLink));
+    }
+
+    @Async
+    public void sendEmailChangeOtp(String to, String name, String otp) {
+        if (!emailEnabled) {
+            log.info("=== EMAIL CHANGE OTP for {} : {} ===", to, otp);
+            return;
+        }
+        sendHtml(to, "SquareEdgeSports - Verify Your New Email", buildOtpHtml(name, otp));
     }
 
     @Async
@@ -75,8 +117,8 @@ public class EmailService {
         }
         String assignment = laneNumber != null ? "Lane " + laneNumber
                 : courtNumber != null ? "Court " + courtNumber
-                : boxGroup != null ? boxGroup.replace("_", " ")
-                : "TBD";
+                        : boxGroup != null ? boxGroup.replace("_", " ")
+                                : "TBD";
         String html = header("Court Assigned")
                 + "<p>Hi " + escape(name) + ",</p>"
                 + "<p>Your " + escape(label(sportType)) + " booking has been assigned.</p>"
@@ -105,7 +147,8 @@ public class EmailService {
     public void sendRefundConfirmation(String to, String name, String sportType, String date,
             java.math.BigDecimal refundAmount, String refundPolicy) {
         if (!emailEnabled) {
-            log.info("Email disabled - refund confirmation for {}: policy={} amount={}", to, refundPolicy, refundAmount);
+            log.info("Email disabled - refund confirmation for {}: policy={} amount={}", to, refundPolicy,
+                    refundAmount);
             return;
         }
         String html = header("Refund Processed")
@@ -146,14 +189,15 @@ public class EmailService {
         sendHtml(fromEmail, "SquareEdgeSports - Contact: " + safeSubject(subject), html, senderEmail);
     }
 
-    @Async
-    public void sendEmailChangeOtp(String to, String name, String otp) {
-        if (!emailEnabled) {
-            log.info("Email disabled - email change OTP for {}: {}", to, otp);
-            return;
-        }
-        sendHtml(to, "SquareEdgeSports - Verify Your New Email", buildOtpHtml(name, otp));
-    }
+    // @Async
+    // public void sendEmailChangeOtp(String to, String name, String otp) {
+    // if (!emailEnabled) {
+    // log.info("Email disabled - email change OTP for {}: {}", to, otp);
+    // return;
+    // }
+    // sendHtml(to, "SquareEdgeSports - Verify Your New Email", buildOtpHtml(name,
+    // otp));
+    // }
 
     private void sendHtml(String to, String subject, String html) {
         sendHtml(to, subject, html, null);
