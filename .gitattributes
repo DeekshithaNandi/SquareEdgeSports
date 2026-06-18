@@ -1,0 +1,29 @@
+# Normalize text files automatically and avoid LF/CRLF warnings
+* text=auto
+
+# Ensure common text files are normalized
+*.java text
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.css text
+*.html text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+*.properties text
+*.xml text
+
+# Keep binary files binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.jar binary
+*.war binary
+*.gz binary
+*.zip binary

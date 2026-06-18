@@ -69,10 +69,6 @@ public class SecurityConfig {
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "https://squareedgesports-frontend.pages.dev "));
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

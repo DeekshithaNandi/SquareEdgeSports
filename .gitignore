@@ -1,0 +1,47 @@
+# Java/Maven
+*.class
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+classpath.index
+
+# IntelliJ and IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+*.local
+
+# Backend uploads and runtime files
+uploads/
+*.db
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+target/
+
+# Npm package lock not needed if using package-lock? keep if desired
+# package-lock.json
+# yarn.lock
