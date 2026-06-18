@@ -41,6 +41,7 @@ D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgespor
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\config\WebMvcConfig.java
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\dto\BookingDto.java
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\controller\AdminController.java
+D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\config\EmailConfig.java
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\dto\AuthResponse.java
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\entity\Booking.java
 D:\Temp Project\SquareEdgeSports - Copy\backend\src\main\java\com\squareedgesports\service\RazorpayService.java
