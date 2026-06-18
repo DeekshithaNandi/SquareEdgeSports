@@ -150,11 +150,6 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.assignCourt(id, laneNumber, courtNumber, boxGroup));
     }
 
-    @GetMapping("/bookings/live")
-    public ResponseEntity<?> liveView() {
-        return ResponseEntity.ok(bookingService.getLiveView(java.time.LocalDate.now()));
-    }
-
     @GetMapping("/admin/revenue")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canViewReports(authentication)")
     public ResponseEntity<?> revenue() { return ResponseEntity.ok(bookingService.getRevenueStats()); }
