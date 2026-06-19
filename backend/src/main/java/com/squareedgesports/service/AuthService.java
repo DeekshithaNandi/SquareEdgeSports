@@ -9,28 +9,33 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Random;
+// import java.util.Random;
 import java.util.UUID;
 
-@Service @RequiredArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository               userRepo;
-    private final OtpRepository                otpRepo;
+    private final UserRepository userRepo;
+    private final OtpRepository otpRepo;
     private final PasswordResetTokenRepository resetTokenRepo;
     private final EmployeePermissionRepository permRepo;
-    private final EmailService                 emailService;
-    private final PasswordEncoder              encoder;
-    private final JwtUtil                      jwtUtil;
+    private final EmailService emailService;
+    private final PasswordEncoder encoder;
+    private final JwtUtil jwtUtil;
 
     // ── Send OTP (registration) ──────────────────────────────────────────────
-    @Transactional
+    // @Transactional
     public ApiResponse sendOtp(String email, String name) {
         if (userRepo.existsByEmail(email))
             return ApiResponse.error("An account with this email already exists.");
         otpRepo.deleteByEmail(email);
-        String code = String.format("%06d", new Random().nextInt(1_000_000));
+        // String code = String.format("%06d", new Random().nextInt(1_000_000));
+        // ✅ Fix
+        String code = String.format("%06d", new SecureRandom().nextInt(1_000_000));
+
         otpRepo.save(OtpVerification.builder()
                 .email(email).otp(code)
                 .expiresAt(LocalDateTime.now().plusMinutes(10))
@@ -43,9 +48,12 @@ public class AuthService {
     public ApiResponse verifyOtp(String email, String code) {
         var otp = otpRepo.findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow(() -> new RuntimeException("No OTP found for this email."));
-        if (otp.isUsed())    return ApiResponse.error("OTP already used.");
-        if (otp.isExpired()) return ApiResponse.error("OTP expired. Please request a new one.");
-        if (!otp.getOtp().equals(code)) return ApiResponse.error("Incorrect OTP.");
+        if (otp.isUsed())
+            return ApiResponse.error("OTP already used.");
+        if (otp.isExpired())
+            return ApiResponse.error("OTP expired. Please request a new one.");
+        if (!otp.getOtp().equals(code))
+            return ApiResponse.error("Incorrect OTP.");
         otp.setUsed(true);
         otpRepo.save(otp);
         return ApiResponse.ok("OTP verified successfully.");
@@ -86,7 +94,8 @@ public class AuthService {
     @Transactional
     public ApiResponse forgotPassword(String email) {
         var user = userRepo.findByEmail(email).orElse(null);
-        if (user == null) throw new RuntimeException("USER_NOT_REGISTERED");
+        if (user == null)
+            throw new RuntimeException("USER_NOT_REGISTERED");
         resetTokenRepo.deleteByEmail(email);
         String token = UUID.randomUUID().toString();
         resetTokenRepo.save(PasswordResetToken.builder()
@@ -102,8 +111,10 @@ public class AuthService {
     public ApiResponse resetPassword(ResetPasswordRequest req) {
         var tokenObj = resetTokenRepo.findByToken(req.getToken())
                 .orElseThrow(() -> new RuntimeException("Invalid or expired reset link."));
-        if (tokenObj.isUsed())    throw new RuntimeException("This reset link has already been used.");
-        if (tokenObj.isExpired()) throw new RuntimeException("This reset link has expired. Please request a new one.");
+        if (tokenObj.isUsed())
+            throw new RuntimeException("This reset link has already been used.");
+        if (tokenObj.isExpired())
+            throw new RuntimeException("This reset link has expired. Please request a new one.");
         var user = userRepo.findByEmail(tokenObj.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found."));
         user.setPassword(encoder.encode(req.getNewPassword()));

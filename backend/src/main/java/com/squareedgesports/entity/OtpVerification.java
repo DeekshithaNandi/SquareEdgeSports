@@ -4,11 +4,17 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "otp_verifications")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "otp_verifications")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OtpVerification {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -20,12 +26,18 @@ public class OtpVerification {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
+    @Builder.Default
     private boolean used = false;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist protected void onCreate() { createdAt = LocalDateTime.now(); }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
-    public boolean isExpired() { return LocalDateTime.now().isAfter(expiresAt); }
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expiresAt);
+    }
 }

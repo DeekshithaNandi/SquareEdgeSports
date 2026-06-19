@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestController @RequestMapping("/api") @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class BookingController {
 
-    private final BookingService  bookingService;
+    private final BookingService bookingService;
     private final RazorpayService razorpayService;
-    private final UserRepository  userRepo;
+    private final UserRepository userRepo;
 
     /* ── Player endpoints ── */
     @PostMapping("/bookings")
@@ -39,12 +41,12 @@ public class BookingController {
     @PostMapping("/bookings/{id}/confirm-payment")
     public ResponseEntity<?> confirmPayment(@PathVariable Long id,
             @RequestBody Map<String, String> body) {
-        String orderId   = body.get("razorpayOrderId");
+        String orderId = body.get("razorpayOrderId");
         String paymentId = body.get("razorpayPaymentId");
         String signature = body.get("razorpaySignature");
         if (!razorpayService.verifySignature(orderId, paymentId, signature)) {
             return ResponseEntity.badRequest()
-                .body(Map.of("message", "Payment verification failed. Please contact support."));
+                    .body(Map.of("message", "Payment verification failed. Please contact support."));
         }
         return ResponseEntity.ok(bookingService.confirmPayment(id, paymentId, "RAZORPAY"));
     }
@@ -60,12 +62,12 @@ public class BookingController {
 
     @PostMapping("/bookings/confirm-payment-batch")
     public ResponseEntity<?> confirmBatchPayment(@RequestBody Map<String, Object> body) {
-        String orderId   = (String) body.get("razorpayOrderId");
+        String orderId = (String) body.get("razorpayOrderId");
         String paymentId = (String) body.get("razorpayPaymentId");
         String signature = (String) body.get("razorpaySignature");
         if (!razorpayService.verifySignature(orderId, paymentId, signature)) {
             return ResponseEntity.badRequest()
-                .body(Map.of("message", "Payment verification failed. Please contact support."));
+                    .body(Map.of("message", "Payment verification failed. Please contact support."));
         }
         List<Long> ids = extractBookingIds(body);
         if (ids == null || ids.isEmpty())
@@ -77,11 +79,12 @@ public class BookingController {
     @SuppressWarnings("unchecked")
     private List<Long> extractBookingIds(Map<String, Object> body) {
         Object raw = body.get("bookingIds");
-        if (!(raw instanceof List)) return null;
+        if (!(raw instanceof List))
+            return null;
         return ((List<?>) raw).stream()
-            .filter(v -> v instanceof Number)
-            .map(v -> ((Number) v).longValue())
-            .collect(Collectors.toList());
+                .filter(v -> v instanceof Number)
+                .map(v -> ((Number) v).longValue())
+                .collect(Collectors.toList());
     }
 
     @PatchMapping("/bookings/{id}/cancel")
@@ -107,7 +110,9 @@ public class BookingController {
     /* ── Admin/Employee endpoints ── */
     @GetMapping("/admin/bookings")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
-    public ResponseEntity<?> all() { return ResponseEntity.ok(bookingService.getAll()); }
+    public ResponseEntity<?> all() {
+        return ResponseEntity.ok(bookingService.getAll());
+    }
 
     @GetMapping("/admin/bookings/date")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
@@ -118,7 +123,9 @@ public class BookingController {
 
     @GetMapping("/admin/bookings/cancelled")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
-    public ResponseEntity<?> cancelled() { return ResponseEntity.ok(bookingService.getCancelled()); }
+    public ResponseEntity<?> cancelled() {
+        return ResponseEntity.ok(bookingService.getCancelled());
+    }
 
     @PatchMapping("/admin/bookings/{id}/cancel")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
@@ -144,15 +151,19 @@ public class BookingController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
     public ResponseEntity<?> assignCourt(@PathVariable Long id,
             @RequestBody Map<String, Object> body) {
-        Integer laneNumber   = body.get("laneNumber")   != null ? Integer.parseInt(body.get("laneNumber").toString())   : null;
-        Integer courtNumber  = body.get("courtNumber")  != null ? Integer.parseInt(body.get("courtNumber").toString())  : null;
-        String  boxGroup     = body.get("boxGroup")     != null ? body.get("boxGroup").toString() : null;
+        Integer laneNumber = body.get("laneNumber") != null ? Integer.parseInt(body.get("laneNumber").toString())
+                : null;
+        Integer courtNumber = body.get("courtNumber") != null ? Integer.parseInt(body.get("courtNumber").toString())
+                : null;
+        String boxGroup = body.get("boxGroup") != null ? body.get("boxGroup").toString() : null;
         return ResponseEntity.ok(bookingService.assignCourt(id, laneNumber, courtNumber, boxGroup));
     }
 
     @GetMapping("/admin/revenue")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canViewReports(authentication)")
-    public ResponseEntity<?> revenue() { return ResponseEntity.ok(bookingService.getRevenueStats()); }
+    public ResponseEntity<?> revenue() {
+        return ResponseEntity.ok(bookingService.getRevenueStats());
+    }
 
     private User getUser(Authentication auth) {
         return userRepo.findByEmail(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));

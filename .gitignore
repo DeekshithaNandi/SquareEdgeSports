@@ -45,3 +45,4 @@ target/
 # Npm package lock not needed if using package-lock? keep if desired
 # package-lock.json
 # yarn.lock
+backend/src/main/resources/application.properties
