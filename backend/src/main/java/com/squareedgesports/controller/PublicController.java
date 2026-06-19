@@ -11,14 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
 
-@RestController @RequestMapping("/api/public") @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/public")
+@RequiredArgsConstructor
 public class PublicController {
 
-    private final CourtRepository       courtRepo;
+    private final CourtRepository courtRepo;
     private final PricingRuleRepository pricingRepo;
-    private final CmsContentRepository  cmsRepo;
-    private final BookingService        bookingService;
-    private final EmailService          emailService;
+    private final CmsContentRepository cmsRepo;
+    private final BookingService bookingService;
+    private final EmailService emailService;
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("ok");
+    }
 
     @GetMapping("/courts")
     public ResponseEntity<?> courts() {
@@ -55,8 +62,8 @@ public class PublicController {
 
     @PostMapping("/contact")
     public ResponseEntity<?> contact(@RequestBody Map<String, String> body) {
-        String name    = body.getOrDefault("name",    "").trim();
-        String email   = body.getOrDefault("email",   "").trim();
+        String name = body.getOrDefault("name", "").trim();
+        String email = body.getOrDefault("email", "").trim();
         String subject = body.getOrDefault("subject", "").trim();
         String message = body.getOrDefault("message", "").trim();
 

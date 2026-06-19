@@ -30,6 +30,14 @@ import { Toaster } from 'react-hot-toast'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import './index.css'
+// import { pingBackend } from './api/axios'
+// pingBackend() // fires instantly on page load, warms up the backend
+
+import { pingBackend } from './api/axios'
+
+// warm up backend + show toast if slow
+pingBackend().catch(() => {})
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

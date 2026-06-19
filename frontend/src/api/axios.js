@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  timeout: 15000,
 })
 
 API.interceptors.request.use(config => {
@@ -23,3 +24,8 @@ API.interceptors.response.use(
 )
 
 export default API
+
+// axios.js — add at the bottom
+// export const pingBackend = () => API.get('/public/courts').catch(() => {})
+export const pingBackend = () => API.get('/public/health').catch(() => {})
+

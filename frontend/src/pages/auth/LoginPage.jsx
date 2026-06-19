@@ -16,23 +16,43 @@ export default function LoginPage() {
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErr(''); setNotRegistered(false) }
 
+  // const handleSubmit = async e => {
+  //   e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
+  //   try {
+  //     const r = await authAPI.login(form)
+  //     login(r.data.token, r.data.user)
+  //     toast.success('Welcome back, ' + r.data.user.fullName + '!')
+  //     const isAdmin = ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(r.data.user.role)
+  //     navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
+  //   } catch (e) {
+  //     const msg = e.response?.data?.message || ''
+  //     if (msg === 'USER_NOT_REGISTERED') {
+  //       setNotRegistered(true)
+  //     } else {
+  //       setErr(msg || 'Invalid credentials.')
+  //     }
+  //   } finally { setLoading(false) }
+  // }
   const handleSubmit = async e => {
-    e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
-    try {
-      const r = await authAPI.login(form)
-      login(r.data.token, r.data.user)
-      toast.success('Welcome back, ' + r.data.user.fullName + '!')
-      const isAdmin = ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(r.data.user.role)
-      navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
-    } catch (e) {
-      const msg = e.response?.data?.message || ''
-      if (msg === 'USER_NOT_REGISTERED') {
-        setNotRegistered(true)
-      } else {
-        setErr(msg || 'Invalid credentials.')
-      }
-    } finally { setLoading(false) }
-  }
+  e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
+  const slowTimer = setTimeout(() => {
+    toast('Backend is waking up, please wait...', { icon: '⏳', duration: 10000 })
+  }, 4000)  // show after 4 seconds
+  try {
+    const r = await authAPI.login(form)
+    clearTimeout(slowTimer)
+    login(r.data.token, r.data.user)
+    toast.success('Welcome back, ' + r.data.user.fullName + '!')
+    const isAdmin = ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(r.data.user.role)
+    navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
+  } catch (e) {
+    clearTimeout(slowTimer)
+    const msg = e.response?.data?.message || ''
+    if (msg === 'USER_NOT_REGISTERED') setNotRegistered(true)
+    else setErr(msg || 'Invalid credentials.')
+  } finally { setLoading(false) }
+}
+
 
   return (
     <div

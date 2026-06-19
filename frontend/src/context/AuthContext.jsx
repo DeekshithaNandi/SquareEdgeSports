@@ -27,28 +27,59 @@ export function AuthProvider({ children }) {
   })
   const [loading, setLoading] = useState(true)
 
+  // const saveUser = (data) => {
+  //   const resolved = resolveUser(data)
+  //   setUser(resolved)
+  //   localStorage.setItem(USER_KEY, JSON.stringify(resolved))
+  //   return resolved
+  // }
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem(TOKEN_KEY)
+  //   if (token) {
+  //     authAPI.me()
+  //       .then(r  => saveUser(r.data))
+  //       .catch(() => {
+  //         localStorage.removeItem(TOKEN_KEY)
+  //         localStorage.removeItem(USER_KEY)
+  //         setUser(null)
+  //       })
+  //       .finally(() => setLoading(false))
+  //   } else {
+  //     setLoading(false)
+  //   }
+  
+  // }, [])
   const saveUser = (data) => {
-    const resolved = resolveUser(data)
-    setUser(resolved)
-    localStorage.setItem(USER_KEY, JSON.stringify(resolved))
-    return resolved
+  const resolved = resolveUser({ ...data, _cachedAt: Date.now() })  // ← add _cachedAt
+  setUser(resolved)
+  localStorage.setItem(USER_KEY, JSON.stringify(resolved))
+  return resolved
+}
+
+useEffect(() => {
+  const token = localStorage.getItem(TOKEN_KEY)
+  if (!token) { setLoading(false); return }
+
+  const stored = localStorage.getItem(USER_KEY)
+  const parsed = stored ? JSON.parse(stored) : null
+  // skip /me if data is less than 5 minutes old
+  if (parsed?._cachedAt && Date.now() - parsed._cachedAt < 5 * 60 * 1000) {
+    setUser(resolveUser(parsed))
+    setLoading(false)
+    return
   }
 
-  useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) {
-      authAPI.me()
-        .then(r  => saveUser(r.data))
-        .catch(() => {
-          localStorage.removeItem(TOKEN_KEY)
-          localStorage.removeItem(USER_KEY)
-          setUser(null)
-        })
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
-  }, [])
+  authAPI.me()
+    .then(r => saveUser(r.data))
+    .catch(() => {
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
+      setUser(null)
+    })
+    .finally(() => setLoading(false))
+}, [])
+
 
   const login = useCallback((token, userData) => {
     localStorage.setItem(TOKEN_KEY, token)
