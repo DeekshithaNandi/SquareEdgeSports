@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, CalendarDays, CreditCard, Star, LogOut, User, Zap, ChevronDown } from 'lucide-react'
+import NotificationBell from '../common/NotificationBell'
 
 const NAV = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard'   },
@@ -88,6 +89,8 @@ export default function UserLayout() {
             {NAV.find(n => n.path === location.pathname)?.label || (location.pathname === '/profile' ? 'My Profile' : 'Dashboard')}
           </div>
 
+          <div className="flex items-center gap-2">
+          <NotificationBell />
           <div className="relative" ref={dropRef}>
             <button onClick={() => setDropOpen(o => !o)}
               className="flex items-center gap-2 px-2 py-1.5 rounded-xl transition-colors"
@@ -117,8 +120,8 @@ export default function UserLayout() {
               </div>
             )}
           </div>
+        </div>
         </header>
-
         <main className="flex-1 overflow-y-auto fade-in" style={{ background: '#f0f5ff' }}>
           <Outlet />
         </main>

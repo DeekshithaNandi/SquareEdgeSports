@@ -3,13 +3,14 @@ package com.squareedgesports.service;
 import com.squareedgesports.dto.*;
 import com.squareedgesports.entity.*;
 import com.squareedgesports.repository.*;
+import com.squareedgesports.service.NotificationService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
-import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class BookingService {
     private final CmsContentRepository cmsRepo;
     private final EmailService emailService;
     private final RazorpayService razorpayService;
+    private final NotificationService notificationService;
 
     /* ── Create booking ── */
     @Transactional
@@ -71,7 +73,10 @@ public class BookingService {
                 .status(Payment.PaymentStatus.PENDING)
                 .description(req.getBookingType() + " booking " + req.getBookingDate())
                 .build());
-
+        notificationService.notifyUser(user.getId(), "BOOKING_CONFIRMED",
+                "Your " + label(req.getBookingType()) + " slot on " + req.getBookingDate() + " at "
+                        + start.toString().substring(0, 5) + " is booked successfully.",
+                b.getId());
         return toDto(b);
     }
 
@@ -103,6 +108,25 @@ public class BookingService {
         b.setCancellationReason(reason);
         b.setCancelledAt(LocalDateTime.now());
         bookingRepo.save(b);
+
+        String policy = calcRefundPolicy(b);
+        BigDecimal refundAmount = calcRefundAmount(b, policy);
+        String userMsg = switch (policy) {
+            case "FULL" -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
+                    + " was cancelled — full refund of ₹" + refundAmount + " will be processed.";
+            case "HALF" -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
+                    + " was cancelled — 50% refund of ₹" + refundAmount + " will be processed.";
+            default -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
+                    + " was cancelled less than 1 hour before the session — no refund is applicable.";
+        };
+        notificationService.notifyUser(b.getUser().getId(), "BOOKING_CANCELLED", userMsg, b.getId());
+
+        notificationService.notifyAdmins("BOOKING_CANCELLED",
+                b.getUser().getFullName() + " cancelled a " + label(b.getBookingType()) + " booking (#" + b.getId()
+                        + ") on " + b.getBookingDate() + " — refund: " + policy
+                        + (refundAmount.compareTo(BigDecimal.ZERO) > 0 ? " (₹" + refundAmount + ")" : ""),
+                b.getId());
+
         return toDto(b);
     }
 
@@ -196,7 +220,7 @@ public class BookingService {
         BigDecimal refundAmount = calcRefundAmount(b, policy);
 
         boolean gatewayRefundProcessed = false;
-        String  gatewayNote            = null;
+        String gatewayNote = null;
 
         // Process Razorpay refund and update payment record
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
@@ -220,7 +244,8 @@ public class BookingService {
             p.setStatus("FULL".equals(policy) ? Payment.PaymentStatus.REFUNDED : Payment.PaymentStatus.PARTIAL_REFUND);
             p.setRefundAmount(refundAmount);
             p.setRefundedAt(LocalDateTime.now());
-            if (gatewayNote != null) p.setRefundReference(gatewayNote);
+            if (gatewayNote != null)
+                p.setRefundReference(gatewayNote);
             paymentRepo.save(p);
         }
 
@@ -237,10 +262,11 @@ public class BookingService {
                 refundAmount, policy);
 
         Map<String, Object> result = new java.util.LinkedHashMap<>();
-        result.put("message",      gatewayRefundProcessed ? "Refund processed" : "Refund recorded — gateway pending");
+        result.put("message", gatewayRefundProcessed ? "Refund processed" : "Refund recorded — gateway pending");
         result.put("refundPolicy", policy);
         result.put("refundAmount", refundAmount);
-        if (gatewayNote != null) result.put("gatewayNote", gatewayNote);
+        if (gatewayNote != null)
+            result.put("gatewayNote", gatewayNote);
         return result;
     }
 
@@ -299,7 +325,24 @@ public class BookingService {
                 b.getUser().getEmail(), b.getUser().getFullName(),
                 b.getBookingType(), b.getBookingDate().toString(),
                 b.getStartTime().toString(), laneNumber, courtNumber, b.getBoxGroup());
+
+        notificationService.notifyUser(b.getUser().getId(), "COURT_ASSIGNED",
+                "Your court/lane for the " + label(b.getBookingType()) + " session on " + b.getBookingDate()
+                        + " has been assigned.",
+                b.getId());
+
         return toDto(b);
+    }
+
+    private String label(String type) {
+        if (type == null)
+            return "session";
+        return switch (type) {
+            case "CRICKET_LANE" -> "Cricket Lane";
+            case "BOX_CRICKET" -> "Box Cricket";
+            case "PICKLEBALL" -> "Pickleball";
+            default -> type.replace("_", " ");
+        };
     }
 
     /* ── Refund policy helpers ───────────────────────────────────────────────── */

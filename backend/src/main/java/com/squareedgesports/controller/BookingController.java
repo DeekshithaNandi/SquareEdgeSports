@@ -75,6 +75,21 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.confirmBatchPayment(ids, paymentId, "RAZORPAY"));
     }
 
+    @PostMapping("/admin/bookings")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageBookings(authentication)")
+    public ResponseEntity<?> createForCustomer(@Valid @RequestBody AdminCreateBookingRequest req) {
+        BookingDto dto = bookingService.create(req.getUserId(), req);
+
+        // Error: markAwaitingPayment method does not exist in BookingService
+        // Solution: Either implement the markAwaitingPayment method in BookingService
+        // or remove this call
+        dto = req.isMarkAsPaid()
+                ? bookingService.confirmPayment(dto.getId(), "DESK-" + dto.getId(), "CASH")
+                : dto;
+
+        return ResponseEntity.ok(dto);
+    }
+
     /** Safely converts a JSON array of numbers (Integer or Long) to List<Long>. */
     @SuppressWarnings("unchecked")
     private List<Long> extractBookingIds(Map<String, Object> body) {

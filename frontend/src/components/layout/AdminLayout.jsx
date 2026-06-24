@@ -7,6 +7,7 @@ import {
   LogOut, ShieldCheck, Zap
 } from 'lucide-react'
 import { userAPI } from '../../api'
+import NotificationBell from '../common/NotificationBell'
 
 const ALL_NAV = [
   { section: 'OVERVIEW' },
@@ -145,6 +146,7 @@ export default function AdminLayout() {
           style={{ background: '#ffffff', borderBottom: '1px solid #dde8f8' }}>
           <div className="font-display text-base font-bold" style={{ color: '#0a1428' }}>{currentLabel}</div>
           <div className="flex items-center gap-3">
+             <NotificationBell />
             <div className="text-xs" style={{ color: '#9aaac8' }}>
               {new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </div>

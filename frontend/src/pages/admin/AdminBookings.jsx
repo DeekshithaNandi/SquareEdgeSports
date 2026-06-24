@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { adminAPI } from '../../api'
 import Badge from '../../components/common/Badge'
 import Spinner from '../../components/common/Spinner'
@@ -8,8 +9,8 @@ import { MapPin, X, Check, RotateCcw, Clock, Search, ChevronDown, ArrowUpDown, S
 
 function refundLabel(policy, amount) {
   if (!policy) return null
-  if (policy === 'FULL') return { text: `Full Refund ₹${amount}`, cls: 'text-green-400' }
-  if (policy === 'HALF') return { text: `50% Refund ₹${amount}`, cls: 'text-yellow-400' }
+  if (policy === 'FULL') return { text: `Full Refund ₹${amount}`, cls: 'text-green-700' }
+  if (policy === 'HALF') return { text: `50% Refund ₹${amount}`, cls: 'text-yellow-700' }
   return { text: 'No Refund (<1h)', cls: 'text-red-400' }
 }
 
@@ -48,7 +49,7 @@ function SportPill({ value, onChange }) {
       {SPORTS.map(s => (
         <button key={s} onClick={() => onChange(s)}
           className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-            (value === s ? 'bg-accent text-white' : 'text-muted hover:text-white')}>
+            (value === s ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]')}>
           {s === 'ALL' ? 'All Sports' : s.replace(/_/g, ' ')}
         </button>
       ))}
@@ -57,6 +58,7 @@ function SportPill({ value, onChange }) {
 }
 
 export default function AdminBookings() {
+  const navigate = useNavigate()
   const [tab,       setTab]       = useState('date')
   const [date,      setDate]      = useState(fmtLocal(new Date()))
   const [bookings,  setBookings]  = useState([])
@@ -227,14 +229,18 @@ export default function AdminBookings() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => navigate('/admin/bookings/new')}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-accent text-white hover:opacity-90">
+          + New Booking
+        </button>
           {/* Tabs */}
           <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
             <button onClick={() => handleTab('date')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'date' ? 'bg-accent text-white' : 'text-muted hover:text-white'}`}>
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'date' ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]'}`}>
               Bookings
             </button>
             <button onClick={() => handleTab('cancelled')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'cancelled' ? 'bg-red-500 text-white' : 'text-muted hover:text-white'}`}>
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'cancelled' ? 'bg-red-500 text-white' : 'text-muted hover:text-[#0a1428]'}`}>
               Cancelled ({cancelled.length || '…'})
             </button>
           </div>
@@ -244,7 +250,7 @@ export default function AdminBookings() {
             <div className="flex items-center gap-2">
               <label className="text-xs text-muted font-bold">Date:</label>
               <input type="date" value={date} onChange={handleDate}
-                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all [color-scheme:light]" />
             </div>
           )}
 
@@ -253,7 +259,7 @@ export default function AdminBookings() {
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
               showFilters || hasFilters
                 ? 'bg-accent/15 border-accent/40 text-accent'
-                : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:text-white'
+                : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:text-[#0a1428]'
             }`}>
             <SlidersHorizontal size={13} />
             Filters
@@ -271,9 +277,9 @@ export default function AdminBookings() {
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search by player name or email…"
-                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
+                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all" />
               {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white">
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-[#0a1428]">
                   <X size={12} />
                 </button>
               )}
@@ -284,7 +290,7 @@ export default function AdminBookings() {
               <ArrowUpDown size={13} className="text-muted" />
               <div className="relative">
                 <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}
-                  className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent [color-scheme:dark] cursor-pointer">
+                  className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-[#0a1428] outline-none focus:border-accent [color-scheme:light] cursor-pointer">
                   <option value="newest">↓ Newest First</option>
                   <option value="oldest">↑ Oldest First</option>
                 </select>
@@ -308,14 +314,14 @@ export default function AdminBookings() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] text-muted font-bold">Slot Date From</span>
               <input type="date" value={cancelFromDate} onChange={e => setCancelFromDate(e.target.value)}
-                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
               <span className="text-[11px] text-muted font-bold">To</span>
               <input type="date" value={cancelToDate} onChange={e => setCancelToDate(e.target.value)}
                 min={cancelFromDate || undefined}
-                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent [color-scheme:dark]" />
+                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
               {(cancelFromDate || cancelToDate) && (
                 <button onClick={() => { setCancelFromDate(''); setCancelToDate('') }}
-                  className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8]">
+                  className="text-[11px] text-muted hover:text-[#0a1428] px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8]">
                   <X size={11} />
                 </button>
               )}
@@ -326,7 +332,7 @@ export default function AdminBookings() {
           {hasFilters && (
             <div className="flex flex-wrap gap-1.5 pt-1">
               {search         && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-accent/15 text-accent border border-accent/30">Search: "{search}"</span>}
-              {sportFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/15 text-green-300 border border-green-500/30">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
+              {sportFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-300">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
               {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f0f5ff] text-[#5a6a8a] border border-[#dde8f8]">Sort: Oldest First</span>}
               {tab === 'cancelled' && (cancelFromDate || cancelToDate) && (
                 <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
@@ -385,11 +391,11 @@ export default function AdminBookings() {
                     <td className="text-xs font-semibold">{b.bookingType?.replace(/_/g, ' ')}</td>
                     <td>
                       {label ? (
-                        <span className="flex items-center gap-1 text-xs text-green-400 font-semibold">
+                        <span className="flex items-center gap-1 text-xs text-green-700 font-semibold">
                           <Check size={11} /> {label}
                         </span>
                       ) : (
-                        <span className="text-xs text-yellow-400/70 italic">Not assigned</span>
+                        <span className="text-xs text-yellow-600 italic">Not assigned</span>
                       )}
                     </td>
                     <td className="text-xs text-muted">
@@ -399,9 +405,9 @@ export default function AdminBookings() {
                     <td>
                       <div className="font-bold">₹{b.amountPaid}</div>
                       <div className={`text-[10px] font-semibold ${
-                        b.paymentStatus === 'PAID'           ? 'text-green-400' :
+                        b.paymentStatus === 'PAID'           ? 'text-green-700' :
                         b.paymentStatus === 'REFUNDED'       ? 'text-blue-400'  :
-                        b.paymentStatus === 'PARTIAL_REFUND' ? 'text-yellow-400': 'text-yellow-400'}`}>
+                        b.paymentStatus === 'PARTIAL_REFUND' ? 'text-yellow-700': 'text-yellow-700'}`}>
                         {b.paymentStatus === 'PARTIAL_REFUND' && b.refundAmount
                           ? `50% Refunded ₹${b.refundAmount}`
                           : b.paymentStatus}
@@ -457,7 +463,7 @@ export default function AdminBookings() {
                           (b.refundPolicy === 'FULL' || b.refundPolicy === 'HALF') &&
                           !isPast(b.bookingDate, b.startTime) && (
                           <button onClick={() => setRefundTarget(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-500/10 border border-yellow-500/25 text-yellow-300 hover:bg-yellow-500/20 transition-all">
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all">
                             <RotateCcw size={10} /> {b.refundPolicy === 'FULL' ? 'Full Refund' : '50% Refund'}
                           </button>
                         )}
@@ -478,7 +484,7 @@ export default function AdminBookings() {
                           <span className="text-[11px] text-blue-400 font-semibold">✓ Full Refunded</span>
                         )}
                         {b.status === 'CANCELLED' && b.paymentStatus === 'PARTIAL_REFUND' && (
-                          <span className="text-[11px] text-yellow-400 font-semibold">
+                          <span className="text-[11px] text-yellow-700 font-semibold">
                             ✓ 50% Refunded{b.refundAmount ? ` ₹${b.refundAmount}` : ''}
                           </span>
                         )}
@@ -514,8 +520,8 @@ export default function AdminBookings() {
               <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]"
                 onClick={() => setRefundTarget(null)}>Cancel</button>
               <button disabled={refunding} onClick={doRefund}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-green-500/15 border border-green-500/30 text-green-300 hover:bg-green-500/25 disabled:opacity-60">
-                {refunding ? <span className="w-4 h-4 border-2 border-green-300/30 border-t-green-300 rounded-full spin" /> : <RotateCcw size={14} />}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-green-100 border border-green-300 text-green-700 hover:bg-green-200 disabled:opacity-60">
+                {refunding ? <span className="w-4 h-4 border-2 border-green-700/30 border-t-green-700 rounded-full spin" /> : <RotateCcw size={14} />}
                 Confirm Refund
               </button>
             </>
@@ -534,13 +540,13 @@ export default function AdminBookings() {
               </div>
               {policy === 'FULL' && (
                 <div className="bg-green-500/[0.08] border border-green-500/25 rounded-xl p-4">
-                  <div className="text-sm font-bold text-green-400 mb-1">✅ Full Refund — Cancelled 24+ hrs in advance</div>
+                  <div className="text-sm font-bold text-green-700 mb-1">✅ Full Refund — Cancelled 24+ hrs in advance</div>
                   <div className="text-xs text-muted">Player will receive the full amount of <strong className="text-white">₹{amount}</strong> back.</div>
                 </div>
               )}
               {policy === 'HALF' && (
-                <div className="bg-yellow-500/[0.08] border border-yellow-500/25 rounded-xl p-4">
-                  <div className="text-sm font-bold text-yellow-400 mb-1">⚠️ 50% Refund — Cancelled 1–24 hrs in advance</div>
+                <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4">
+                  <div className="text-sm font-bold text-yellow-700 mb-1">⚠️ 50% Refund — Cancelled 1–24 hrs in advance</div>
                   <div className="text-xs text-muted">Player will receive <strong className="text-white">₹{amount}</strong> (50% of ₹{refundTarget.amountPaid}).</div>
                 </div>
               )}
@@ -560,7 +566,7 @@ export default function AdminBookings() {
       {assignTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setAssignTarget(null)} />
-          <div className="relative w-full max-w-sm bg-[#1a1a30] border border-[#dde8f8] rounded-2xl p-6 shadow-2xl">
+            <div className="relative w-full max-w-sm bg-white border border-[#dde8f8] rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="font-bold text-sm">Assign Court / Lane</div>
@@ -574,9 +580,9 @@ export default function AdminBookings() {
             </div>
 
             <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-xl p-3.5 mb-4 text-xs text-[#5a6a8a] space-y-1">
-              <div className="flex justify-between"><span>Time</span><span className="font-semibold text-white">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
-              <div className="flex justify-between"><span>Date</span><span className="font-semibold text-white">{assignTarget.bookingDate}</span></div>
-              {assignTarget.boxGroup && <div className="flex justify-between"><span>Box</span><span className="font-semibold text-white">{assignTarget.boxGroup.replace('_', ' ')}</span></div>}
+              <div className="flex justify-between"><span>Time</span><span className="font-semibold text-[#0a1428]">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
+              <div className="flex justify-between"><span>Date</span><span className="font-semibold text-[#0a1428]">{assignTarget.bookingDate}</span></div>
+              {assignTarget.boxGroup && <div className="flex justify-between"><span>Box</span><span className="font-semibold text-[#0a1428]">{assignTarget.boxGroup.replace('_', ' ')}</span></div>}
             </div>
 
             {assignTarget.bookingType !== 'BOX_CRICKET' ? (
@@ -590,7 +596,7 @@ export default function AdminBookings() {
                           onClick={() => { setAssignBoxGroup(bg); setAssignValue(''); setAssignConflict(null) }}
                           className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all ${
                             assignBoxGroup === bg
-                              ? 'bg-blue-600/15 border-blue-600/40 text-blue-300'
+                              ? 'bg-blue-600/15 border-blue-400 text-blue-700'
                               : 'bg-[#f8faff] border-[#dde8f8] text-[#5a6a8a] hover:border-[#dde8f8]'
                           }`}>
                           {bg.replace('_', ' ')}
@@ -610,30 +616,30 @@ export default function AdminBookings() {
                   value={assignValue}
                   onChange={e => { setAssignValue(e.target.value); checkConflictLocally(e.target.value) }}
                   placeholder={assignTarget.bookingType === 'PICKLEBALL' ? '1, 2 or 3' : assignTarget.bookingType === 'CRICKET_LANE' ? (assignBoxGroup === 'BOX_A' ? '1–4' : '5–8') : '1–8'}
-                  className={`w-full bg-[#f8faff] border rounded-xl px-4 py-3 text-sm text-white focus:outline-none mb-2 transition-all ${
+                  className={`w-full bg-[#f8faff] border rounded-xl px-4 py-3 text-sm text-[#0a1428] focus:outline-none mb-2 transition-all ${
                     assignConflict ? 'border-red-500/60 focus:border-red-500' : 'border-[#dde8f8] focus:border-blue-600/50'
                   }`}
                   onKeyDown={e => e.key === 'Enter' && submitAssign()}
                 />
                 {assignConflict ? (
-                  <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-3 py-2.5 mb-4">
-                    <span className="text-red-400 text-sm mt-0.5">⛔</span>
+                  <div className="flex items-start gap-2 bg-red-50 border border-red-300 rounded-xl px-3 py-2.5 mb-4">
+                    <span className="text-red-600 text-sm mt-0.5">⛔</span>
                     <div>
-                      <div className="text-xs font-bold text-red-400">Already taken!</div>
-                      <div className="text-[11px] text-red-300/70">
+                      <div className="text-xs font-bold text-red-700">Already taken!</div>
+                      <div className="text-[11px] text-red-600">
                         Booking #{assignConflict.id} · {assignConflict.name} · {assignConflict.time}
                       </div>
-                      <div className="text-[10px] text-red-300/50 mt-0.5">Choose a different number</div>
+                      <div className="text-[10px] text-red-500 mt-0.5">Choose a different number</div>
                     </div>
                   </div>
                 ) : assignValue && !isNaN(parseInt(assignValue)) ? (
-                  <div className="flex items-center gap-1.5 text-[11px] text-green-400 mb-4">
+                  <div className="flex items-center gap-1.5 text-[11px] text-green-700 mb-4">
                     <span>✓</span> Available — no conflicts found
                   </div>
                 ) : <div className="mb-4" />}
               </>
             ) : (
-              <div className="bg-blue-600/[0.07] border border-blue-600/20 rounded-xl p-3.5 text-xs text-blue-300 mb-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-blue-700 mb-4">
                 Box group is already set to <strong>{assignTarget.boxGroup?.replace('_', ' ')}</strong>. Confirming will send the assignment email.
               </div>
             )}

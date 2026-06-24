@@ -11,7 +11,7 @@ import { Search, Trash2, UserPlus, Shield, Mail, Send, Crown } from 'lucide-reac
 const ROLES = ['PLAYER', 'EMPLOYEE', 'ADMINISTRATOR', 'SUPER_ADMIN']
 
 const ROLE_COLORS = {
-  PLAYER:        { bg: 'bg-green-500/10',  border: 'border-green-500/30',  text: 'text-green-400',  active: 'bg-green-500/25 border-green-500' },
+  PLAYER:        { bg: 'bg-green-100',  border: 'border-green-300',  text: 'text-green-700',  active: 'bg-green-200 border-green-500' },
   EMPLOYEE:      { bg: 'bg-blue-500/10',   border: 'border-blue-500/30',   text: 'text-blue-400',   active: 'bg-blue-500/25 border-blue-500'   },
   ADMINISTRATOR: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', active: 'bg-purple-500/25 border-purple-500'},
   SUPER_ADMIN:   { bg: 'bg-red-500/10',    border: 'border-red-500/30',    text: 'text-red-400',    active: 'bg-red-500/25 border-red-500'     },
@@ -210,7 +210,7 @@ export default function AdminUsers() {
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all w-56"
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all w-56"
               placeholder="Search users…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <button onClick={() => setInvite(true)}
@@ -225,10 +225,10 @@ export default function AdminUsers() {
         {FILTER_TABS.map(tab => (
           <button key={tab.value} onClick={() => switchTab(tab.value)}
             className={'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ' +
-              (roleFilter === tab.value ? 'bg-accent text-white' : 'text-muted hover:text-white')}>
+              (roleFilter === tab.value ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]')}>
             {tab.label}
             <span className={'px-1.5 py-0.5 rounded-full text-[10px] font-bold ' +
-              (roleFilter === tab.value ? 'bg-[#f0f5ff]' : 'bg-[#f0f5ff]')}>
+              (roleFilter === tab.value ? 'bg-white text-accent' : 'bg-[#dde8f8] text-muted')}>
               {countFor(tab.value)}
             </span>
           </button>
@@ -257,7 +257,7 @@ export default function AdminUsers() {
                         }
                         <div>
                           <div className="font-semibold text-sm">{u.fullName}</div>
-                          {!u.emailVerified && <span className="text-[10px] text-yellow-400">⚠ Pending setup</span>}
+                          {!u.emailVerified && <span className="text-[10px] text-yellow-700">⚠ Pending setup</span>}
                         </div>
                       </div>
                     </td>
@@ -280,7 +280,7 @@ export default function AdminUsers() {
                           </button>
                         )}
                         {u.role === 'PLAYER' && (
-                          <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 hover:bg-yellow-500/20 transition-all"
+                          <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all"
                             onClick={() => openMembership(u)}>
                             <Crown size={11} className="inline mr-1" />Member
                           </button>
@@ -357,7 +357,7 @@ export default function AdminUsers() {
                     <Badge value={view.role} />
                     <Badge value={view.active ? 'active' : 'inactive'} />
                     {!view.emailVerified && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/15 text-yellow-300 border border-yellow-500/25">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100  text-yellow-700 border border-yellow-300">
                         ⚠ Setup Pending
                       </span>
                     )}
@@ -375,7 +375,7 @@ export default function AdminUsers() {
                   <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3">
                     <div className="text-[10px] text-muted font-semibold mb-1">Email</div>
                     <div className="text-xs font-semibold break-all">{view.email}</div>
-                    <div className={`text-[10px] mt-1 font-semibold ${view.emailVerified ? 'text-green-400' : 'text-yellow-400'}`}>
+                    <div className={`text-[10px] mt-1 font-semibold ${view.emailVerified ? 'text-green-700' : 'text-yellow-600'}`}>
                       {view.emailVerified ? '✓ Verified' : '⚠ Not verified'}
                     </div>
                   </div>
@@ -420,10 +420,10 @@ export default function AdminUsers() {
                               ? 'bg-green-500/10 border-green-500/25'
                               : 'bg-[#f8faff] border-[#dde8f8]'
                           }`}>
-                          <div className={`text-[10px] font-bold mb-1 ${view.permissions[p.key] ? 'text-green-400' : 'text-muted'}`}>
+                          <div className={`text-[10px] font-bold mb-1 ${view.permissions[p.key] ? 'text-green-700' : 'text-muted'}`}>
                             {view.permissions[p.key] ? '✓' : '✗'}
                           </div>
-                          <div className={`text-[9px] font-semibold leading-tight ${view.permissions[p.key] ? 'text-green-300' : 'text-[#9aaac8]'}`}>
+                          <div className={`text-[9px] font-semibold leading-tight ${view.permissions[p.key] ? 'text-green-700' : 'text-[#9aaac8]'}`}>
                             {p.label}
                           </div>
                         </div>
@@ -434,8 +434,8 @@ export default function AdminUsers() {
                     <div className="grid grid-cols-5 gap-1.5">
                       {PERM_LABELS.map(p => (
                         <div key={p.key} className="rounded-xl p-2.5 border bg-green-500/10 border-green-500/25 text-center">
-                          <div className="text-[10px] font-bold text-green-400 mb-1">✓</div>
-                          <div className="text-[9px] font-semibold text-green-300 leading-tight">{p.label}</div>
+                          <div className="text-[10px] font-bold text-green-700 mb-1">✓</div>
+                          <div className="text-[9px] font-semibold text-green-700 leading-tight">{p.label}</div>
                         </div>
                       ))}
                     </div>
@@ -453,10 +453,10 @@ export default function AdminUsers() {
                       { key: 'boxCricketMember',  label: 'Box Cricket',  emoji: '🏟️' },
                       { key: 'pickleballMember',  label: 'Pickleball',   emoji: '🏓' },
                     ].map(s => (
-                      <div key={s.key} className={`rounded-xl p-3 border text-center ${view[s.key] ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-[#f8faff] border-[#dde8f8]'}`}>
+                      <div key={s.key} className={`rounded-xl p-3 border text-center ${view[s.key] ? 'bg-yellow-100 border-yellow-300' : 'bg-[#f8faff] border-[#dde8f8]'}`}>
                         <div className="text-lg mb-1">{s.emoji}</div>
-                        <div className={`text-[10px] font-bold ${view[s.key] ? 'text-yellow-300' : 'text-muted'}`}>{s.label}</div>
-                        <div className={`text-[9px] mt-0.5 ${view[s.key] ? 'text-green-400' : 'text-[#9aaac8]'}`}>{view[s.key] ? '✓ Active' : 'Inactive'}</div>
+                        <div className={`text-[10px] font-bold ${view[s.key] ? 'text-yellow-700' : 'text-muted'}`}>{s.label}</div>
+                        <div className={`text-[9px] mt-0.5 ${view[s.key] ? 'text-green-700' : 'text-[#9aaac8]'}`}>{view[s.key] ? '✓ Active' : 'Inactive'}</div>
                       </div>
                     ))}
                   </div>
@@ -505,7 +505,7 @@ export default function AdminUsers() {
                   <button key={s} type="button" onClick={() => setEf(f => ({ ...f, active: s === 'active' }))}
                     className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${
                       ef.active === (s === 'active')
-                        ? s === 'active' ? 'bg-green-500/25 border-green-500 text-green-400' : 'bg-red-500/25 border-red-500 text-red-400'
+                        ? s === 'active' ? 'bg-green-200 border-green-500 text-green-700' : 'bg-red-200 border-red-500 text-red-700'
                         : 'bg-[#f8faff] border-[#dde8f8] text-muted opacity-60 hover:opacity-90'
                     }`}>
                     {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -605,13 +605,13 @@ export default function AdminUsers() {
             <button key={sport.key} onClick={() => toggleMember(sport.key)}
               className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${
                 memberForm[sport.key]
-                  ? 'bg-yellow-500/10 border-yellow-500/30'
+                  ? 'bg-yellow-100 border-yellow-300'
                   : 'bg-[#f8faff] border-[#dde8f8] hover:bg-[#f8faff]'
               }`}>
               <div className="flex items-center gap-3">
                 <span className="text-xl">{sport.emoji}</span>
                 <div className="text-left">
-                  <div className={`text-sm font-bold ${memberForm[sport.key] ? 'text-yellow-300' : 'text-white'}`}>{sport.label}</div>
+                  <div className={`text-sm font-bold ${memberForm[sport.key] ? 'text-yellow-700' : 'text-white'}`}>{sport.label}</div>
                   <div className="text-xs text-muted">{sport.desc}</div>
                 </div>
               </div>
@@ -630,7 +630,7 @@ export default function AdminUsers() {
                   { key: 'pickleballMember',  label: 'Pickleball'   },
                 ].map(s => (
                   <span key={s.key} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    memberUser[s.key] ? 'bg-yellow-500/20 text-yellow-300' : 'bg-[#f8faff] text-muted'
+                    memberUser[s.key] ? 'bg-yellow-100 text-yellow-700' : 'bg-[#f8faff] text-muted'
                   }`}>
                     {s.label}: {memberUser[s.key] ? '✓ Active' : '✗ None'}
                   </span>

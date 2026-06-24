@@ -61,7 +61,7 @@ export default function AdminCMS() {
                     <td className="font-mono text-xs text-muted">{c.contentKey}</td>
                     <td className="font-semibold text-sm">{c.title || '—'}</td>
                     <td><span className="badge-blue text-[10px]">{c.contentType}</span></td>
-                    <td>{c.discountPercent > 0 ? <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/20 text-green-300">{c.discountPercent}% OFF</span> : <span className="text-xs text-muted">—</span>}</td>
+                    <td>{c.discountPercent > 0 ? <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">{c.discountPercent}% OFF</span> : <span className="text-xs text-muted">—</span>}</td>
                     <td>{c.active ? <span className="badge-green">Active</span> : <span className="badge-red">Inactive</span>}</td>
                     <td className="text-xs text-muted">{c.sortOrder}</td>
                     <td className="text-xs text-muted">{c.updatedAt?.slice(0, 10) || '—'}</td>
@@ -138,7 +138,7 @@ export default function AdminCMS() {
           {/* Discount conditions — only shown when discount > 0 */}
           {(form.discountPercent ?? 0) > 0 && (
             <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4 space-y-3">
-              <div className="text-xs font-bold text-green-400 mb-1">🎯 Discount Conditions</div>
+              <div className="text-xs font-bold text-green-700 mb-1">🎯 Discount Conditions</div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Apply On</label>

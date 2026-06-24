@@ -24,6 +24,7 @@ import LiveCourtView from './pages/user/LiveCourtView'
 import AdminLayout   from './components/layout/AdminLayout'
 import AdminOverview from './pages/admin/AdminOverview'
 import AdminBookings from './pages/admin/AdminBookings'
+import AdminCreateBooking from './pages/admin/AdminCreateBooking'
 import AdminUsers    from './pages/admin/AdminUsers'
 import AdminPayments from './pages/admin/AdminPayments'
 import AdminRevenue  from './pages/admin/AdminRevenue'
@@ -81,6 +82,7 @@ export default function App() {
       <Route path="/admin" element={<PrivateRoute adminOnly><AdminLayout /></PrivateRoute>}>
         <Route index           element={<AdminOverview />} />
         <Route path="bookings" element={<AdminBookings />} />
+        <Route path="bookings/new" element={<AdminCreateBooking />} />
         <Route path="users"    element={<AdminUsers />} />
         <Route path="payments" element={<AdminPayments />} />
         <Route path="revenue"  element={<AdminRevenue />} />

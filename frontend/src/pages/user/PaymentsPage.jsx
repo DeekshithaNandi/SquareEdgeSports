@@ -43,7 +43,7 @@ export default function PaymentsPage() {
                   <td>
                     <div className="font-bold">₹{parseFloat(p.amount).toFixed(2)}</div>
                     {p.status === 'PARTIAL_REFUND' && p.refundAmount && (
-                      <div className="text-[10px] text-yellow-400 font-semibold mt-0.5">
+                      <div className="text-[10px] text-yellow-700 font-semibold mt-0.5">
                         50% Refunded · ₹{parseFloat(p.refundAmount).toFixed(2)}
                       </div>
                     )}

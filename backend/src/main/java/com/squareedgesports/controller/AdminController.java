@@ -17,23 +17,23 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR','EMPLOYEE')")  // base: any staff can hit this controller
+@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR','EMPLOYEE')") // base: any staff can hit this controller
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final UserRepository               userRepo;
-    private final CourtRepository              courtRepo;
-    private final PricingRuleRepository        pricingRepo;
-    private final FeedbackRepository           feedbackRepo;
-    private final PaymentRepository            paymentRepo;
-    private final CmsContentRepository         cmsRepo;
+    private final UserRepository userRepo;
+    private final CourtRepository courtRepo;
+    private final PricingRuleRepository pricingRepo;
+    private final FeedbackRepository feedbackRepo;
+    private final PaymentRepository paymentRepo;
+    private final CmsContentRepository cmsRepo;
     private final EmployeePermissionRepository permRepo;
     private final PasswordResetTokenRepository resetTokenRepo;
-    private final OtpRepository                otpRepo;
-    private final BookingRepository            bookingRepo;
-    private final AuthService                  authService;
-    private final EmailService                 emailService;
-    private final PasswordEncoder              encoder;
+    private final OtpRepository otpRepo;
+    private final BookingRepository bookingRepo;
+    private final AuthService authService;
+    private final EmailService emailService;
+    private final PasswordEncoder encoder;
 
     // ── Users ─────────────────────────────────────────────────────────────────
     // READ: employee with canManageUsers OR admin
@@ -57,15 +57,24 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         User u = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        if (body.containsKey("fullName")) u.setFullName((String) body.get("fullName"));
-        if (body.containsKey("phone"))    u.setPhone((String) body.get("phone"));
-        if (body.containsKey("addressLine1")) u.setAddressLine1((String) body.get("addressLine1"));
-        if (body.containsKey("addressLine2")) u.setAddressLine2((String) body.get("addressLine2"));
-        if (body.containsKey("city"))         u.setCity((String) body.get("city"));
-        if (body.containsKey("state"))        u.setState((String) body.get("state"));
-        if (body.containsKey("country"))      u.setCountry((String) body.get("country"));
-        if (body.containsKey("zipCode"))      u.setZipCode((String) body.get("zipCode"));
-        if (body.get("active") instanceof Boolean b) u.setActive(b);
+        if (body.containsKey("fullName"))
+            u.setFullName((String) body.get("fullName"));
+        if (body.containsKey("phone"))
+            u.setPhone((String) body.get("phone"));
+        if (body.containsKey("addressLine1"))
+            u.setAddressLine1((String) body.get("addressLine1"));
+        if (body.containsKey("addressLine2"))
+            u.setAddressLine2((String) body.get("addressLine2"));
+        if (body.containsKey("city"))
+            u.setCity((String) body.get("city"));
+        if (body.containsKey("state"))
+            u.setState((String) body.get("state"));
+        if (body.containsKey("country"))
+            u.setCountry((String) body.get("country"));
+        if (body.containsKey("zipCode"))
+            u.setZipCode((String) body.get("zipCode"));
+        if (body.get("active") instanceof Boolean b)
+            u.setActive(b);
         if (body.containsKey("role")) {
             User.Role newRole = User.Role.valueOf((String) body.get("role"));
             User.Role oldRole = u.getRole();
@@ -102,13 +111,17 @@ public class AdminController {
     }
 
     @PostMapping("/users/invite")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
+    // @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageUsers(authentication) or @permCheck.canManageBookings(authentication)")
     public ResponseEntity<?> inviteUser(@RequestBody AdminCreateUserRequest req) {
         if (userRepo.existsByEmail(req.getEmail()))
             return ResponseEntity.badRequest().body(ApiResponse.error("Email already exists."));
         User.Role role;
-        try { role = User.Role.valueOf(req.getRole()); }
-        catch (Exception e) { return ResponseEntity.badRequest().body(ApiResponse.error("Invalid role.")); }
+        try {
+            role = User.Role.valueOf(req.getRole());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Invalid role."));
+        }
 
         User user = userRepo.save(User.builder()
                 .fullName(req.getFullName()).email(req.getEmail())
@@ -163,30 +176,36 @@ public class AdminController {
         java.util.List<String> newlyActivated = new java.util.ArrayList<>();
         if (body.containsKey("cricketLaneMember")) {
             boolean val = Boolean.TRUE.equals(body.get("cricketLaneMember"));
-            if (val && !u.isCricketLaneMember()) newlyActivated.add("CRICKET_LANE");
+            if (val && !u.isCricketLaneMember())
+                newlyActivated.add("CRICKET_LANE");
             u.setCricketLaneMember(val);
         }
-        if (body.containsKey("boxCricketMember"))  {
+        if (body.containsKey("boxCricketMember")) {
             boolean val = Boolean.TRUE.equals(body.get("boxCricketMember"));
-            if (val && !u.isBoxCricketMember())  newlyActivated.add("BOX_CRICKET");
+            if (val && !u.isBoxCricketMember())
+                newlyActivated.add("BOX_CRICKET");
             u.setBoxCricketMember(val);
         }
-        if (body.containsKey("pickleballMember"))  {
+        if (body.containsKey("pickleballMember")) {
             boolean val = Boolean.TRUE.equals(body.get("pickleballMember"));
-            if (val && !u.isPickleballMember())  newlyActivated.add("PICKLEBALL");
+            if (val && !u.isPickleballMember())
+                newlyActivated.add("PICKLEBALL");
             u.setPickleballMember(val);
         }
         // Set/extend expiry if anything newly activated
         if (!newlyActivated.isEmpty()) {
             LocalDateTime newExpiry = LocalDateTime.now().plusDays(30);
-            u.setMembershipExpiry(u.getMembershipExpiry() != null && u.getMembershipExpiry().isAfter(LocalDateTime.now())
-                ? u.getMembershipExpiry().plusDays(30) : newExpiry);
+            u.setMembershipExpiry(
+                    u.getMembershipExpiry() != null && u.getMembershipExpiry().isAfter(LocalDateTime.now())
+                            ? u.getMembershipExpiry().plusDays(30)
+                            : newExpiry);
         }
         userRepo.save(u);
 
         // Send activation email for each newly activated sport
         String expiresAt = u.getMembershipExpiry() != null
-            ? u.getMembershipExpiry().toLocalDate().toString() : "30 days";
+                ? u.getMembershipExpiry().toLocalDate().toString()
+                : "30 days";
         for (String sport : newlyActivated) {
             emailService.sendMembershipActivation(u.getEmail(), u.getFullName(), sport, expiresAt);
         }
@@ -198,7 +217,9 @@ public class AdminController {
     // READ: employee with canManageCourts OR admin
     @GetMapping("/courts")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageCourts(authentication)")
-    public ResponseEntity<?> getCourts() { return ResponseEntity.ok(courtRepo.findAll()); }
+    public ResponseEntity<?> getCourts() {
+        return ResponseEntity.ok(courtRepo.findAll());
+    }
 
     // WRITE: admin only
     @PostMapping("/courts")
@@ -211,9 +232,13 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> updateCourt(@PathVariable Long id, @RequestBody Court body) {
         Court c = courtRepo.findById(id).orElseThrow(() -> new RuntimeException("Court not found"));
-        c.setName(body.getName()); c.setType(body.getType()); c.setLocation(body.getLocation());
-        c.setDescription(body.getDescription()); c.setPricePerSlot(body.getPricePerSlot());
-        c.setMemberPricePerSlot(body.getMemberPricePerSlot()); c.setCapacity(body.getCapacity());
+        c.setName(body.getName());
+        c.setType(body.getType());
+        c.setLocation(body.getLocation());
+        c.setDescription(body.getDescription());
+        c.setPricePerSlot(body.getPricePerSlot());
+        c.setMemberPricePerSlot(body.getMemberPricePerSlot());
+        c.setCapacity(body.getCapacity());
         c.setStatus(body.getStatus());
         return ResponseEntity.ok(courtRepo.save(c));
     }
@@ -228,7 +253,9 @@ public class AdminController {
     // ── Pricing ───────────────────────────────────────────────────────────────
     @GetMapping("/pricing")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
-    public ResponseEntity<?> getPricing() { return ResponseEntity.ok(pricingRepo.findAll()); }
+    public ResponseEntity<?> getPricing() {
+        return ResponseEntity.ok(pricingRepo.findAll());
+    }
 
     @PutMapping("/pricing/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
@@ -238,12 +265,14 @@ public class AdminController {
             Object pv = body.get("price");
             if (pv == null)
                 return ResponseEntity.badRequest().body(ApiResponse.error("price must not be null"));
-            try { rule.setPrice(new BigDecimal(pv.toString())); }
-            catch (NumberFormatException e) {
+            try {
+                rule.setPrice(new BigDecimal(pv.toString()));
+            } catch (NumberFormatException e) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("Invalid price format"));
             }
         }
-        if (body.containsKey("description")) rule.setDescription((String) body.get("description"));
+        if (body.containsKey("description"))
+            rule.setDescription((String) body.get("description"));
         return ResponseEntity.ok(pricingRepo.save(rule));
     }
 
@@ -253,10 +282,14 @@ public class AdminController {
     public ResponseEntity<?> getFeedback() {
         return ResponseEntity.ok(feedbackRepo.findAllWithUser().stream().map(f -> {
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("id", f.getId()); m.put("rating", f.getRating());
-            m.put("category", f.getCategory()); m.put("comment", f.getComment());
-            m.put("userName", f.getUser().getFullName()); m.put("userEmail", f.getUser().getEmail());
-            m.put("reviewed", f.isReviewed()); m.put("createdAt", f.getCreatedAt());
+            m.put("id", f.getId());
+            m.put("rating", f.getRating());
+            m.put("category", f.getCategory());
+            m.put("comment", f.getComment());
+            m.put("userName", f.getUser().getFullName());
+            m.put("userEmail", f.getUser().getEmail());
+            m.put("reviewed", f.isReviewed());
+            m.put("createdAt", f.getCreatedAt());
             return m;
         }).collect(Collectors.toList()));
     }
@@ -264,7 +297,10 @@ public class AdminController {
     @PatchMapping("/feedback/{id}/reviewed")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> markReviewed(@PathVariable Long id) {
-        feedbackRepo.findById(id).ifPresent(f -> { f.setReviewed(true); feedbackRepo.save(f); });
+        feedbackRepo.findById(id).ifPresent(f -> {
+            f.setReviewed(true);
+            feedbackRepo.save(f);
+        });
         return ResponseEntity.ok(ApiResponse.ok("Marked as reviewed"));
     }
 
@@ -275,17 +311,23 @@ public class AdminController {
     public ResponseEntity<?> getPayments() {
         return ResponseEntity.ok(paymentRepo.findAllWithUser().stream().map(p -> {
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("id", p.getId()); m.put("userName", p.getUser().getFullName());
-            m.put("userEmail", p.getUser().getEmail()); m.put("amount", p.getAmount());
-            m.put("status", p.getStatus()); m.put("method", p.getPaymentMethod());
-            m.put("reference", p.getPaymentReference()); m.put("description", p.getDescription());
-            m.put("paidAt", p.getPaidAt()); m.put("createdAt", p.getCreatedAt());
-            m.put("refundAmount", p.getRefundAmount()); m.put("refundedAt", p.getRefundedAt());
+            m.put("id", p.getId());
+            m.put("userName", p.getUser().getFullName());
+            m.put("userEmail", p.getUser().getEmail());
+            m.put("amount", p.getAmount());
+            m.put("status", p.getStatus());
+            m.put("method", p.getPaymentMethod());
+            m.put("reference", p.getPaymentReference());
+            m.put("description", p.getDescription());
+            m.put("paidAt", p.getPaidAt());
+            m.put("createdAt", p.getCreatedAt());
+            m.put("refundAmount", p.getRefundAmount());
+            m.put("refundedAt", p.getRefundedAt());
             // expose booking date so UI can filter payments by the session date
             if (p.getBooking() != null) {
-                m.put("bookingDate",  p.getBooking().getBookingDate());
+                m.put("bookingDate", p.getBooking().getBookingDate());
                 m.put("bookingStart", p.getBooking().getStartTime());
-                m.put("bookingType",  p.getBooking().getBookingType());
+                m.put("bookingType", p.getBooking().getBookingType());
             }
             return m;
         }).collect(Collectors.toList()));
@@ -305,7 +347,9 @@ public class AdminController {
     // ── CMS ───────────────────────────────────────────────────────────────────
     @GetMapping("/cms")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
-    public ResponseEntity<?> getCms() { return ResponseEntity.ok(cmsRepo.findAll()); }
+    public ResponseEntity<?> getCms() {
+        return ResponseEntity.ok(cmsRepo.findAll());
+    }
 
     @PostMapping("/cms")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
@@ -317,8 +361,12 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> updateCms(@PathVariable Long id, @RequestBody CmsContent body) {
         CmsContent c = cmsRepo.findById(id).orElseThrow(() -> new RuntimeException("Content not found"));
-        c.setTitle(body.getTitle()); c.setBody(body.getBody()); c.setImageUrl(body.getImageUrl());
-        c.setContentType(body.getContentType()); c.setActive(body.isActive()); c.setSortOrder(body.getSortOrder());
+        c.setTitle(body.getTitle());
+        c.setBody(body.getBody());
+        c.setImageUrl(body.getImageUrl());
+        c.setContentType(body.getContentType());
+        c.setActive(body.isActive());
+        c.setSortOrder(body.getSortOrder());
         c.setDiscountPercent(body.getDiscountPercent() != null ? body.getDiscountPercent() : 0);
         c.setDayRestriction(body.getDayRestriction() != null ? body.getDayRestriction() : "ALL_DAYS");
         c.setDiscountTimeFrom(body.getDiscountTimeFrom());
@@ -338,12 +386,12 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR','EMPLOYEE')")
     public ResponseEntity<?> stats() {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("totalUsers",     userRepo.count());
-        m.put("totalCourts",    courtRepo.count());
-        m.put("activeCourts",   courtRepo.findByStatus(Court.CourtStatus.ACTIVE).size());
-        m.put("avgRating",      feedbackRepo.averageRating());
+        m.put("totalUsers", userRepo.count());
+        m.put("totalCourts", courtRepo.count());
+        m.put("activeCourts", courtRepo.findByStatus(Court.CourtStatus.ACTIVE).size());
+        m.put("avgRating", feedbackRepo.averageRating());
         m.put("totalEmployees", userRepo.findAll().stream().filter(u -> u.getRole() == User.Role.EMPLOYEE).count());
-        m.put("totalAdmins",    userRepo.findAll().stream()
+        m.put("totalAdmins", userRepo.findAll().stream()
                 .filter(u -> u.getRole() == User.Role.SUPER_ADMIN || u.getRole() == User.Role.ADMINISTRATOR).count());
         return ResponseEntity.ok(m);
     }

@@ -482,7 +482,7 @@ export default function BookingModal({ initialType, onClose }) {
                                 ? 'bg-red-500/[0.05] border-red-500/15 text-red-400/40 cursor-not-allowed'
                                 : selected
                                   ? `${typeInfo.bg} ${typeInfo.border} ${typeInfo.text} font-bold ring-1 ring-blue-600/40`
-                                  : 'bg-green-500/[0.05] border-green-500/20 text-green-300 hover:bg-green-500/10'
+                                  : 'bg-green-50 border-green-400 text-green-700 hover:bg-green-100'
                           }`}>
                           <Clock size={9} className="mx-auto mb-0.5" />
                           <div className="font-semibold">{fmtTime(slot.startTime)}</div>
@@ -567,7 +567,7 @@ export default function BookingModal({ initialType, onClose }) {
                       onChange={e => setSignInPassword(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleGuestSignIn()}
                       placeholder="Your password"
-                      className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-white/25 focus:outline-none focus:border-blue-600/50" />
+                      className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
                     <button type="button" onClick={() => setShowPw(p => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
                       {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -612,7 +612,7 @@ export default function BookingModal({ initialType, onClose }) {
                   ))}
                   <div className="flex justify-between">
                     <span className="text-[#5a6a8a]">Court / Lane</span>
-                    <span className="text-yellow-400 font-semibold text-xs">Assigned by admin via email</span>
+                    <span className="text-yellow-700 font-semibold text-xs">Assigned by admin via email</span>
                   </div>
                   {(() => {
                     const memberApplied = createdBookings[0]?.memberDiscountApplied
@@ -654,7 +654,7 @@ export default function BookingModal({ initialType, onClose }) {
                 <strong>Secure Payment:</strong> You'll be redirected to Razorpay's secure checkout. UPI, cards, net banking accepted.
               </div>
 
-              <div className="bg-yellow-500/[0.05] border border-yellow-500/15 rounded-xl p-3.5 text-xs text-yellow-300 leading-relaxed">
+              <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3.5 text-xs text-yellow-700 leading-relaxed">
                 <strong>Lane/Court Assignment:</strong> Our team will assign your specific lane or court and notify you by email.
               </div>
 
@@ -663,8 +663,8 @@ export default function BookingModal({ initialType, onClose }) {
               </div>
 
               {/* ── Test Mode Credentials ── */}
-              <div className="bg-amber-500/[0.08] border border-amber-500/25 rounded-xl p-3.5 text-xs space-y-2">
-                <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-2">
+              <div className="bg-amber-50 border border-amber-300 rounded-xl p-3.5 text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-amber-700 mb-2">
                   🧪 Test Mode — Use these credentials
                 </div>
 

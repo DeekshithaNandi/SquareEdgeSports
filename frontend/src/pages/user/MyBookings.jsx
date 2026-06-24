@@ -42,8 +42,8 @@ function fmtDateTime(dt) {
 
 function RefundBadge({ policy, amount }) {
   if (!policy) return null
-  if (policy === 'FULL') return <span className="text-[11px] font-bold text-green-400">✓ Full Refund ₹{amount}</span>
-  if (policy === 'HALF') return <span className="text-[11px] font-bold text-yellow-400">50% Refund ₹{amount}</span>
+  if (policy === 'FULL') return <span className="text-[11px] font-bold text-green-700">✓ Full Refund ₹{amount}</span>
+  if (policy === 'HALF') return <span className="text-[11px] font-bold text-yellow-700">50% Refund ₹{amount}</span>
   return <span className="text-[11px] font-bold text-red-400">No Refund</span>
 }
 
@@ -188,11 +188,11 @@ export default function MyBookings() {
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                 b.courtAssigned ? 'bg-green-500/20' : 'bg-yellow-500/20'
               }`}>
-                <MapPin size={14} className={b.courtAssigned ? 'text-green-400' : 'text-yellow-400'} />
+                <MapPin size={14} className={b.courtAssigned ? 'text-green-700' : 'text-yellow-600'} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className={`text-xs font-bold ${b.courtAssigned ? 'text-green-300' : 'text-yellow-300'}`}>
+                  <span className={`text-xs font-bold ${b.courtAssigned ? 'text-green-700' : 'text-yellow-600'}`}>
                     {b.courtAssigned ? 'Court Assigned' : 'Assignment Pending'}
                   </span>
                   <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 text-[9px] font-bold border border-red-500/20">
@@ -223,7 +223,7 @@ export default function MyBookings() {
           ['cancelled', `Cancelled (${cancelled.length})`],
         ].map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${tab === k ? 'bg-accent text-white' : 'text-muted hover:text-white'}`}>
+            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${tab === k ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]'}`}>
             {l}
           </button>
         ))}
@@ -256,11 +256,11 @@ export default function MyBookings() {
 
       {/* -- Pending payment alert ---------------------------------------------- */}
       {tab === 'active' && !loading && active.filter(b => b.paymentStatus === 'PENDING' && !isPendingExpired(b.createdAt)).length > 0 && (
-        <div className="mb-3 p-3.5 rounded-xl bg-yellow-500/[0.07] border border-yellow-500/25 flex items-start gap-3">
-          <AlertTriangle size={15} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+        <div className="mb-3 p-3.5 rounded-xl bg-yellow-50 border border-yellow-300 flex items-start gap-3">
+          <AlertTriangle size={15} className="text-yellow-600 flex-shrink-0 mt-0.5" />
           <div>
-            <div className="text-xs font-bold text-yellow-300">Payment Pending</div>
-            <div className="text-[11px] text-yellow-300/60 mt-0.5">
+            <div className="text-xs font-bold text-yellow-700">Payment Pending</div>
+            <div className="text-[11px] text-yellow-600 mt-0.5">
               You have {active.filter(b => b.paymentStatus === 'PENDING' && !isPendingExpired(b.createdAt)).length} booking(s) awaiting payment.
               Complete within 10 minutes or the slot will be released.
             </div>
@@ -282,10 +282,17 @@ export default function MyBookings() {
               )}
             </div>
           ) : list.map(b => (
+            // <div key={b.id} className={`card p-4 flex flex-col sm:flex-row sm:items-center gap-4 ${
+            //   b.paymentStatus === 'PENDING' && !isPendingExpired(b.createdAt)
+            //     ? 'border-yellow-500/30 bg-yellow-500/[0.03]'
+            //     : ''
+            // }`}>
             <div key={b.id} className={`card p-4 flex flex-col sm:flex-row sm:items-center gap-4 ${
               b.paymentStatus === 'PENDING' && !isPendingExpired(b.createdAt)
                 ? 'border-yellow-500/30 bg-yellow-500/[0.03]'
-                : ''
+                : b.paymentStatus === 'DUE'
+                  ? 'border-blue-500/30 bg-blue-500/[0.03]'
+                  : ''
             }`}>
               {/* Sport icon */}
               <div className="text-3xl flex-shrink-0">{typeEmoji(b.bookingType)}</div>
@@ -312,14 +319,14 @@ export default function MyBookings() {
                 {/* Court/Lane assignment status */}
                 <div className="mt-2">
                   {b.courtAssigned ? (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-300 text-[11px] font-semibold">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-100 border border-green-300 text-green-700 text-[11px] font-semibold">
                       <MapPin size={10} />
                       {b.bookingType === 'CRICKET_LANE' ? `Lane ${b.laneNumber} Assigned` :
                        b.bookingType === 'BOX_CRICKET'  ? `${b.boxGroup?.replace('_', ' ')} Assigned` :
                        `Court ${b.courtNumber} Assigned`}
                     </div>
                   ) : b.status === 'CONFIRMED' ? (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 text-[11px]">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-100 border border-yellow-300 text-yellow-700 text-[11px]">
                       <Clock size={10} /> Court / Lane — Pending assignment
                     </div>
                   ) : null}
@@ -328,12 +335,20 @@ export default function MyBookings() {
 
               {/* Amount + action */}
               <div className="flex sm:flex-col items-center sm:items-end gap-3 flex-shrink-0">
+                {/* <div className="text-right">
+                  <div className="text-lg font-extrabold">₹{b.amountPaid}</div>
+                  <div className={`text-[10px] font-bold ${
+                    b.paymentStatus === 'PAID' ? 'text-green-700' :
+                    b.paymentStatus === 'REFUNDED' ? 'text-blue-400' : 'text-yellow-400'
+                  }`}>{b.paymentStatus}</div>
+                </div> */}
                 <div className="text-right">
                   <div className="text-lg font-extrabold">₹{b.amountPaid}</div>
                   <div className={`text-[10px] font-bold ${
-                    b.paymentStatus === 'PAID' ? 'text-green-400' :
-                    b.paymentStatus === 'REFUNDED' ? 'text-blue-400' : 'text-yellow-400'
-                  }`}>{b.paymentStatus}</div>
+                    b.paymentStatus === 'PAID' ? 'text-green-700' :
+                    b.paymentStatus === 'REFUNDED' ? 'text-blue-400' :
+                    b.paymentStatus === 'DUE' ? 'text-blue-600' : 'text-yellow-700'
+                  }`}>{b.paymentStatus === 'DUE' ? 'Pay at Venue' : b.paymentStatus}</div>
                 </div>
                 {/* Cancelled — show refund info */}
                 {b.status === 'CANCELLED' && (
@@ -344,7 +359,7 @@ export default function MyBookings() {
                     )}
                   </div>
                 )}
-                {/* PENDING payment — show Pay Now or Expired */}
+                {/* PENDING payment — show Pay Now or Expired
                 {b.status === 'CONFIRMED' && b.paymentStatus === 'PENDING' && (
                   isPendingExpired(b.createdAt)
                     ? <span className="flex items-center gap-1 text-[10px] text-red-400/70 italic"><AlertTriangle size={10} /> Slot expired</span>
@@ -355,13 +370,38 @@ export default function MyBookings() {
                       </button>
                 )}
                 {/* Only show Cancel if CONFIRMED+PAID and session hasn't started yet */}
-                {b.status === 'CONFIRMED' && b.paymentStatus === 'PAID' && !isPast(b.bookingDate, b.startTime?.toString()) && (
+                {/* {b.status === 'CONFIRMED' && b.paymentStatus === 'PAID' && !isPast(b.bookingDate, b.startTime?.toString()) && (
                   <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all"
                     onClick={() => setTarget(b)}>Cancel</button>
                 )}
                 {b.status === 'CONFIRMED' && b.paymentStatus === 'PAID' && isPast(b.bookingDate, b.startTime?.toString()) && (
                   <span className="text-[10px] text-muted italic">Session ended</span>
+                )} */} 
+                {/* PENDING payment — show Pay Now or Expired */}
+                {b.status === 'CONFIRMED' && b.paymentStatus === 'PENDING' && (
+                  isPendingExpired(b.createdAt)
+                    ? <span className="flex items-center gap-1 text-[10px] text-red-400/70 italic"><AlertTriangle size={10} /> Slot expired</span>
+                    : <button disabled={paying}
+                        onClick={() => continuePendingPayment(b)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all disabled:opacity-50">
+                        <CreditCard size={11} /> Pay Now
+                      </button>
                 )}
+                {/* DUE — booked by staff; customer pays at the venue (card/QR), not through the app */}
+                {b.status === 'CONFIRMED' && b.paymentStatus === 'DUE' && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/10 border border-blue-500/20 text-blue-300">
+                    <CreditCard size={11} /> Pay at Venue
+                  </span>
+                )}
+                {/* Only show Cancel if CONFIRMED+(PAID or DUE) and session hasn't started yet */}
+                {b.status === 'CONFIRMED' && (b.paymentStatus === 'PAID' || b.paymentStatus === 'DUE') && !isPast(b.bookingDate, b.startTime?.toString()) && (
+                  <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all"
+                    onClick={() => setTarget(b)}>Cancel</button>
+                )}
+                {b.status === 'CONFIRMED' && (b.paymentStatus === 'PAID' || b.paymentStatus === 'DUE') && isPast(b.bookingDate, b.startTime?.toString()) && (
+                  <span className="text-[10px] text-muted italic">Session ended</span>
+                )}
+
               </div>
             </div>
           ))}

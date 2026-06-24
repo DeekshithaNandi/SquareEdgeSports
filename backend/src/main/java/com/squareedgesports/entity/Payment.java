@@ -5,11 +5,17 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "payments")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "payments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,7 +30,7 @@ public class Payment {
     private BigDecimal amount;
 
     private String paymentReference;
-    private String paymentMethod;  // RAZORPAY | STRIPE | TEST_MODE | CASH
+    private String paymentMethod; // RAZORPAY | STRIPE | TEST_MODE | CASH
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDING;
@@ -42,8 +48,18 @@ public class Payment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @PrePersist  protected void onCreate() { createdAt = updatedAt = LocalDateTime.now(); }
-    @PreUpdate   protected void onUpdate() { updatedAt = LocalDateTime.now(); }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = updatedAt = LocalDateTime.now();
+    }
 
-    public enum PaymentStatus { PENDING, PAID, FAILED, REFUNDED, PARTIAL_REFUND }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // public enum PaymentStatus { PENDING, PAID, FAILED, REFUNDED, PARTIAL_REFUND }
+    public enum PaymentStatus {
+        PENDING, PAID, FAILED, REFUNDED, PARTIAL_REFUND, DUE
+    }
 }

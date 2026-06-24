@@ -100,13 +100,13 @@ export default function LoginPage() {
 
             {/* Not registered — banner */}
             {notRegistered && (
-              <div className="bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
+              <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <UserX size={15} className="text-amber-400 flex-shrink-0" />
-                  <span className="text-xs font-bold text-amber-300">Account not found</span>
+                  <UserX size={15} className="text-amber-600 flex-shrink-0" />
+                  <span className="text-xs font-bold text-amber-700">Account not found</span>
                 </div>
-                <p className="text-[11px] text-amber-200/70 leading-relaxed">
-                  No account exists for <strong className="text-amber-200">{form.email}</strong>.
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  No account exists for <strong className="text-amber-800">{form.email}</strong>.
                   Please register below before signing in.
                 </p>
               </div>

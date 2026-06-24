@@ -29,7 +29,7 @@ function Select({ value, onChange, options, label }) {
   return (
     <div className="relative">
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-white outline-none focus:border-accent transition-all cursor-pointer [color-scheme:dark]">
+        className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-[#0a1428] outline-none focus:border-accent transition-all cursor-pointer [color-scheme:light]">
         {options.map(o => (
           <option key={o.value ?? o} value={o.value ?? o}>
             {o.label ?? (o === 'ALL' ? `All ${label}` : o.replace(/_/g, ' '))}
@@ -153,9 +153,9 @@ export default function AdminPayments() {
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search by player name or email…"
-              className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-accent transition-all" />
+              className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all" />
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white">
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-[#0a1428]">
                 <X size={12} />
               </button>
             )}
@@ -166,7 +166,7 @@ export default function AdminPayments() {
             {STATUSES.map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-                  (statusFilter === s ? 'bg-accent text-white' : 'text-muted hover:text-white')}>
+                  (statusFilter === s ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]')}>
                 {s}
               </button>
             ))}
@@ -189,12 +189,12 @@ export default function AdminPayments() {
           <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
             <button onClick={() => setDateType('slot')}
               className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-                (dateType === 'slot' ? 'bg-[#f8faff] text-white' : 'text-muted hover:text-white')}>
+                (dateType === 'slot' ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]')}>
               📅 Slot Date
             </button>
             <button onClick={() => setDateType('booking')}
               className={'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ' +
-                (dateType === 'booking' ? 'bg-[#f8faff] text-white' : 'text-muted hover:text-white')}>
+                (dateType === 'booking' ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]')}>
               🕐 Booked On
             </button>
           </div>
@@ -203,14 +203,14 @@ export default function AdminPayments() {
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-muted font-bold">From</span>
             <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
-              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent transition-all [color-scheme:light]" />
             <span className="text-[11px] text-muted font-bold">To</span>
             <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
               min={fromDate || undefined}
-              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-accent transition-all [color-scheme:dark]" />
+              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent transition-all [color-scheme:light]" />
             {(fromDate || toDate) && (
               <button onClick={() => { setFromDate(''); setToDate('') }}
-                className="text-[11px] text-muted hover:text-white px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8] transition-all">
+                className="text-[11px] text-muted hover:text-[#0a1428] px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8] transition-all">
                 <X size={11} />
               </button>
             )}
@@ -233,9 +233,9 @@ export default function AdminPayments() {
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-1.5 pt-1">
             {search       && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-accent/15 text-accent border border-accent/30">Search: "{search}"</span>}
-            {statusFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">Status: {statusFilter}</span>}
-            {sportFilter  !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/15 text-green-300 border border-green-500/30">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
-            {methodFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-500/15 text-yellow-300 border border-yellow-500/30">Method: {methodFilter}</span>}
+            {statusFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-300">Status: {statusFilter}</span>}
+            {sportFilter  !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-300">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
+            {methodFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-300">Method: {methodFilter}</span>}
             {(fromDate || toDate)   && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">{dateType === 'slot' ? 'Slot' : 'Booked'}: {fromDate || '…'} → {toDate || '…'}</span>}
             {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f0f5ff] text-[#5a6a8a] border border-[#dde8f8]">Sort: Oldest First</span>}
           </div>
@@ -303,7 +303,7 @@ export default function AdminPayments() {
                   <td>
                     {p.status === 'PAID' && !isSessionPast(p.bookingDate, p.bookingStart) && (
                       <button onClick={() => refund(p.id)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-400/10 border border-yellow-400/20 text-yellow-300 hover:bg-yellow-400/20 transition-all">
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all">
                         Refund
                       </button>
                     )}

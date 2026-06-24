@@ -36,7 +36,7 @@ function CmsBlock({ item, onDismiss }) {
               )}
             </div>
             <button onClick={() => onDismiss(item.id)}
-              className="p-1 rounded-lg text-muted hover:text-white hover:bg-[#f0f5ff] transition-all flex-shrink-0">
+              className="p-1 rounded-lg text-muted hover:text-[#0a1428] hover:bg-[#f0f5ff] transition-all flex-shrink-0">
               <X size={14} />
             </button>
           </div>
@@ -58,7 +58,7 @@ function CmsBlock({ item, onDismiss }) {
           )}
         </div>
         <button onClick={() => onDismiss(item.id)}
-          className="p-1 rounded-lg text-muted hover:text-white hover:bg-[#f0f5ff] transition-all flex-shrink-0 mt-0.5">
+          className="p-1 rounded-lg text-muted hover:text-[#0a1428] hover:bg-[#f0f5ff] transition-all flex-shrink-0 mt-0.5">
           <X size={12} />
         </button>
       </div>
@@ -186,7 +186,7 @@ export default function UserDashboard() {
       </div>
 
       {/* Cancellation policy (static) */}
-      <div className="bg-yellow-400/5 border border-yellow-400/20 rounded-xl px-4 py-3 mb-6 text-xs text-yellow-300">
+      <div className="bg-yellow-50 border border-yellow-300 rounded-xl px-4 py-3 mb-6 text-xs text-yellow-700">
         <strong>📋 Cancellation Policy:</strong> Free refund 24+ hrs · 50% within 1–24 hrs · No refund &lt;1 hr before session
       </div>
 
@@ -212,7 +212,7 @@ export default function UserDashboard() {
                     <div className="font-bold text-sm">{sport.label}</div>
                   </div>
                   {isMember ? (
-                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/15 border border-green-500/25 text-green-400 text-[10px] font-black uppercase">
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 border border-green-300 text-green-700 text-[10px] font-black uppercase">
                       <CheckCircle size={9} /> MEMBER
                     </span>
                   ) : (
@@ -223,7 +223,7 @@ export default function UserDashboard() {
                 </div>
 
                 {isMember ? (
-                  <div className="text-xs text-green-400/80 mb-3">
+                  <div className="text-xs text-green-700 mb-3">
                     Save ₹{sport.save}/session · Active
                     {expiry && <div className="text-[10px] text-muted mt-0.5">Expires: {new Date(expiry).toLocaleDateString('en-IN')}</div>}
                   </div>

@@ -196,8 +196,8 @@ export default function EditProfile() {
           <div className="border-t border-[#dde8f8] pt-5 space-y-4">
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-accent" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider">Address</span>
-              <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] bg-blue-500/10 text-blue-400 font-normal tracking-normal normal-case">
+              <span className="text-xs font-bold text-[#0a1428] uppercase tracking-wider">Address</span>
+              <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] bg-blue-100 text-blue-700 font-normal tracking-normal normal-case">
                 Google Maps
               </span>
             </div>
@@ -276,9 +276,9 @@ export default function EditProfile() {
             {/* Summary preview — shown after address selected */}
             {addressSelected && address.addressLine1 && (
               <div className="flex items-start gap-2.5 px-3.5 py-3 bg-green-500/[0.06] border border-green-500/20 rounded-xl">
-                <CheckCircle size={13} className="text-green-400 flex-shrink-0 mt-0.5" />
+                <CheckCircle size={13} className="text-green-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs text-green-400 font-semibold mb-0.5">Address confirmed</p>
+                  <p className="text-xs text-green-700 font-semibold mb-0.5">Address confirmed</p>
                   <p className="text-xs text-muted leading-relaxed">
                     {formatFullAddress(address)}
                   </p>

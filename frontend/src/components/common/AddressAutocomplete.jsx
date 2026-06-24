@@ -180,7 +180,7 @@ export default function AddressAutocomplete({
     <div ref={containerRef} className="relative">
       <div className="relative">
         <MapPin size={14} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${
-          confirmed ? 'text-green-400' : 'text-muted'
+          confirmed ? 'text-green-700' : 'text-muted'
         }`} />
         <input
           ref={inputRef}
@@ -195,10 +195,10 @@ export default function AddressAutocomplete({
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {loading   && <Loader size={13} className="text-muted spin" />}
-          {confirmed && !loading && <CheckCircle size={13} className="text-green-400" />}
+          {confirmed && !loading && <CheckCircle size={13} className="text-green-700" />}
           {query && !loading && (
             <button type="button" onClick={clear}
-              className="text-muted hover:text-white transition-colors ml-0.5">
+              className="text-muted hover:text-[#0a1428] transition-colors ml-0.5">
               <X size={13} />
             </button>
           )}

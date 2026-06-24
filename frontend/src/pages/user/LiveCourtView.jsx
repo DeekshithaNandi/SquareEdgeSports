@@ -37,7 +37,7 @@ function fmtTime(t) {
 }
 
 function typeColor(t) {
-  if (t === 'CRICKET_LANE') return { badge: 'bg-green-500/15 text-green-300 border-green-500/25', dot: 'bg-green-400' }
+  if (t === 'CRICKET_LANE') return { badge: 'bg-green-100 text-green-300 border-green-500', dot: 'bg-green-500' }
   if (t === 'BOX_CRICKET')  return { badge: 'bg-blue-600/15 text-blue-300 border-blue-600/25', dot: 'bg-blue-400' }
   return { badge: 'bg-blue-600/15 text-blue-300 border-blue-600/25', dot: 'bg-blue-400' }
 }
@@ -100,7 +100,7 @@ export default function LiveCourtView() {
       <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-xl border-b border-[#dde8f8] px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-white transition-all">
+            <Link to="/" className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-[#0a1428] transition-all">
               <ArrowLeft size={16} />
             </Link>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-700 to-blue-600 flex items-center justify-center">
@@ -109,8 +109,8 @@ export default function LiveCourtView() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm">Live Court View</span>
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/15 border border-green-500/25 text-green-400 text-[10px] font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 border border-green-300 text-green-700 text-[10px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                   LIVE
                 </span>
               </div>
@@ -123,7 +123,7 @@ export default function LiveCourtView() {
               {lastSync && <div className="text-[10px] text-[#9aaac8]">Synced {lastSync}</div>}
             </div>
             <button onClick={load} disabled={loading}
-              className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-white transition-all">
+              className="p-2 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a] hover:text-[#0a1428] transition-all">
               <RefreshCw size={15} className={loading ? 'spin' : ''} />
             </button>
           </div>
@@ -135,7 +135,7 @@ export default function LiveCourtView() {
         {/* Summary row */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Active Now', val: active.length, icon: <Activity size={16} />, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
+            { label: 'Active Now', val: active.length, icon: <Activity size={16} />, color: 'text-green-700', bg: 'bg-green-100 border-green-300' },
             { label: 'Upcoming',   val: upcoming.length, icon: <Clock size={16} />,    color: 'text-blue-400',  bg: 'bg-blue-500/10 border-blue-500/20' },
             { label: "Today's Total", val: bookings.length, icon: <Users size={16} />, color: 'text-blue-400', bg: 'bg-blue-600/10 border-blue-600/20' },
           ].map(s => (
@@ -174,7 +174,7 @@ export default function LiveCourtView() {
                       }`}>
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs font-bold text-[#5a6a8a]">Lane {lane}</span>
-                          <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-green-400 animate-pulse' : 'bg-[#f0f5ff]'}`} />
+                          <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-green-500 animate-pulse' : 'bg-[#f0f5ff]'}`} />
                         </div>
                         {b ? (
                           <>
@@ -182,7 +182,7 @@ export default function LiveCourtView() {
                             <div className="text-[10px] text-[#5a6a8a] mt-0.5">
                               {fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}
                             </div>
-                            <div className="text-[10px] text-green-400 mt-1 font-semibold">● Playing</div>
+                            <div className="text-[10px] text-green-700 mt-1 font-semibold">● Playing</div>
                           </>
                         ) : (
                           <div className="text-xs text-[#9aaac8] mt-1">Available</div>

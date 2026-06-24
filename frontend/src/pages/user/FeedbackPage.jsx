@@ -54,7 +54,7 @@ export default function FeedbackPage() {
   if (done) return (
     <div className="page-wrap flex flex-col items-center justify-center min-h-[50vh]">
       <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/25 flex items-center justify-center mb-5">
-        <CheckCircle2 size={30} className="text-green-400" />
+        <CheckCircle2 size={30} className="text-green-600" />
       </div>
       <h2 className="font-display text-2xl font-bold mb-2">Thank you!</h2>
       <p className="text-sm text-muted mb-8">Your feedback helps us improve the experience for everyone.</p>
@@ -109,7 +109,7 @@ export default function FeedbackPage() {
                     className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
                       active
                         ? 'bg-accent/20 border-accent text-accent'
-                        : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:border-[#dde8f8] hover:text-white'
+                        : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:border-[#dde8f8] hover:text-[#0a1428]'
                     }`}>
                     {active && <span className="mr-1.5">✓</span>}
                     {cat}

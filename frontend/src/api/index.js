@@ -38,6 +38,13 @@ export const userAPI = {
   membershipOrder:     (data)   => API.post('/user/membership/order', data),
   membershipConfirm:   (data)   => API.post('/user/membership/confirm', data),
 }
+// ── Notifications ─────────────────────────────────────────────────────────
+export const notificationAPI = {
+  my:          ()   => API.get('/notifications/my'),
+  unreadCount: ()   => API.get('/notifications/unread-count'),
+  markRead:    (id) => API.patch(`/notifications/${id}/read`),
+  markAllRead: ()   => API.patch('/notifications/read-all'),
+}
 
 // ── Public ────────────────────────────────────────────────────────────────
 export const publicAPI = {
@@ -61,6 +68,7 @@ export const adminAPI = {
   notifyNoRefund:    (id)          => API.post(`/admin/bookings/${id}/notify-no-refund`),
   assignCourt:       (id, data)    => API.patch(`/admin/bookings/${id}/assign`, data),
   revenue:           ()            => API.get('/admin/revenue'),
+  createBookingForCustomer: (data) => API.post('/admin/bookings', data),
   // Users
   allUsers:          ()            => API.get('/admin/users'),
   getUser:           (id)          => API.get(`/admin/users/${id}`),

@@ -49,8 +49,8 @@ export default function AdminOverview() {
             <span className="text-xs text-muted ml-1">— {todayStr}</span>
           </div>
           <div className="flex gap-3 text-xs">
-            <span className="text-green-400 font-semibold">{confirmed} confirmed</span>
-            <span className="text-yellow-300 font-semibold">{pending} pending</span>
+            <span className="text-green-700 font-semibold">{confirmed} confirmed</span>
+            <span className="text-yellow-700 font-semibold">{pending} pending</span>
           </div>
         </div>
         {displayBookings.length === 0 ? (
@@ -74,7 +74,7 @@ export default function AdminOverview() {
                     </td>
                     <td>
                       <div className="text-xs font-semibold">{b.bookingType?.replace(/_/g, ' ')}</div>
-                      <div className={`text-[10px] mt-0.5 ${b.laneNumber || b.courtNumber ? 'text-green-400' : 'text-yellow-400/70'}`}>{courtLabel}</div>
+                      <div className={`text-[10px] mt-0.5 ${b.laneNumber || b.courtNumber ? 'text-green-700' : 'text-yellow-600'}`}>{courtLabel}</div>
                     </td>
                     <td className="text-xs text-muted">{b.startTime?.toString().slice(0,5)} – {b.endTime?.toString().slice(0,5)}</td>
                     <td className="text-sm font-bold">₹{b.amountPaid ?? '—'}</td>
@@ -92,7 +92,7 @@ export default function AdminOverview() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: 'Manage Users',  to: '/admin/users?role=PLAYER',  icon: Users,     color: 'text-accent'    },
-            { label: 'View Bookings', to: '/admin/bookings',            icon: Activity,  color: 'text-green-400' },
+            { label: 'View Bookings', to: '/admin/bookings',            icon: Activity,  color: 'text-green-700' },
             { label: 'Courts Setup',  to: '/admin/courts',              icon: Building2, color: 'text-blue-400'  },
             { label: 'All Employees', to: '/admin/users?role=EMPLOYEE', icon: UserCheck, color: 'text-purple-400'},
           ].map(({ label, to, icon: Icon, color }) => (
