@@ -138,8 +138,8 @@ export default function AdminPayments() {
 
       {/* ── Stat cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Collected"  value={'₹' + totalCollected.toFixed(2)} icon="💰" color="#22c55e" />
-        <StatCard label="Total Refunded"   value={'₹' + totalRefunded.toFixed(2)}  icon="↩️" color="#ef4444" />
+        <StatCard label="Total Collected"  value={'$' + totalCollected.toFixed(2)} icon="💰" color="#22c55e" />
+        <StatCard label="Total Refunded"   value={'$' + totalRefunded.toFixed(2)}  icon="↩️" color="#ef4444" />
         <StatCard label="All Transactions" value={payments.length}                 icon="📋" color="#7c5cfc" />
         <StatCard label="Sessions Today"   value={sessionsTodayCount}              icon="📅" color="#f5c842" sub={todayStr} />
       </div>
@@ -286,7 +286,7 @@ export default function AdminPayments() {
                     )}
                   </td>
                   <td>
-                    <div className="font-bold text-sm">₹{parseFloat(p.amount || 0).toFixed(2)}</div>
+                    <div className="font-bold text-sm">${parseFloat(p.amount || 0).toFixed(2)}</div>
                   </td>
                   <td>
                     <span className="badge-blue text-[10px]">{p.method || 'PENDING'}</span>

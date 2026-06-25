@@ -292,12 +292,20 @@ export default function EditProfile() {
             )}
           </div>
 
-          <button type="submit" disabled={saving}
+          {/* <button type="submit" disabled={saving}
             className="btn-primary flex items-center gap-2 mt-2">
             {saving
               ? <><span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" />Saving…</>
               : 'Save Changes'}
-          </button>
+          </button> */}
+          <div className="flex justify-end mt-2">
+            <button type="submit" disabled={saving}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold bg-accent text-white hover:opacity-90 disabled:opacity-60 transition-all">
+              {saving
+                ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" />Saving…</>
+                : 'Save Changes'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

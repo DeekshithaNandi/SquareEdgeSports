@@ -77,7 +77,7 @@ export default function AdminOverview() {
                       <div className={`text-[10px] mt-0.5 ${b.laneNumber || b.courtNumber ? 'text-green-700' : 'text-yellow-600'}`}>{courtLabel}</div>
                     </td>
                     <td className="text-xs text-muted">{b.startTime?.toString().slice(0,5)} – {b.endTime?.toString().slice(0,5)}</td>
-                    <td className="text-sm font-bold">₹{b.amountPaid ?? '—'}</td>
+                    <td className="text-sm font-bold">${parseFloat(b.amountPaid || 0).toFixed(2)}</td>
                     <td><Badge value={b.status} /></td>
                   </tr>
                 )

@@ -47,15 +47,15 @@ public class DataInitializer implements CommandLineRunner {
      * Always upserts — so prices update on every restart without manual DB edits
      */
     private void seedPricingRules() {
-        upsertPricing("CRICKET_LANE", "Cricket Lane – Non Member", "500.00");
-        upsertPricing("CRICKET_LANE_MEMBER", "Cricket Lane – Member", "400.00");
-        upsertPricing("BOX_CRICKET", "Box Cricket – Non Member", "1500.00");
-        upsertPricing("BOX_CRICKET_MEMBER", "Box Cricket – Member", "1200.00");
-        upsertPricing("PICKLEBALL", "Pickleball – Non Member", "500.00");
-        upsertPricing("PICKLEBALL_MEMBER", "Pickleball – Member", "400.00");
-        upsertPricing("CRICKET_LANE_MEMBERSHIP", "Cricket Lane Membership / month", "1500.00");
-        upsertPricing("BOX_CRICKET_MEMBERSHIP", "Box Cricket Membership / month", "3000.00");
-        upsertPricing("PICKLEBALL_MEMBERSHIP", "Pickleball Membership / month", "1500.00");
+        upsertPricing("CRICKET_LANE", "Cricket Lane – Non Member", "30");
+        upsertPricing("CRICKET_LANE_MEMBER", "Cricket Lane – Member", "25");
+        upsertPricing("BOX_CRICKET", "Box Cricket – Non Member", "50");
+        upsertPricing("BOX_CRICKET_MEMBER", "Box Cricket – Member", "40");
+        upsertPricing("PICKLEBALL", "Pickleball – Non Member", "30");
+        upsertPricing("PICKLEBALL_MEMBER", "Pickleball – Member", "25");
+        upsertPricing("CRICKET_LANE_MEMBERSHIP", "Cricket Lane Membership / month", "50");
+        upsertPricing("BOX_CRICKET_MEMBERSHIP", "Box Cricket Membership / month", "100");
+        upsertPricing("PICKLEBALL_MEMBERSHIP", "Pickleball Membership / month", "50");
         log.info("Pricing rules updated (INR)");
     }
 
@@ -74,32 +74,32 @@ public class DataInitializer implements CommandLineRunner {
                 courtRepo.save(Court.builder()
                         .name("Cricket Lane " + i).type(Court.CourtType.CRICKET_LANE)
                         .boxGroup("BOX_A").laneNumber(i).location("Indoor Hall A")
-                        .pricePerSlot(new BigDecimal("500")).memberPricePerSlot(new BigDecimal("400"))
+                        .pricePerSlot(new BigDecimal("30")).memberPricePerSlot(new BigDecimal("25"))
                         .capacity(6).status(Court.CourtStatus.ACTIVE).build());
             // Cricket lanes 5-8 → Box B
             for (int i = 5; i <= 8; i++)
                 courtRepo.save(Court.builder()
                         .name("Cricket Lane " + i).type(Court.CourtType.CRICKET_LANE)
                         .boxGroup("BOX_B").laneNumber(i).location("Indoor Hall A")
-                        .pricePerSlot(new BigDecimal("500")).memberPricePerSlot(new BigDecimal("400"))
+                        .pricePerSlot(new BigDecimal("30")).memberPricePerSlot(new BigDecimal("25"))
                         .capacity(6).status(Court.CourtStatus.ACTIVE).build());
             // Pickleball courts 1-3
             for (int i = 1; i <= 3; i++)
                 courtRepo.save(Court.builder()
                         .name("Pickleball Court " + i).type(Court.CourtType.PICKLEBALL)
                         .location("Outdoor Area").laneNumber(i)
-                        .pricePerSlot(new BigDecimal("500")).memberPricePerSlot(new BigDecimal("400"))
+                        .pricePerSlot(new BigDecimal("30")).memberPricePerSlot(new BigDecimal("25"))
                         .capacity(4).status(Court.CourtStatus.ACTIVE).build());
             log.info("Courts seeded");
         } else {
             // Always update existing court prices to reflect current INR values
             courtRepo.findAll().forEach(c -> {
                 if (c.getType() == Court.CourtType.CRICKET_LANE) {
-                    c.setPricePerSlot(new BigDecimal("500"));
-                    c.setMemberPricePerSlot(new BigDecimal("400"));
+                    c.setPricePerSlot(new BigDecimal("30"));
+                    c.setMemberPricePerSlot(new BigDecimal("25"));
                 } else if (c.getType() == Court.CourtType.PICKLEBALL) {
-                    c.setPricePerSlot(new BigDecimal("500"));
-                    c.setMemberPricePerSlot(new BigDecimal("400"));
+                    c.setPricePerSlot(new BigDecimal("30"));
+                    c.setMemberPricePerSlot(new BigDecimal("25"));
                 }
                 courtRepo.save(c);
             });

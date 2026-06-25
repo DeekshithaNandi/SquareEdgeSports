@@ -36,7 +36,7 @@ export default function LoginPage() {
   const handleSubmit = async e => {
   e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
   const slowTimer = setTimeout(() => {
-    toast('Backend is waking up, please wait...', { icon: '⏳', duration: 10000 })
+    // toast('Backend is waking up, please wait...', { icon: '⏳', duration: 10000 })
   }, 4000)  // show after 4 seconds
   try {
     const r = await authAPI.login(form)

@@ -37,7 +37,7 @@ export default function AdminPricing() {
               </div>
             </div>
             <div className="mb-4">
-              <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price (₹)</label>
+              <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price ($)</label>
               <input className="inp text-xl font-bold text-center" type="number" min="0" step="0.01"
                 value={r.price} onChange={e=>update(r.id,"price",e.target.value)}/>
             </div>
@@ -58,7 +58,7 @@ export default function AdminPricing() {
               <tr key={r.id}>
                 <td className="font-mono text-xs text-muted">{r.ruleKey}</td>
                 <td className="text-sm">{r.description}</td>
-                <td className="font-bold">₹{parseFloat(r.price).toFixed(2)}</td>
+                <td className="font-bold">${parseFloat(r.price).toFixed(2)}</td>
                 <td className="text-xs text-muted">{r.updatedAt?.slice(0,10)||"—"}</td>
               </tr>
             ))}

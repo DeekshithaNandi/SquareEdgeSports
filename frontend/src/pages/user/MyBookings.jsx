@@ -42,8 +42,8 @@ function fmtDateTime(dt) {
 
 function RefundBadge({ policy, amount }) {
   if (!policy) return null
-  if (policy === 'FULL') return <span className="text-[11px] font-bold text-green-700">✓ Full Refund ₹{amount}</span>
-  if (policy === 'HALF') return <span className="text-[11px] font-bold text-yellow-700">50% Refund ₹{amount}</span>
+  if (policy === 'FULL') return <span className="text-[11px] font-bold text-green-700">✓ Full Refund ${amount}</span>
+  if (policy === 'HALF') return <span className="text-[11px] font-bold text-yellow-700">50% Refund ${amount}</span>
   return <span className="text-[11px] font-bold text-red-400">No Refund</span>
 }
 
@@ -277,7 +277,7 @@ export default function MyBookings() {
               {tab === 'active' && (
                 <button onClick={() => { setBookType('CRICKET_LANE'); setShowBook(true) }}
                   className="mt-4 px-5 py-2.5 rounded-xl text-sm font-bold bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all">
-                  Book Your First Session
+                  Book Your Session
                 </button>
               )}
             </div>
@@ -343,7 +343,7 @@ export default function MyBookings() {
                   }`}>{b.paymentStatus}</div>
                 </div> */}
                 <div className="text-right">
-                  <div className="text-lg font-extrabold">₹{b.amountPaid}</div>
+                  <div className="text-lg font-extrabold">${b.amountPaid}</div>
                   <div className={`text-[10px] font-bold ${
                     b.paymentStatus === 'PAID' ? 'text-green-700' :
                     b.paymentStatus === 'REFUNDED' ? 'text-blue-400' :

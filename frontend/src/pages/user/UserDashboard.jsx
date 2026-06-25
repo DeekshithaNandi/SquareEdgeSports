@@ -198,11 +198,12 @@ export default function UserDashboard() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {MEMBERSHIP_SPORTS.map(sport => {
-            const isMember = user?.[sport.memberKey]
-            const expiry   = user?.membershipExpiry
+            const expiry    = user?.membershipExpiry
+            const isExpired = expiry && new Date(expiry + 'Z') < new Date()
+            const isMember  = user?.[sport.memberKey] && !isExpired
             return (
               <div key={sport.key} className={`card p-4 border ${
-                isMember
+                (isMember && !isExpired)
                   ? 'border-green-500/30 bg-green-500/[0.04]'
                   : 'border-[#dde8f8]'
               }`}>
@@ -224,13 +225,13 @@ export default function UserDashboard() {
 
                 {isMember ? (
                   <div className="text-xs text-green-700 mb-3">
-                    Save ₹{sport.save}/session · Active
+                    {isExpired ? 'Membership Expired' : `Save $${sport.save}/session · Active`}
                     {expiry && <div className="text-[10px] text-muted mt-0.5">Expires: {new Date(expiry).toLocaleDateString('en-IN')}</div>}
                   </div>
                 ) : (
                   <div className="text-xs text-muted mb-3">
-                    <span className="font-bold text-white">₹{sport.fee}/month</span>
-                    <span className="ml-1">· save ₹{sport.save}/session</span>
+                    <span className="font-bold text-[#0a1428]"> ${sport.fee}/month</span>
+                    <span className="ml-1">· save ${sport.save}/session</span>
                   </div>
                 )}
 
@@ -241,7 +242,7 @@ export default function UserDashboard() {
                     className="w-full py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-700 to-blue-600 hover:opacity-90 transition-all text-white flex items-center justify-center gap-1.5">
                     {buyingMembership === sport.key
                       ? <><span className="w-3 h-3 border-2 border-[#dde8f8] border-t-white rounded-full animate-spin" />Processing…</>
-                      : <><Crown size={11} /> Get Membership — ₹{sport.fee}</>}
+                      : <><Crown size={11} /> Get Membership — ${sport.fee}</>}
                   </button>
                 ) : (
                   <button

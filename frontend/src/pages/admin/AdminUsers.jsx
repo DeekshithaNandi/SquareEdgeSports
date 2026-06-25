@@ -12,9 +12,9 @@ const ROLES = ['PLAYER', 'EMPLOYEE', 'ADMINISTRATOR', 'SUPER_ADMIN']
 
 const ROLE_COLORS = {
   PLAYER:        { bg: 'bg-green-100',  border: 'border-green-300',  text: 'text-green-700',  active: 'bg-green-200 border-green-500' },
-  EMPLOYEE:      { bg: 'bg-blue-500/10',   border: 'border-blue-500/30',   text: 'text-blue-400',   active: 'bg-blue-500/25 border-blue-500'   },
-  ADMINISTRATOR: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', active: 'bg-purple-500/25 border-purple-500'},
-  SUPER_ADMIN:   { bg: 'bg-red-500/10',    border: 'border-red-500/30',    text: 'text-red-400',    active: 'bg-red-500/25 border-red-500'     },
+  EMPLOYEE:      { bg: 'bg-blue-100',   border: 'border-blue-300',   text: 'text-blue-700',   active: 'bg-blue-200 border-blue-500'   },
+  ADMINISTRATOR: { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-700', active: 'bg-purple-200 border-purple-500'},
+  SUPER_ADMIN:   { bg: 'bg-red-100',    border: 'border-red-300',    text: 'text-red-700',    active: 'bg-red-200 border-red-500'     },
 }
 
 const FILTER_TABS = [
@@ -274,7 +274,7 @@ export default function AdminUsers() {
                           Edit
                         </button>
                         {u.role === 'EMPLOYEE' && (
-                          <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 transition-all"
+                          <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-100 border border-purple-300 text-purple-700 hover:bg-purple-200 transition-all"
                             onClick={() => openPermissions(u)}>
                             <Shield size={11} className="inline mr-1" />Perms
                           </button>
@@ -337,9 +337,9 @@ export default function AdminUsers() {
           const isStaff = view.role !== 'PLAYER'
           const fullAddress = [view.addressLine1, view.addressLine2, view.city, view.state, view.zipCode, view.country].filter(Boolean).join(', ')
           const accessLabel = {
-            SUPER_ADMIN:   { text: 'Complete system access — all modules & settings', color: 'text-red-300',    bg: 'bg-red-500/10 border-red-500/25'    },
-            ADMINISTRATOR: { text: 'Full admin access — all modules & settings',       color: 'text-purple-300', bg: 'bg-purple-500/10 border-purple-500/25'},
-            EMPLOYEE:      { text: 'Restricted access — permissions set individually', color: 'text-blue-300',   bg: 'bg-blue-500/10 border-blue-500/25'   },
+            SUPER_ADMIN:   { text: 'Complete system access — all modules & settings', color: 'text-red-700',    bg: 'bg-red-50 border-red-200'     },
+            ADMINISTRATOR: { text: 'Full admin access — all modules & settings',       color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200'},
+            EMPLOYEE:      { text: 'Restricted access — permissions set individually', color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200'   },
           }[view.role]
           return (
             <div className="space-y-5">
@@ -460,11 +460,16 @@ export default function AdminUsers() {
                       </div>
                     ))}
                   </div>
-                  {view.membershipExpiry && (
-                    <div className="mt-2 text-[11px] text-blue-300 text-center">
-                      Expires: {view.membershipExpiry?.slice(0, 10)}
-                    </div>
-                  )}
+                  {view.membershipExpiry && (() => {
+                    const expired = new Date(view.membershipExpiry + 'Z') < new Date()
+                    return (
+                      <div className="mt-2 text-[11px] text-center">
+                        <span style={{ color: expired ? '#dc2626' : '#5a6a8a' }}>
+                          {expired ? 'Expired: ' : 'Expires: '}{view.membershipExpiry?.slice(0, 10)}
+                        </span>
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
             </div>
@@ -574,7 +579,7 @@ export default function AdminUsers() {
             <button key={p.key} onClick={() => togglePerm(p.key)}
               className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${perms[p.key] ? 'bg-accent/10 border-accent/30' : 'bg-[#f8faff] border-[#dde8f8] hover:bg-[#f8faff]'}`}>
               <div className="text-left">
-                <div className={`text-sm font-bold ${perms[p.key] ? 'text-accent' : 'text-white'}`}>{p.label}</div>
+                <div className={`text-sm font-bold ${perms[p.key] ? 'text-accent' : 'text-[#0a1428]'}`}>{p.label}</div>
                 <div className="text-xs text-muted">{p.desc}</div>
               </div>
               <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${perms[p.key] ? 'bg-accent' : 'bg-[#f0f5ff]'}`}>
@@ -611,7 +616,7 @@ export default function AdminUsers() {
               <div className="flex items-center gap-3">
                 <span className="text-xl">{sport.emoji}</span>
                 <div className="text-left">
-                  <div className={`text-sm font-bold ${memberForm[sport.key] ? 'text-yellow-700' : 'text-white'}`}>{sport.label}</div>
+                  <div className={`text-sm font-bold ${memberForm[sport.key] ? 'text-yellow-700' : 'text-[#0a1428]'}`}>{sport.label}</div>
                   <div className="text-xs text-muted">{sport.desc}</div>
                 </div>
               </div>
@@ -636,8 +641,13 @@ export default function AdminUsers() {
                   </span>
                 ))}
                 {memberUser.membershipExpiry && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300">
-                    Expires: {memberUser.membershipExpiry?.slice(0, 10)}
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    new Date(memberUser.membershipExpiry + 'Z') < new Date()
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {new Date(memberUser.membershipExpiry + 'Z') < new Date() ? 'Expired: ' : 'Expires: '}
+                    {memberUser.membershipExpiry?.slice(0, 10)}
                   </span>
                 )}
               </div>
@@ -659,7 +669,7 @@ export default function AdminUsers() {
         </>}>
         {deleteTarget && (
           <p className="text-sm text-muted leading-relaxed">
-            Are you sure you want to delete <strong className="text-white">{deleteTarget.fullName}</strong> ({deleteTarget.email})?
+            Are you sure you want to delete <strong className="text-[#0a1428]">{deleteTarget.fullName}</strong> ({deleteTarget.email})?
             This action cannot be undone.
           </p>
         )}

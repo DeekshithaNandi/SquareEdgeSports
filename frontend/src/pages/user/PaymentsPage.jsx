@@ -21,7 +21,7 @@ export default function PaymentsPage() {
       <div className="section-sub mb-6">All your transactions in one place</div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[{l:'Total Paid',v:'₹'+total.toFixed(2),c:'#22c55e'},{l:'Refunded',v:'₹'+refunded.toFixed(2),c:'#f5c842'},{l:'Transactions',v:payments.length,c:'#7c5cfc'}].map(s=>(
+        {[{l:'Total Paid',v:'$'+total.toFixed(2),c:'#22c55e'},{l:'Refunded',v:'$'+refunded.toFixed(2),c:'#f5c842'},{l:'Transactions',v:payments.length,c:'#7c5cfc'}].map(s=>(
           <div key={s.l} className="card p-5 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 rounded-full -translate-y-4 translate-x-4 opacity-15" style={{background:s.c}}/>
             <div className="text-xs text-muted uppercase tracking-widest font-semibold mb-2">{s.l}</div>
@@ -41,14 +41,14 @@ export default function PaymentsPage() {
                 <tr key={p.id}>
                   <td className="text-sm">{p.description || '—'}</td>
                   <td>
-                    <div className="font-bold">₹{parseFloat(p.amount).toFixed(2)}</div>
+                    <div className="font-bold">${parseFloat(p.amount).toFixed(2)}</div>
                     {p.status === 'PARTIAL_REFUND' && p.refundAmount && (
                       <div className="text-[10px] text-yellow-700 font-semibold mt-0.5">
-                        50% Refunded · ₹{parseFloat(p.refundAmount).toFixed(2)}
+                        50% Refunded · ${parseFloat(p.refundAmount).toFixed(2)}
                       </div>
                     )}
                     {p.status === 'REFUNDED' && (
-                      <div className="text-[10px] text-blue-400 font-semibold mt-0.5">Full Refunded · ₹{parseFloat(p.amount).toFixed(2)}</div>
+                      <div className="text-[10px] text-blue-400 font-semibold mt-0.5">Full Refunded · ${parseFloat(p.amount).toFixed(2)}</div>
                     )}
                   </td>
                   <td><span className="badge-blue text-[10px]">{p.method||'—'}</span></td>

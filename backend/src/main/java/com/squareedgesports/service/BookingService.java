@@ -43,7 +43,15 @@ public class BookingService {
 
         BigDecimal price = calculatePrice(req.getBookingType(), user, req.getBookingDate(), start);
 
-        boolean isMember = switch (req.getBookingType()) {
+        // boolean isMember = switch (req.getBookingType()) {
+        // case "CRICKET_LANE" -> user.isCricketLaneMember();
+        // case "BOX_CRICKET" -> user.isBoxCricketMember();
+        // case "PICKLEBALL" -> user.isPickleballMember();
+        // default -> false;
+        // };
+        boolean membershipActive = user.getMembershipExpiry() == null
+                || user.getMembershipExpiry().isAfter(LocalDateTime.now());
+        boolean isMember = membershipActive && switch (req.getBookingType()) {
             case "CRICKET_LANE" -> user.isCricketLaneMember();
             case "BOX_CRICKET" -> user.isBoxCricketMember();
             case "PICKLEBALL" -> user.isPickleballMember();

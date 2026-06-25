@@ -117,7 +117,8 @@ export default function BookingModal({ initialType, onClose }) {
   }
 
   function getUnitPrice() {
-    const isMember = user?.[typeInfo.memberKey]
+    const isExpired = user?.membershipExpiry && new Date(user.membershipExpiry + 'Z') < new Date()
+    const isMember  = user?.[typeInfo.memberKey] && !isExpired
     const [full, member] = typeInfo.prices
     return { amount: isMember ? member : full, isMember: !!isMember }
   }
@@ -388,11 +389,11 @@ export default function BookingModal({ initialType, onClose }) {
                   <div className="flex-1">
                     <div className="font-semibold text-sm">{info.label}</div>
                     <div className="text-[11px] text-[#5a6a8a] mt-0.5">
-                      {key === 'CRICKET_LANE' ? `8 individual lanes · ₹${info.prices[0]}/session` :
-                       key === 'BOX_CRICKET'  ? `Full box (4 lanes) · ₹${info.prices[0]}/session` :
-                       `3 courts · ₹${info.prices[0]}/session`}
+                      {key === 'CRICKET_LANE' ? `8 individual lanes · $${info.prices[0]}/session` :
+                       key === 'BOX_CRICKET'  ? `Full box (4 lanes) · $${info.prices[0]}/session` :
+                       `3 courts · $${info.prices[0]}/session`}
                       {' · '}
-                      <span className={info.text}>Members ₹{info.prices[1]}</span>
+                      <span className={info.text}>Members ${info.prices[1]}</span>
                     </div>
                   </div>
                   {type === key && <CheckCircle size={16} className={info.text} />}
@@ -514,19 +515,19 @@ export default function BookingModal({ initialType, onClose }) {
                           <>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-[#5a6a8a]">Original</span>
-                              <span className="text-xs text-[#5a6a8a] line-through">₹{totalAmount}</span>
+                              <span className="text-xs text-[#5a6a8a] line-through">${totalAmount}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-green-400 font-bold">
                                 {sameDiscount ? `🎉 ${selectedDiscount}% Discount` : '🎉 Discount applied'}
                               </span>
-                              <span className="text-xs text-green-400 font-bold">−₹{totalAmount - discountedTotal}</span>
+                              <span className="text-xs text-green-400 font-bold">−${totalAmount - discountedTotal}</span>
                             </div>
                           </>
                         )}
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-[#5a6a8a]">Total to Pay</span>
-                          <span className="font-extrabold text-sm" style={{ color: '#0a1428' }}>₹{discountedTotal}</span>
+                          <span className="font-extrabold text-sm" style={{ color: '#0a1428' }}>${discountedTotal}</span>
                         </div>
                       </div>
                       {getUnitPrice().isMember && (
@@ -625,24 +626,24 @@ export default function BookingModal({ initialType, onClose }) {
                         {memberApplied && (
                           <div className="flex justify-between items-center">
                             <span className="text-[10px] text-blue-400 font-bold">✓ Member price</span>
-                            <span className="text-xs text-blue-400">₹{unitBase}/slot</span>
+                            <span className="text-xs text-blue-400">${unitBase}/slot</span>
                           </div>
                         )}
                         {savings > 0 && (
                           <>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-[#5a6a8a]">Original</span>
-                              <span className="text-xs text-[#5a6a8a] line-through">₹{baseTotal}</span>
+                              <span className="text-xs text-[#5a6a8a] line-through">${baseTotal}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] text-green-400 font-bold">🎉 CMS Discount</span>
-                              <span className="text-xs text-green-400 font-bold">−₹{savings}</span>
+                              <span className="text-xs text-green-400 font-bold">−${savings}</span>
                             </div>
                           </>
                         )}
                         <div className="flex justify-between items-center">
                           <span className="text-[#5a6a8a] font-semibold">Total Due</span>
-                          <span className="text-xl font-extrabold">₹{Math.round(actualTotal)}</span>
+                          <span className="text-xl font-extrabold">${Math.round(actualTotal)}</span>
                         </div>
                       </div>
                     )
@@ -764,7 +765,7 @@ export default function BookingModal({ initialType, onClose }) {
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm bg-accent hover:opacity-90 transition-all shadow-2xl shadow-blue-600/20 disabled:opacity-60">
               {paying
                 ? <><Loader size={14} className="spin" /> Processing…</>
-                : <>🔐 Pay ₹{createdBookings.reduce((s, b) => s + parseFloat(b.amountPaid || 0), 0).toFixed(0)} via Razorpay</>
+                : <>🔐 Pay ${createdBookings.reduce((s, b) => s + parseFloat(b.amountPaid || 0), 0).toFixed(0)} via Razorpay</>
               }
             </button>
           </div>

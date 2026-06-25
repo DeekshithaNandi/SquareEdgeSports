@@ -133,9 +133,9 @@ function HomeSection({ setBooking, user }) {
                   <div className="text-base mb-0.5">{s.emoji}</div>
                   <div className="text-[9px] font-bold mb-0.5 leading-tight" style={{ color: AW.t2 }}>{s.name}</div>
                   <div className="text-xs font-extrabold leading-tight" style={{ color: AW.blue }}>
-                    ₹{s.membershipFee}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
+                    ${s.membershipFee}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
                   </div>
-                  <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ₹{s.price - s.memberPrice}/session</div>
+                  <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
                 </div>
               </div>
             ))}
@@ -179,10 +179,10 @@ function HomeSection({ setBooking, user }) {
                 <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: AW.bd }}>
                   <div>
                     <div className="text-base font-extrabold leading-none" style={{ color: AW.t1 }}>
-                      ₹{s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span>
+                      ${s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span>
                     </div>
                     <div className="text-[9px] mt-0.5" style={{ color: AW.t3 }}>
-                      Members <b style={{ color: AW.blue }}>₹{s.memberPrice}</b>
+                      Members <b style={{ color: AW.blue }}>${s.memberPrice}</b>
                     </div>
                   </div>
                   <button
@@ -217,8 +217,8 @@ function HomeSection({ setBooking, user }) {
             </div>
             <div className="px-3 py-2.5 flex items-center justify-between">
               <div>
-                <div className="text-sm font-extrabold" style={{ color: AW.t1 }}>₹{s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span></div>
-                <div className="text-[9px]" style={{ color: AW.t3 }}>Members <b style={{ color: AW.blue }}>₹{s.memberPrice}</b></div>
+                <div className="text-sm font-extrabold" style={{ color: AW.t1 }}>${s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span></div>
+                <div className="text-[9px]" style={{ color: AW.t3 }}>Members <b style={{ color: AW.blue }}>${s.memberPrice}</b></div>
               </div>
               <button className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border"
                 style={{ background: AW.dim, borderColor: AW.dbdr, color: AW.blue }}
@@ -299,7 +299,7 @@ function AboutSection({ setBooking }) {
                   style={{ background: 'linear-gradient(to top,rgba(10,20,40,.80) 0%,transparent 60%)' }} />
                 <div className="absolute bottom-2 left-0 right-0 text-center">
                   <div className="text-[10px] font-bold text-white">{s.name}</div>
-                  <div className="text-[9px] text-white/60">₹{s.price}/session</div>
+                  <div className="text-[9px] text-white/60">${s.price}/session</div>
                 </div>
               </div>
             ))}

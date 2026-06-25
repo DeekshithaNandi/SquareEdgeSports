@@ -9,8 +9,8 @@ import { MapPin, X, Check, RotateCcw, Clock, Search, ChevronDown, ArrowUpDown, S
 
 function refundLabel(policy, amount) {
   if (!policy) return null
-  if (policy === 'FULL') return { text: `Full Refund ₹${amount}`, cls: 'text-green-700' }
-  if (policy === 'HALF') return { text: `50% Refund ₹${amount}`, cls: 'text-yellow-700' }
+  if (policy === 'FULL') return { text: `Full Refund $${amount}`, cls: 'text-green-700' }
+  if (policy === 'HALF') return { text: `50% Refund $${amount}`, cls: 'text-yellow-700' }
   return { text: 'No Refund (<1h)', cls: 'text-red-400' }
 }
 
@@ -403,13 +403,13 @@ export default function AdminBookings() {
                       <div>{b.startTime?.toString().slice(0, 5)} – {b.endTime?.toString().slice(0, 5)}</div>
                     </td>
                     <td>
-                      <div className="font-bold">₹{b.amountPaid}</div>
+                      <div className="font-bold">${b.amountPaid}</div>
                       <div className={`text-[10px] font-semibold ${
                         b.paymentStatus === 'PAID'           ? 'text-green-700' :
                         b.paymentStatus === 'REFUNDED'       ? 'text-blue-400'  :
                         b.paymentStatus === 'PARTIAL_REFUND' ? 'text-yellow-700': 'text-yellow-700'}`}>
                         {b.paymentStatus === 'PARTIAL_REFUND' && b.refundAmount
-                          ? `50% Refunded ₹${b.refundAmount}`
+                          ? `50% Refunded $${b.refundAmount}`
                           : b.paymentStatus}
                       </div>
                     </td>
@@ -485,7 +485,7 @@ export default function AdminBookings() {
                         )}
                         {b.status === 'CANCELLED' && b.paymentStatus === 'PARTIAL_REFUND' && (
                           <span className="text-[11px] text-yellow-700 font-semibold">
-                            ✓ 50% Refunded{b.refundAmount ? ` ₹${b.refundAmount}` : ''}
+                            ✓ 50% Refunded{b.refundAmount ? ` $${b.refundAmount}` : ''}
                           </span>
                         )}
                       </div>
@@ -536,18 +536,18 @@ export default function AdminBookings() {
                 <div className="flex justify-between"><span className="text-muted">Player</span><span className="font-semibold">{refundTarget.userName}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Sport</span><span className="font-semibold">{refundTarget.bookingType?.replace(/_/g,' ')}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Session</span><span className="font-semibold">{refundTarget.bookingDate} · {refundTarget.startTime?.toString().slice(0,5)}</span></div>
-                <div className="flex justify-between"><span className="text-muted">Paid</span><span className="font-semibold">₹{refundTarget.amountPaid}</span></div>
+                <div className="flex justify-between"><span className="text-muted">Paid</span><span className="font-semibold">${refundTarget.amountPaid}</span></div>
               </div>
               {policy === 'FULL' && (
                 <div className="bg-green-500/[0.08] border border-green-500/25 rounded-xl p-4">
                   <div className="text-sm font-bold text-green-700 mb-1">✅ Full Refund — Cancelled 24+ hrs in advance</div>
-                  <div className="text-xs text-muted">Player will receive the full amount of <strong className="text-white">₹{amount}</strong> back.</div>
+                  <div className="text-xs text-muted">Player will receive the full amount of <strong className="text-white">${amount}</strong> back.</div>
                 </div>
               )}
               {policy === 'HALF' && (
                 <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4">
                   <div className="text-sm font-bold text-yellow-700 mb-1">⚠️ 50% Refund — Cancelled 1–24 hrs in advance</div>
-                  <div className="text-xs text-muted">Player will receive <strong className="text-white">₹{amount}</strong> (50% of ₹{refundTarget.amountPaid}).</div>
+                  <div className="text-xs text-muted">Player will receive <strong className="text-white">${amount}</strong> (50% of ${refundTarget.amountPaid}).</div>
                 </div>
               )}
               {policy === 'NONE' && (

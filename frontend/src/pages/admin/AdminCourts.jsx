@@ -54,7 +54,7 @@ export default function AdminCourts() {
               <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-4" style={{background:"rgba(124,92,252,0.1)"}}>{ICONS[c.type]||"🏟️"}</div>
               <h4 className="font-display font-bold text-sm mb-1">{c.name}</h4>
               <div className="text-xs text-muted mb-1">📍 {c.location||"—"}</div>
-              <div className="text-xs text-muted mb-3">₹{c.pricePerSlot}/slot · Member: ₹{c.memberPricePerSlot||"—"}</div>
+              <div className="text-xs text-muted mb-3">${c.pricePerSlot}/slot · Member: ${c.memberPricePerSlot||"—"}</div>
               <div className="flex items-center justify-between mb-4">
                 <Badge value={c.status||"ACTIVE"}/>
                 <span className="text-xs text-muted">Cap: {c.capacity||"—"}</span>
@@ -84,9 +84,9 @@ export default function AdminCourts() {
               <select className="inp" value={form.status} onChange={e=>sf("status",e.target.value)}>{STATUSES.map(s=><option key={s}>{s}</option>)}</select></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price/Slot (₹)</label>
+            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price/Slot ($)</label>
               <input className="inp" type="number" value={form.pricePerSlot||""} onChange={e=>sf("pricePerSlot",e.target.value)}/></div>
-            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Member Price (₹)</label>
+            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Member Price ($)</label>
               <input className="inp" type="number" value={form.memberPricePerSlot||""} onChange={e=>sf("memberPricePerSlot",e.target.value)}/></div>
           </div>
           <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Capacity</label>

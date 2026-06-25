@@ -11,7 +11,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="font-bold mb-1 text-white">{label}</div>
       {payload.map(p => (
         <div key={p.name} style={{ color: p.color }} className="font-semibold">
-          {p.name}: ₹{p.value}
+          {p.name}: ${p.value}
         </div>
       ))}
     </div>
@@ -37,9 +37,9 @@ export default function AdminRevenue() {
       <div className="section-sub mb-6">Financial performance overview</div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
-        <StatCard label="Total Revenue"   value={'₹' + parseFloat(data?.totalRevenue   || 0).toFixed(2)} icon="💰" color="#7c5cfc" sub="All time" />
-        <StatCard label="Today Revenue"   value={'₹' + parseFloat(data?.todayRevenue   || 0).toFixed(2)} icon="📆" color="#f5c842" sub="Today" />
-        <StatCard label="Monthly Revenue" value={'₹' + parseFloat(data?.monthlyRevenue || 0).toFixed(2)} icon="📈" color="#4f8ef7" sub="This month" />
+        <StatCard label="Total Revenue"   value={'$' + parseFloat(data?.totalRevenue   || 0).toFixed(2)} icon="💰" color="#7c5cfc" sub="All time" />
+        <StatCard label="Today Revenue"   value={'$' + parseFloat(data?.todayRevenue   || 0).toFixed(2)} icon="📆" color="#f5c842" sub="Today" />
+        <StatCard label="Monthly Revenue" value={'$' + parseFloat(data?.monthlyRevenue || 0).toFixed(2)} icon="📈" color="#4f8ef7" sub="This month" />
         <StatCard label="Total Bookings"  value={data?.totalBookings || 0}                               icon="📅" color="#22c55e" sub="All time" />
       </div>
 
@@ -56,7 +56,7 @@ export default function AdminRevenue() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="date" tick={{ fill: '#6b6b8a', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: '#6b6b8a', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => '₹' + v} />
+            <YAxis tick={{ fill: '#6b6b8a', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => '$' + v} />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="revenue" name="revenue" stroke="#7c5cfc" strokeWidth={2.5}
               fill="url(#revGrad)" dot={{ r: 3, fill: '#7c5cfc', stroke: '#080810', strokeWidth: 2 }} activeDot={{ r: 5 }} />

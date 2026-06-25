@@ -1,7 +1,7 @@
 // ── Currency ──────────────────────────────────────────────────────────────────
 export const formatCurrency = (amount) => {
   const n = parseFloat(amount || 0)
-  return '₹' + n.toFixed(2)
+  return '$' + n.toFixed(2)
 }
 
 // ── Date ──────────────────────────────────────────────────────────────────────
