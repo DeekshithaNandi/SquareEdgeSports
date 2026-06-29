@@ -293,7 +293,7 @@ export default function AdminPayments() {
                   </td>
                   <td className="text-xs">
                     {p.bookingDate
-                      ? <span className="font-semibold text-white">{p.bookingDate?.toString().slice(0, 10)}</span>
+                      ? <span className="font-semibold text-[#0a1428]">{p.bookingDate?.toString().slice(0, 10)}</span>
                       : <span className="text-muted">—</span>}
                   </td>
                   <td className="text-xs text-muted">

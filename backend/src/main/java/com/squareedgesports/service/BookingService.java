@@ -385,25 +385,20 @@ public class BookingService {
         slot.put("endTime", end.toString());
 
         if ("CRICKET_LANE".equals(type)) {
-            String box = boxGroup != null ? boxGroup : "BOX_A";
             long count = conflicts.stream()
-                    .filter(b -> "CRICKET_LANE".equals(b.getBookingType()) && box.equals(b.getBoxGroup()))
+                    .filter(b -> "CRICKET_LANE".equals(b.getBookingType()))
                     .count();
-            boolean boxTaken = conflicts.stream()
-                    .anyMatch(b -> "BOX_CRICKET".equals(b.getBookingType()) && box.equals(b.getBoxGroup()));
-            int capacity = 4;
-            slot.put("available", !boxTaken && count < capacity);
+            int capacity = 8;
+            slot.put("available", count < capacity);
             slot.put("remaining", (int) Math.max(0, capacity - count));
-            slot.put("boxGroup", box);
 
         } else if ("BOX_CRICKET".equals(type)) {
-            String box = boxGroup != null ? boxGroup : "BOX_A";
-            boolean anyLaneInBox = conflicts.stream()
-                    .anyMatch(b -> "CRICKET_LANE".equals(b.getBookingType()) && box.equals(b.getBoxGroup()));
-            boolean boxBooked = conflicts.stream()
-                    .anyMatch(b -> "BOX_CRICKET".equals(b.getBookingType()) && box.equals(b.getBoxGroup()));
-            slot.put("available", !anyLaneInBox && !boxBooked);
-            slot.put("boxGroup", box);
+            long count = conflicts.stream()
+                    .filter(b -> "BOX_CRICKET".equals(b.getBookingType()))
+                    .count();
+            int capacity = 2;
+            slot.put("available", count < capacity);
+            slot.put("remaining", (int) Math.max(0, capacity - count));
 
         } else { // PICKLEBALL
             long count = conflicts.stream()

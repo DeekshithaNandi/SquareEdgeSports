@@ -29,6 +29,7 @@ class BookingServiceTest {
     @Mock CmsContentRepository cmsRepo;
     @Mock EmailService emailService;
     @Mock RazorpayService razorpayService;
+    @Mock NotificationService notificationService;
 
     @InjectMocks BookingService bookingService;
 
@@ -794,10 +795,10 @@ class BookingServiceTest {
     }
 
     @Test
-    void getAvailableSlots_cricketLane_capacity4_partiallyFilled() {
+    void getAvailableSlots_cricketLane_capacity8_partiallyFilled() {
         LocalDate date = LocalDate.now().plusDays(1);
 
-        // 2 CRICKET_LANE bookings in BOX_A
+        // 2 CRICKET_LANE bookings — capacity is 8, so 6 remain
         List<Booking> conflicts = List.of(
                 Booking.builder().bookingType("CRICKET_LANE").boxGroup("BOX_A").build(),
                 Booking.builder().bookingType("CRICKET_LANE").boxGroup("BOX_A").build()
@@ -808,64 +809,65 @@ class BookingServiceTest {
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> slots = (List<Map<String, Object>>) result.get("slots");
-        // 2 of 4 taken → available, 2 remaining
         assertThat((Boolean) slots.get(0).get("available")).isTrue();
-        assertThat((Integer) slots.get(0).get("remaining")).isEqualTo(2);
+        assertThat((Integer) slots.get(0).get("remaining")).isEqualTo(6);
     }
 
     @Test
-    void getAvailableSlots_cricketLane_blockedByBoxCricketInSameBox() {
+    void getAvailableSlots_cricketLane_capacity8_unavailableWhenFull() {
         LocalDate date = LocalDate.now().plusDays(1);
 
-        // BOX_CRICKET booking in BOX_A blocks all CRICKET_LANE in BOX_A
-        List<Booking> conflicts = List.of(
-                Booking.builder().bookingType("BOX_CRICKET").boxGroup("BOX_A").build()
-        );
+        List<Booking> conflicts = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            conflicts.add(Booking.builder().bookingType("CRICKET_LANE").build());
+        }
         when(bookingRepo.findConflicting(any(), any(), any(), any())).thenReturn(conflicts);
 
-        Map<String, Object> result = bookingService.getAvailableSlots(date, "CRICKET_LANE", "BOX_A");
+        Map<String, Object> result = bookingService.getAvailableSlots(date, "CRICKET_LANE", null);
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> slots = (List<Map<String, Object>>) result.get("slots");
         for (Map<String, Object> slot : slots) {
             assertThat((Boolean) slot.get("available")).isFalse();
+            assertThat((Integer) slot.get("remaining")).isEqualTo(0);
         }
     }
 
     @Test
-    void getAvailableSlots_boxCricket_blockedWhenLaneBookingExistsInSameBox() {
+    void getAvailableSlots_boxCricket_capacity2_unavailableWhenFull() {
         LocalDate date = LocalDate.now().plusDays(1);
 
         List<Booking> conflicts = List.of(
-                Booking.builder().bookingType("CRICKET_LANE").boxGroup("BOX_A").build()
+                Booking.builder().bookingType("BOX_CRICKET").build(),
+                Booking.builder().bookingType("BOX_CRICKET").build()
         );
         when(bookingRepo.findConflicting(any(), any(), any(), any())).thenReturn(conflicts);
 
-        Map<String, Object> result = bookingService.getAvailableSlots(date, "BOX_CRICKET", "BOX_A");
+        Map<String, Object> result = bookingService.getAvailableSlots(date, "BOX_CRICKET", null);
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> slots = (List<Map<String, Object>>) result.get("slots");
         for (Map<String, Object> slot : slots) {
             assertThat((Boolean) slot.get("available")).isFalse();
+            assertThat((Integer) slot.get("remaining")).isEqualTo(0);
         }
     }
 
     @Test
-    void getAvailableSlots_boxCricket_blockedWhenBoxAlreadyBooked() {
+    void getAvailableSlots_boxCricket_capacity2_availableWhenOneBooked() {
         LocalDate date = LocalDate.now().plusDays(1);
 
         List<Booking> conflicts = List.of(
-                Booking.builder().bookingType("BOX_CRICKET").boxGroup("BOX_A").build()
+                Booking.builder().bookingType("BOX_CRICKET").build()
         );
         when(bookingRepo.findConflicting(any(), any(), any(), any())).thenReturn(conflicts);
 
-        Map<String, Object> result = bookingService.getAvailableSlots(date, "BOX_CRICKET", "BOX_A");
+        Map<String, Object> result = bookingService.getAvailableSlots(date, "BOX_CRICKET", null);
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> slots = (List<Map<String, Object>>) result.get("slots");
-        for (Map<String, Object> slot : slots) {
-            assertThat((Boolean) slot.get("available")).isFalse();
-        }
+        assertThat((Boolean) slots.get(0).get("available")).isTrue();
+        assertThat((Integer) slots.get(0).get("remaining")).isEqualTo(1);
     }
 
     // ─── createBatchRazorpayOrder() ───────────────────────────────────────────

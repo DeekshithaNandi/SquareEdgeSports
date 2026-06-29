@@ -9,9 +9,9 @@ import { X, CheckCircle, Crown } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const MEMBERSHIP_SPORTS = [
-  { key: 'CRICKET_LANE', label: 'Cricket Lane', emoji: '🏏', memberKey: 'cricketLaneMember', fee: 1500, save: 100, color: 'green' },
-  { key: 'BOX_CRICKET',  label: 'Box Cricket',  emoji: '📦', memberKey: 'boxCricketMember',  fee: 3000, save: 300, color: 'violet' },
-  { key: 'PICKLEBALL',   label: 'Pickleball',   emoji: '🏓', memberKey: 'pickleballMember',  fee: 1500, save: 100, color: 'orange' },
+  { key: 'CRICKET_LANE', label: 'Cricket Lane', emoji: '🏏', memberKey: 'cricketLaneMember', fee: 50, save: 5, color: 'green' },
+  { key: 'BOX_CRICKET',  label: 'Box Cricket',  emoji: '📦', memberKey: 'boxCricketMember',  fee: 100, save: 10, color: 'violet' },
+  { key: 'PICKLEBALL',   label: 'Pickleball',   emoji: '🏓', memberKey: 'pickleballMember',  fee: 50, save: 5, color: 'orange' },
 ]
 
 // Renders a single CMS block based on its contentType

@@ -41,7 +41,6 @@ export default function AdminCreateBooking() {
 
   // Booking details
   const [type,      setType]      = useState('CRICKET_LANE')
-  const [boxGroup,  setBoxGroup]  = useState('BOX_A')
   const [date,      setDate]      = useState(today())
   const [slots,     setSlots]     = useState([])
   const [loadSlots, setLoadSlots] = useState(false)
@@ -59,13 +58,11 @@ export default function AdminCreateBooking() {
     setSlots([])
     setSelSlots([])
     setLoadSlots(true)
-    const bg = type === 'BOX_CRICKET' ? boxGroup : undefined
-    publicAPI.availability(date, type, bg)
+    publicAPI.availability(date, type)
       .then(r => setSlots(r.data.slots || []))
       .catch(() => toast.error('Could not load availability'))
       .finally(() => setLoadSlots(false))
-  }, [date, type, boxGroup])
-
+    }, [date, type])
   const filteredUsers = customerQuery.trim()
     ? users.filter(u =>
         u.fullName?.toLowerCase().includes(customerQuery.toLowerCase()) ||
@@ -126,7 +123,6 @@ export default function AdminCreateBooking() {
           bookingDate: date,
           startTime:   slot.startTime,
           bookingType: type,
-          ...(type === 'BOX_CRICKET' ? { boxGroup } : {}),
           markAsPaid,
         })
       }
@@ -241,22 +237,6 @@ export default function AdminCreateBooking() {
             ))}
           </div>
         </div>
-
-        {type === 'BOX_CRICKET' && (
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">Box</label>
-            <div className="flex gap-2">
-              {['BOX_A', 'BOX_B'].map(b => (
-                <button key={b} onClick={() => setBoxGroup(b)}
-                  className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-semibold ${
-                    boxGroup === b ? 'bg-accent text-white border-transparent' : 'bg-[#f8faff] border-[#dde8f8]'
-                  }`}>
-                  {b.replace('_', ' ')}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         <div>
           <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">Date</label>

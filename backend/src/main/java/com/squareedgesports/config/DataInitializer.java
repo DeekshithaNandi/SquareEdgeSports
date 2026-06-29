@@ -90,6 +90,14 @@ public class DataInitializer implements CommandLineRunner {
                         .location("Outdoor Area").laneNumber(i)
                         .pricePerSlot(new BigDecimal("30")).memberPricePerSlot(new BigDecimal("25"))
                         .capacity(4).status(Court.CourtStatus.ACTIVE).build());
+
+            // Box Cricket courts 1-2
+            for (int i = 1; i <= 2; i++)
+                courtRepo.save(Court.builder()
+                        .name("Box Cricket " + i).type(Court.CourtType.BOX_CRICKET)
+                        .location("Indoor Hall B").laneNumber(i)
+                        .pricePerSlot(new BigDecimal("50")).memberPricePerSlot(new BigDecimal("40"))
+                        .capacity(1).status(Court.CourtStatus.ACTIVE).build());
             log.info("Courts seeded");
         } else {
             // Always update existing court prices to reflect current INR values
@@ -100,10 +108,25 @@ public class DataInitializer implements CommandLineRunner {
                 } else if (c.getType() == Court.CourtType.PICKLEBALL) {
                     c.setPricePerSlot(new BigDecimal("30"));
                     c.setMemberPricePerSlot(new BigDecimal("25"));
+                } else if (c.getType() == Court.CourtType.BOX_CRICKET) {
+                    c.setPricePerSlot(new BigDecimal("50"));
+                    c.setMemberPricePerSlot(new BigDecimal("40"));
                 }
                 courtRepo.save(c);
             });
-            log.info("Court prices updated (INR)");
+            // Seed Box Cricket courts if they don't exist yet
+            boolean hasBoxCricket = courtRepo.findAll().stream()
+                    .anyMatch(c -> c.getType() == Court.CourtType.BOX_CRICKET);
+            if (!hasBoxCricket) {
+                for (int i = 1; i <= 2; i++)
+                    courtRepo.save(Court.builder()
+                            .name("Box Cricket " + i).type(Court.CourtType.BOX_CRICKET)
+                            .location("Indoor Hall B").laneNumber(i)
+                            .pricePerSlot(new BigDecimal("50")).memberPricePerSlot(new BigDecimal("40"))
+                            .capacity(1).status(Court.CourtStatus.ACTIVE).build());
+                log.info("Box Cricket courts seeded");
+            }
+            log.info("Court prices updated");
         }
     }
 }

@@ -5,9 +5,9 @@ import { X, ChevronLeft, ChevronRight, CheckCircle, Clock, Loader, Calendar, Eye
 import toast from 'react-hot-toast'
 
 const TYPES = {
-  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', prices: [500, 400], memberKey: 'cricketLaneMember',  color: 'green',  bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
-  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', prices: [1500, 1200], memberKey: 'boxCricketMember', color: 'violet', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
-  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', prices: [500, 400], memberKey: 'pickleballMember',   color: 'orange', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', prices: [30, 25], memberKey: 'cricketLaneMember',  color: 'green',  bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', prices: [50, 40], memberKey: 'boxCricketMember', color: 'violet', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', prices: [30, 25], memberKey: 'pickleballMember',   color: 'orange', bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
 }
 
 function today() { return new Date().toISOString().split('T')[0] }
@@ -63,7 +63,7 @@ export default function BookingModal({ initialType, onClose }) {
 
   const [step,      setStep]      = useState(1)
   const [type,      setType]      = useState(initialType || 'CRICKET_LANE')
-  const [boxGroup,  setBoxGroup]  = useState('BOX_A')
+ 
   const [date,      setDate]      = useState(today())
   const [slots,     setSlots]     = useState([])
   const [loadSlots, setLoadSlots] = useState(false)
@@ -94,12 +94,11 @@ export default function BookingModal({ initialType, onClose }) {
     if (step !== 3) return
     setLoadSlots(true)
     setSlots([])
-    const bg = type === 'BOX_CRICKET' ? boxGroup : undefined
-    publicAPI.availability(date, type, bg)
-      .then(r => setSlots(r.data.slots || []))
-      .catch(() => toast.error('Could not load availability'))
-      .finally(() => setLoadSlots(false))
-  }, [step, date, type, boxGroup])
+   publicAPI.availability(date, type)
+  .then(r => setSlots(r.data.slots || []))
+  .catch(() => toast.error('Could not load availability'))
+  .finally(() => setLoadSlots(false))
+}, [step, date, type])
 
   function changeType(t) {
     setType(t)
@@ -168,7 +167,7 @@ export default function BookingModal({ initialType, onClose }) {
           bookingDate: date,
           startTime:   slot.startTime,
           bookingType: type,
-          ...(type === 'BOX_CRICKET' ? { boxGroup } : {}),
+          
         }
         const res = await bookingAPI.create(payload)
         created.push(res.data)
@@ -390,7 +389,7 @@ export default function BookingModal({ initialType, onClose }) {
                     <div className="font-semibold text-sm">{info.label}</div>
                     <div className="text-[11px] text-[#5a6a8a] mt-0.5">
                       {key === 'CRICKET_LANE' ? `8 individual lanes · $${info.prices[0]}/session` :
-                       key === 'BOX_CRICKET'  ? `Full box (4 lanes) · $${info.prices[0]}/session` :
+                       key === 'BOX_CRICKET'  ? `2 courts · $${info.prices[0]}/session` :
                        `3 courts · $${info.prices[0]}/session`}
                       {' · '}
                       <span className={info.text}>Members ${info.prices[1]}</span>
@@ -415,25 +414,6 @@ export default function BookingModal({ initialType, onClose }) {
                   style={{ color: '#0a1428' }} />
               </div>
 
-              {type === 'BOX_CRICKET' && (
-                <div>
-                  <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">Select Box</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {['BOX_A', 'BOX_B'].map(b => (
-                      <button key={b} onClick={() => { setBoxGroup(b); setSelSlots([]) }}
-                        className={`p-3.5 rounded-xl border text-center transition-all ${
-                          boxGroup === b
-                            ? 'bg-blue-600/15 border-blue-600/40 text-blue-300'
-                            : 'bg-[#f8faff] border-[#dde8f8] text-[#5a6a8a] hover:border-[#dde8f8]'
-                        }`}>
-                        <div className="font-bold text-sm">{b.replace('_', ' ')}</div>
-                        <div className="text-[10px] mt-0.5 text-[#9aaac8]">{b === 'BOX_A' ? 'Lanes 1–4' : 'Lanes 5–8'}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {type === 'CRICKET_LANE' && (
                 <div className="bg-blue-600/[0.05] border border-blue-600/15 rounded-xl p-3.5 text-xs text-[#5a6a8a] leading-relaxed">
                   <strong className="text-blue-400">Lane Assignment:</strong> Your specific lane and box will be assigned by our team and confirmed via email.
@@ -452,8 +432,7 @@ export default function BookingModal({ initialType, onClose }) {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <div className="text-sm font-semibold">{date}</div>
-                  <div className="text-[10px] text-[#9aaac8]">{typeInfo.label}{type === 'BOX_CRICKET' ? ` · ${boxGroup.replace('_', ' ')}` : ''}</div>
-                </div>
+                  <div className="text-[10px] text-[#9aaac8]">{typeInfo.label}</div>                </div>
                 <button onClick={() => setStep(2)} className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1">
                   <ChevronLeft size={11} /> Change
                 </button>

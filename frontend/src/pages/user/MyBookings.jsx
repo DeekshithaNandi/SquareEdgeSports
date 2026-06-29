@@ -203,7 +203,7 @@ export default function MyBookings() {
                   {typeEmoji(b.bookingType)} {
                     b.courtAssigned
                       ? (b.bookingType === 'CRICKET_LANE' ? `Lane ${b.laneNumber}` :
-                         b.bookingType === 'BOX_CRICKET' ? b.boxGroup?.replace('_', ' ') :
+                         b.bookingType === 'BOX_CRICKET' ? (b.courtNumber ? `Court ${b.courtNumber}` : 'Check your email') :
                          `Court ${b.courtNumber}`)
                       : 'Check your email for assignment'
                   }
@@ -302,7 +302,7 @@ export default function MyBookings() {
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <span className="font-bold text-sm">
                     {b.bookingType === 'CRICKET_LANE' ? 'Cricket Lane' :
-                     b.bookingType === 'BOX_CRICKET'  ? `Box Cricket · ${b.boxGroup?.replace('_', ' ') || ''}` :
+                     b.bookingType === 'BOX_CRICKET'  ? 'Box Cricket' :
                      'Pickleball'}
                   </span>
                   <Badge value={b.status} />
@@ -322,7 +322,7 @@ export default function MyBookings() {
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-100 border border-green-300 text-green-700 text-[11px] font-semibold">
                       <MapPin size={10} />
                       {b.bookingType === 'CRICKET_LANE' ? `Lane ${b.laneNumber} Assigned` :
-                       b.bookingType === 'BOX_CRICKET'  ? `${b.boxGroup?.replace('_', ' ')} Assigned` :
+                       b.bookingType === 'BOX_CRICKET'  ? `Court ${b.courtNumber} Assigned` :
                        `Court ${b.courtNumber} Assigned`}
                     </div>
                   ) : b.status === 'CONFIRMED' ? (
