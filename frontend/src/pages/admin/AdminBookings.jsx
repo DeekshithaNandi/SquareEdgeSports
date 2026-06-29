@@ -22,6 +22,18 @@ function isPast(bookingDate, startTime) {
   return session <= new Date()
 }
 
+function sessionStatus(bookingDate, startTime, endTime) {
+  if (!bookingDate || !startTime || !endTime) return 'upcoming'
+  const now = new Date()
+  const [sh, sm] = startTime.toString().split(':').map(Number)
+  const [eh, em] = endTime.toString().split(':').map(Number)
+  const start = new Date(bookingDate); start.setHours(sh, sm, 0, 0)
+  const end   = new Date(bookingDate); end.setHours(eh, em, 0, 0)
+  if (now < start) return 'upcoming'
+  if (now < end)   return 'ongoing'
+  return 'completed'
+}
+
 function fmtDateTime(dt) {
   if (!dt) return '—'
   const d = new Date(dt)
@@ -59,7 +71,7 @@ function SportPill({ value, onChange }) {
 
 export default function AdminBookings() {
   const navigate = useNavigate()
-  const [tab,       setTab]       = useState('date')
+  const [tab,       setTab]       = useState('upcoming')
   const [date,      setDate]      = useState('')
   const [bookings,  setBookings]  = useState([])
   const [cancelled, setCancelled] = useState([])
@@ -74,7 +86,9 @@ export default function AdminBookings() {
   const [assignTarget,   setAssignTarget]   = useState(null)
   const [assignValue,    setAssignValue]    = useState('')
   const [assigning,      setAssigning]      = useState(false)
-  const [assignConflict, setAssignConflict] = useState(null)
+  const [availableCourts, setAvailableCourts] = useState([])
+  const [courtsLoading,   setCourtsLoading]   = useState(false)
+  
 
   // -- Shared filters -----------------------------------------------------------
   const [search,       setSearch]       = useState('')
@@ -104,15 +118,9 @@ export default function AdminBookings() {
     adminAPI.cancelledBookings().then(r => setCancelled(r.data)).finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadBookings('') }, [])
+ useEffect(() => { loadBookings(''); loadCancelled() }, [])
 
-  const handleTab = t => {
-    setTab(t)
-    setSearch(''); setSportFilter('ALL'); setSortOrder('newest')
-    if (t === 'date') loadBookings(date || '')
-    else loadCancelled()
-  }
-  const handleDate = e => { setDate(e.target.value); loadBookings(e.target.value) }
+const handleDate = e => { setDate(e.target.value); loadBookings(e.target.value) }
 
   // -- Actions ------------------------------------------------------------------
   const cancel = async id => {
@@ -136,381 +144,360 @@ export default function AdminBookings() {
   }
 
   // -- Assign helpers -----------------------------------------------------------
-  const openAssign = b => { setAssignTarget(b); setAssignValue(''); setAssignConflict(null) }
-
-  const submitAssign = async () => {
-    if (!assignValue.trim()) { toast.error('Enter a number'); return }
-    const num = parseInt(assignValue)
-    if (isNaN(num) || num < 1) { toast.error('Enter a valid number'); return }
-    if (assignConflict) { toast.error(`Already taken by booking #${assignConflict.id}`); return }
-    setAssigning(true)
-    try {
-      const body = {}
-      if (assignTarget.bookingType === 'CRICKET_LANE') {
-        body.laneNumber = num
-      } else if (assignTarget.bookingType === 'PICKLEBALL') {
-        body.courtNumber = num
-      } else if (assignTarget.bookingType === 'BOX_CRICKET') {
-        body.courtNumber = num
-      }
-      await adminAPI.assignCourt(assignTarget.id, body)
-      toast.success('Court assigned & email sent!')
-      setAssignTarget(null); loadBookings(date)
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Assignment failed')
-    } finally { setAssigning(false) }
-  }
-
-  const assignLabel = b => {
-    if (b.bookingType === 'CRICKET_LANE') return 'Lane number (1–8)'
-    if (b.bookingType === 'PICKLEBALL')   return 'Court number (1–3)'
-    if (b.bookingType === 'BOX_CRICKET')  return 'Court number (1–2)'
-    return ''
-  }
-
-  const checkConflictLocally = num => {
-    if (!assignTarget || !num) { setAssignConflict(null); return }
-    const n = parseInt(num)
-    if (isNaN(n) || n < 1) { setAssignConflict(null); return }
+const openAssign = async b => {
+  setAssignTarget(b)
+  setAssignValue('')
+  setCourtsLoading(true)
+  try {
+    const r = await adminAPI.allCourts()
     const overlaps = (aS, aE, bS, bE) => aS < bE && aE > bS
-    const clash = bookings.find(other => {
-      if (other.id === assignTarget.id || other.status === 'CANCELLED') return false
-      if (other.bookingDate !== assignTarget.bookingDate) return false
-      if (!overlaps(assignTarget.startTime, assignTarget.endTime, other.startTime, other.endTime)) return false
-      if (assignTarget.bookingType === 'PICKLEBALL')   return other.courtNumber === n
-      if (assignTarget.bookingType === 'CRICKET_LANE') return other.laneNumber === n
-      if (assignTarget.bookingType === 'BOX_CRICKET')  return other.courtNumber === n
-      return false
-    })
-    setAssignConflict(clash
-      ? { id: clash.id, name: clash.userName, time: `${clash.startTime?.slice(0,5)}–${clash.endTime?.slice(0,5)}` }
-      : null)
+    const courts = r.data
+      .filter(c => c.type === b.bookingType && c.status === 'ACTIVE')
+      .sort((x, y) => (x.laneNumber || 0) - (y.laneNumber || 0))
+      .map(c => {
+        const takenBy = bookings.find(other => {
+          if (other.id === b.id || other.status === 'CANCELLED') return false
+          if (other.bookingDate !== b.bookingDate) return false
+          if (!overlaps(b.startTime, b.endTime, other.startTime, other.endTime)) return false
+          const assignedNum = b.bookingType === 'CRICKET_LANE' ? other.laneNumber : other.courtNumber
+          return assignedNum === c.laneNumber
+        })
+        return { ...c, available: !takenBy, takenBy: takenBy || null }
+      })
+    setAvailableCourts(courts)
+  } catch {
+    toast.error('Failed to load courts')
+    setAvailableCourts([])
+  } finally {
+    setCourtsLoading(false)
   }
+}
+  const submitAssign = async () => {
+  if (!assignValue) { toast.error('Select a court/lane first'); return }
+  const selectedCourt = availableCourts.find(c => c.id === parseInt(assignValue))
+  if (!selectedCourt) { toast.error('Invalid selection'); return }
+  if (!selectedCourt.available) { toast.error('That court is already taken'); return }
+  setAssigning(true)
+  try {
+    const body = {}
+    if (assignTarget.bookingType === 'CRICKET_LANE') {
+      body.laneNumber = selectedCourt.laneNumber
+    } else {
+      body.courtNumber = selectedCourt.laneNumber
+    }
+    await adminAPI.assignCourt(assignTarget.id, body)
+    toast.success('Court assigned & email sent!')
+    setAssignTarget(null); loadBookings(date)
+  } catch (e) {
+    toast.error(e.response?.data?.message || 'Assignment failed')
+  } finally { setAssigning(false) }
+}
 
   const isExpiredPending = b =>
     b.paymentStatus === 'PENDING' &&
     b.createdAt && (Date.now() - new Date(b.createdAt).getTime()) > 10 * 60 * 1000
 
   // -- Filtered + sorted lists --------------------------------------------------
-  const applyCommon = (arr) => arr
-    .filter(b => !isExpiredPending(b))
+ const applySearch = arr => arr
+  .filter(b => !isExpiredPending(b))
+  .filter(b => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return b.userName?.toLowerCase().includes(q) || b.userEmail?.toLowerCase().includes(q)
+  })
+  .filter(b => sportFilter === 'ALL' || b.bookingType === sportFilter)
+
+const upcoming = useMemo(() =>
+  applySearch(bookings.filter(b => b.status !== 'CANCELLED' && sessionStatus(b.bookingDate, b.startTime, b.endTime) === 'upcoming'))
+    .sort((a, b) => a.bookingDate.localeCompare(b.bookingDate) || a.startTime.toString().localeCompare(b.startTime.toString())),
+  [bookings, search, sportFilter])
+
+const ongoing = useMemo(() =>
+  applySearch(bookings.filter(b => b.status !== 'CANCELLED' && sessionStatus(b.bookingDate, b.startTime, b.endTime) === 'ongoing'))
+    .sort((a, b) => a.startTime.toString().localeCompare(b.startTime.toString())),
+  [bookings, search, sportFilter])
+
+const completed = useMemo(() =>
+  applySearch(bookings.filter(b => b.status !== 'CANCELLED' && sessionStatus(b.bookingDate, b.startTime, b.endTime) === 'completed'))
+    .sort((a, b) => b.bookingDate.localeCompare(a.bookingDate) || b.startTime.toString().localeCompare(a.startTime.toString())),
+  [bookings, search, sportFilter])
+
+const filteredCancelled = useMemo(() => {
+  let arr = cancelled
     .filter(b => {
       if (!search) return true
       const q = search.toLowerCase()
       return b.userName?.toLowerCase().includes(q) || b.userEmail?.toLowerCase().includes(q)
     })
     .filter(b => sportFilter === 'ALL' || b.bookingType === sportFilter)
-    .sort((a, b) => {
-      const ad = new Date(a.bookingDate || 0).getTime()
-      const bd = new Date(b.bookingDate || 0).getTime()
-      if(ad !== bd) return sortOrder === 'newest' ? bd - ad : ad - bd
-      return (a.startTime || '').localeCompare(b.startTime || '')
-    })
+  if (cancelFromDate) arr = arr.filter(b => b.bookingDate >= cancelFromDate)
+  if (cancelToDate)   arr = arr.filter(b => b.bookingDate <= cancelToDate)
+  return arr.sort((a, b) => new Date(b.cancelledAt || 0) - new Date(a.cancelledAt || 0))
+}, [cancelled, search, sportFilter, cancelFromDate, cancelToDate])
 
-  const filteredBookings = useMemo(() => applyCommon(bookings)
-    .filter(b => !isPast(b.bookingDate, b.startTime)),
-    [bookings, search, sportFilter, sortOrder])
-
-  const filteredCancelled = useMemo(() => {
-    let arr = applyCommon(cancelled)
-    if (cancelFromDate) arr = arr.filter(b => b.bookingDate >= cancelFromDate)
-    if (cancelToDate)   arr = arr.filter(b => b.bookingDate <= cancelToDate)
-    return arr
-  }, [cancelled, search, sportFilter, sortOrder, cancelFromDate, cancelToDate])
-
-  const list       = tab === 'date' ? filteredBookings : filteredCancelled
-  const hasFilters = search || sportFilter !== 'ALL' || sortOrder !== 'newest' ||
-                     (tab === 'cancelled' && (cancelFromDate || cancelToDate))
-
+const counts = { upcoming: upcoming.length, ongoing: ongoing.length, completed: completed.length, cancelled: filteredCancelled.length }
+const list = tab === 'upcoming' ? upcoming : tab === 'ongoing' ? ongoing : tab === 'completed' ? completed : filteredCancelled
+const hasFilters = search || sportFilter !== 'ALL'
   return (
     <div className="page-wrap">
 
       {/* -- Header -- */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-        <div>
-          <div className="section-title">Bookings Management</div>
-          <div className="section-sub">
-            {tab === 'date'
-              ? `${list.length}${hasFilters && list.length !== bookings.length ? ` of ${bookings.length}` : ''} booking${bookings.length !== 1 ? 's' : ''} ${date ? ` on ${date}` : ' (all active)'}`
-              : `${list.length}${hasFilters && list.length !== cancelled.length ? ` of ${cancelled.length}` : ''} cancelled booking${cancelled.length !== 1 ? 's' : ''}`}
-            {hasFilters && <span className="ml-2 text-accent font-bold">· Filtered</span>}
-          </div>
-        </div>
+     <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+  <div>
+    <div className="section-title">Bookings Management</div>
+    <div className="section-sub">
+      {tab === 'upcoming'  && `${upcoming.length} upcoming session${upcoming.length !== 1 ? 's' : ''}${date ? ` on ${date}` : ''}`}
+      {tab === 'ongoing'   && `${ongoing.length} session${ongoing.length !== 1 ? 's' : ''} in progress right now`}
+      {tab === 'completed' && `${completed.length} completed session${completed.length !== 1 ? 's' : ''}${date ? ` on ${date}` : ''}`}
+      {tab === 'cancelled' && `${filteredCancelled.length} of ${cancelled.length} cancelled booking${cancelled.length !== 1 ? 's' : ''}`}
+      {hasFilters && <span className="ml-2 text-accent font-bold">· Filtered</span>}
+    </div>
+  </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <button onClick={() => navigate('/admin/bookings/new')}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-accent text-white hover:opacity-90">
-            + New Booking
-          </button>
+  <div className="flex items-center gap-2 flex-wrap">
+    <button onClick={() => navigate('/admin/bookings/new')}
+      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-accent text-white hover:opacity-90">
+      + New Booking
+    </button>
 
-          {/* Tabs */}
-          <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
-            <button onClick={() => handleTab('date')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'date' ? 'bg-accent text-white' : 'text-muted hover:text-[#0a1428]'}`}>
-              Bookings
-            </button>
-            <button onClick={() => handleTab('cancelled')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab === 'cancelled' ? 'bg-red-500 text-white' : 'text-muted hover:text-[#0a1428]'}`}>
-              Cancelled ({cancelled.length || '…'})
-            </button>
-          </div>
+    {/* 4 Tabs */}
+    <div className="flex gap-1 bg-[#f8faff] rounded-xl p-1">
+      {[
+        { key: 'upcoming',  label: 'Upcoming',  color: 'bg-accent'    },
+        { key: 'ongoing',   label: 'Ongoing',   color: 'bg-green-500' },
+        { key: 'completed', label: 'Completed', color: 'bg-[#5a6a8a]' },
+        { key: 'cancelled', label: 'Cancelled', color: 'bg-red-500'   },
+      ].map(t => (
+        <button key={t.key}
+          onClick={() => { setTab(t.key); setSearch(''); setSportFilter('ALL') }}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            tab === t.key ? t.color + ' text-white' : 'text-muted hover:text-[#0a1428]'
+          }`}>
+          {t.label}
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+            tab === t.key ? 'bg-white/20' : 'bg-[#dde8f8] text-[#5a6a8a]'
+          }`}>
+            {counts[t.key]}
+          </span>
+        </button>
+      ))}
+    </div>
 
-          {/* Date picker — By Date tab only */}
-          {tab === 'date' && (
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-muted font-bold">Date:</label>
-              <input type="date" value={date} onChange={handleDate}
-              className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all [color-scheme:light]" />
-
-              {date && (
-                <button onClick={() => { setDate(''); loadBookings('') }}
-                className="text-xs text-[#5a6a8a] hover:text-red-500 font-bold px-2">
-                ✕ All
-                </button>
-            )}
-            </div>
-          )}
-
-          {/* Filter toggle */}
-          <button onClick={() => setShowFilters(f => !f)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
-              showFilters || hasFilters
-                ? 'bg-accent/15 border-accent/40 text-accent'
-                : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:text-[#0a1428]'
-            }`}>
-            <SlidersHorizontal size={13} />
-            Filters
-            {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
-          </button>
-        </div>
+    {/* Date picker — not for Cancelled tab */}
+    {tab !== 'cancelled' && (
+      <div className="flex items-center gap-2">
+        <label className="text-xs text-muted font-bold">Date:</label>
+        <input type="date" value={date} onChange={handleDate}
+          className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all [color-scheme:light]" />
+        {date && (
+          <button onClick={() => { setDate(''); loadBookings('') }}
+            className="text-xs text-[#5a6a8a] hover:text-red-500 font-bold px-2">✕ All</button>
+        )}
       </div>
+    )}
+
+    {/* Filter toggle */}
+    <button onClick={() => setShowFilters(f => !f)}
+      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
+        showFilters || hasFilters
+          ? 'bg-accent/15 border-accent/40 text-accent'
+          : 'bg-[#f8faff] border-[#dde8f8] text-muted hover:text-[#0a1428]'
+      }`}>
+      <SlidersHorizontal size={13} />
+      Filters
+      {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
+    </button>
+  </div>
+</div>
 
       {/* -- Filter panel -- */}
       {showFilters && (
-        <div className="card p-4 mb-5 space-y-3">
-          <div className="flex flex-wrap gap-3 items-center">
-            {/* Search */}
-            <div className="relative flex-1 min-w-[200px]">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search by player name or email…"
-                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all" />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-[#0a1428]">
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-
-            {/* Sort */}
-            <div className="flex items-center gap-2">
-              <ArrowUpDown size={13} className="text-muted" />
-              <div className="relative">
-                <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}
-                  className="appearance-none bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-[#0a1428] outline-none focus:border-accent [color-scheme:light] cursor-pointer">
-                  <option value="newest">↓ Newest First</option>
-                  <option value="oldest">↑ Oldest First</option>
-                </select>
-                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-              </div>
-            </div>
-
-            {hasFilters && (
-              <button onClick={() => { setSearch(''); setSportFilter('ALL'); setSortOrder('newest'); setCancelFromDate(''); setCancelToDate('') }}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
-                <X size={11} /> Clear
-              </button>
-            )}
-          </div>
-
-          {/* Sport filter */}
-          <SportPill value={sportFilter} onChange={setSportFilter} />
-
-          {/* Cancelled date range */}
-          {tab === 'cancelled' && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] text-muted font-bold">Slot Date From</span>
-              <input type="date" value={cancelFromDate} onChange={e => setCancelFromDate(e.target.value)}
-                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
-              <span className="text-[11px] text-muted font-bold">To</span>
-              <input type="date" value={cancelToDate} onChange={e => setCancelToDate(e.target.value)}
-                min={cancelFromDate || undefined}
-                className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
-              {(cancelFromDate || cancelToDate) && (
-                <button onClick={() => { setCancelFromDate(''); setCancelToDate('') }}
-                  className="text-[11px] text-muted hover:text-[#0a1428] px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8]">
-                  <X size={11} />
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Active tags */}
-          {hasFilters && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {search && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-accent/15 text-accent border border-accent/30">Search: "{search}"</span>}
-              {sportFilter !== 'ALL' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-300">Sport: {sportFilter.replace(/_/g, ' ')}</span>}
-              {sortOrder !== 'newest' && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f0f5ff] text-[#5a6a8a] border border-[#dde8f8]">Sort: Oldest First</span>}
-              {tab === 'cancelled' && (cancelFromDate || cancelToDate) && (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-300">
-                  Slot: {cancelFromDate || '…'} → {cancelToDate || '…'}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+  <div className="card p-4 mb-5 space-y-3">
+    <div className="flex flex-wrap gap-3 items-center">
+      <div className="relative flex-1 min-w-[200px]">
+        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search by player name or email…"
+          className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl pl-9 pr-4 py-2 text-sm text-[#0a1428] outline-none focus:border-accent transition-all" />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-[#0a1428]">
+            <X size={12} />
+          </button>
+        )}
+      </div>
+      {hasFilters && (
+        <button onClick={() => { setSearch(''); setSportFilter('ALL'); setCancelFromDate(''); setCancelToDate('') }}
+          className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
+          <X size={11} /> Clear
+        </button>
       )}
+    </div>
+    <SportPill value={sportFilter} onChange={setSportFilter} />
 
+    {/* Cancelled date range */}
+    {tab === 'cancelled' && (
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] text-muted font-bold">Slot Date From</span>
+        <input type="date" value={cancelFromDate} onChange={e => setCancelFromDate(e.target.value)}
+          className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
+        <span className="text-[11px] text-muted font-bold">To</span>
+        <input type="date" value={cancelToDate} onChange={e => setCancelToDate(e.target.value)}
+          min={cancelFromDate || undefined}
+          className="bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2 text-xs text-[#0a1428] outline-none focus:border-accent [color-scheme:light]" />
+        {(cancelFromDate || cancelToDate) && (
+          <button onClick={() => { setCancelFromDate(''); setCancelToDate('') }}
+            className="text-[11px] text-muted hover:text-[#0a1428] px-2 py-1.5 rounded-lg bg-[#f8faff] border border-[#dde8f8]">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+    )}
+  </div>
+)}
       {/* -- Table -- */}
       {loading ? <div className="flex justify-center py-20"><Spinner size={28} /></div> : (
-        <div className="card overflow-hidden">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>User</th>
-                <th>Sport</th>
-                <th>Court / Lane</th>
-                <th>Date · Time</th>
-                <th>Amount</th>
-                {tab === 'cancelled' && <th>Cancelled At</th>}
-                {tab === 'cancelled' && <th>Refund</th>}
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.length === 0 ? (
-                <tr>
-                  <td colSpan={tab === 'cancelled' ? 10 : 8} className="text-center text-muted py-14">
-                    {hasFilters
-                      ? 'No bookings match your filters'
-                      : tab === 'date' ? `No bookings on ${date}` : 'No cancelled bookings'}
-                  </td>
-                </tr>
-              ) : list.map(b => {
-                const label = courtLabel(b)
-                const rl    = tab === 'cancelled' ? refundLabel(b.refundPolicy, b.refundAmount) : null
-                return (
-                  <tr key={b.id}>
-                    <td className="font-mono text-xs text-muted">#{b.id}</td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-a2 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                          {b.userName?.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                        </div>
-                        <div>
-                          <div className="text-xs font-semibold">{b.userName}</div>
-                          <div className="text-[10px] text-muted">{b.userEmail}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-xs font-semibold">{b.bookingType?.replace(/_/g, ' ')}</td>
-                    <td>
-                      {label ? (
-                        <span className="flex items-center gap-1 text-xs text-green-700 font-semibold">
-                          <Check size={11} /> {label}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-yellow-600 italic">Not assigned</span>
-                      )}
-                    </td>
-                    <td className="text-xs text-muted">
-                      <div>{b.bookingDate}</div>
-                      <div>{b.startTime?.toString().slice(0, 5)} – {b.endTime?.toString().slice(0, 5)}</div>
-                    </td>
-                    <td>
-                      <div className="font-bold">${b.amountPaid}</div>
-                      <div className={`text-[10px] font-semibold ${
-                        b.paymentStatus === 'PAID'           ? 'text-green-700' :
-                        b.paymentStatus === 'REFUNDED'       ? 'text-blue-400'  :
-                        b.paymentStatus === 'PARTIAL_REFUND' ? 'text-yellow-700': 'text-yellow-700'}`}>
-                        {b.paymentStatus === 'PARTIAL_REFUND' && b.refundAmount
-                          ? `50% Refunded $${b.refundAmount}`
-                          : b.paymentStatus}
-                      </div>
-                    </td>
-                    {tab === 'cancelled' && (
-                      <td className="text-xs text-muted">
-                        {b.cancelledAt ? (
-                          <span className="flex items-center gap-1">
-                            <Clock size={9} /> {fmtDateTime(b.cancelledAt)}
-                          </span>
-                        ) : <span className="italic opacity-50">—</span>}
-                        {b.cancellationReason && (
-                          <div className="text-[10px] text-[#5a6a8a] mt-0.5 max-w-[120px] truncate" title={b.cancellationReason}>
-                            {b.cancellationReason}
-                          </div>
-                        )}
-                      </td>
+  <div className="card overflow-hidden">
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>#</th><th>User</th><th>Sport</th><th>Court / Lane</th>
+          <th>Date · Time</th><th>Amount</th>
+          {tab === 'ongoing'   && <th>Status</th>}
+          {tab === 'cancelled' && <th>Cancelled At</th>}
+          {tab === 'cancelled' && <th>Refund</th>}
+          {tab !== 'ongoing'   && <th>Status</th>}
+          {tab !== 'completed' && <th>Actions</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {list.length === 0 ? (
+          <tr>
+            <td colSpan={tab === 'cancelled' ? 9 : tab === 'completed' ? 7 : 8}
+              className="text-center text-muted py-14">
+              {tab === 'upcoming'  ? (hasFilters ? 'No upcoming bookings match filters' : date ? `No upcoming bookings on ${date}` : 'No upcoming bookings') :
+               tab === 'ongoing'   ? 'No sessions currently in progress' :
+               tab === 'completed' ? (date ? `No completed sessions on ${date}` : 'No completed sessions') :
+               'No cancelled bookings'}
+            </td>
+          </tr>
+        ) : list.map(b => {
+          const label = courtLabel(b)
+          const rl = tab === 'cancelled' ? refundLabel(b.refundPolicy, b.refundAmount) : null
+          return (
+            <tr key={b.id} className={tab === 'ongoing' ? 'bg-green-500/[0.02]' : ''}>
+              <td className="font-mono text-xs text-muted">#{b.id}</td>
+              <td>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-a2 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                    {b.userName?.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold">{b.userName}</div>
+                    <div className="text-[10px] text-muted">{b.userEmail}</div>
+                  </div>
+                </div>
+              </td>
+              <td className="text-xs font-semibold">{b.bookingType?.replace(/_/g, ' ')}</td>
+              <td>
+                {label
+                  ? <span className="flex items-center gap-1 text-xs text-green-700 font-semibold"><Check size={11} /> {label}</span>
+                  : <span className="text-xs text-yellow-600 italic">Not assigned</span>}
+              </td>
+              <td className="text-xs text-muted">
+                <div>{b.bookingDate}</div>
+                <div>{b.startTime?.toString().slice(0, 5)} – {b.endTime?.toString().slice(0, 5)}</div>
+              </td>
+              <td>
+                <div className="font-bold">${b.amountPaid}</div>
+                <div className={`text-[10px] font-semibold ${
+                  b.paymentStatus === 'PAID' ? 'text-green-700' :
+                  b.paymentStatus === 'REFUNDED' ? 'text-blue-400' :
+                  b.paymentStatus === 'PARTIAL_REFUND' ? 'text-yellow-700' : 'text-yellow-700'}`}>
+                  {b.paymentStatus === 'PARTIAL_REFUND' && b.refundAmount ? `50% Refunded $${b.refundAmount}` : b.paymentStatus}
+                </div>
+              </td>
+
+              {tab === 'ongoing' && (
+                <td>
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-100 border border-green-300 px-2 py-0.5 rounded-full w-fit">
+                    🟢 LIVE
+                  </span>
+                </td>
+              )}
+              {tab === 'cancelled' && (
+                <td className="text-xs text-muted">
+                  {b.cancelledAt
+                    ? <span className="flex items-center gap-1"><Clock size={9} /> {fmtDateTime(b.cancelledAt)}</span>
+                    : <span className="italic opacity-50">—</span>}
+                  {b.cancellationReason && (
+                    <div className="text-[10px] text-[#5a6a8a] mt-0.5 max-w-[120px] truncate" title={b.cancellationReason}>
+                      {b.cancellationReason}
+                    </div>
+                  )}
+                </td>
+              )}
+              {tab === 'cancelled' && (
+                <td>
+                  {rl ? <span className={`text-[11px] font-bold ${rl.cls}`}>{rl.text}</span>
+                      : <span className="text-muted text-xs">—</span>}
+                </td>
+              )}
+              {tab !== 'ongoing' && <td><Badge value={b.status} /></td>}
+
+              {tab !== 'completed' && (
+                <td>
+                  <div className="flex gap-2 flex-wrap">
+                    {(tab === 'upcoming' || tab === 'ongoing') && b.status === 'CONFIRMED' && !label && (
+                      <button onClick={() => openAssign(b)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-blue-600/10 border border-blue-600/25 text-blue-400 hover:bg-blue-600/20 transition-all">
+                        <MapPin size={10} /> Assign
+                      </button>
                     )}
-                    {tab === 'cancelled' && (
-                      <td>
-                        {rl
-                          ? <span className={`text-[11px] font-bold ${rl.cls}`}>{rl.text}</span>
-                          : <span className="text-muted text-xs">—</span>}
-                      </td>
+                    {(tab === 'upcoming' || tab === 'ongoing') && b.status === 'CONFIRMED' && label && (
+                      <button onClick={() => openAssign(b)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
+                        <MapPin size={10} /> Reassign
+                      </button>
                     )}
-                    <td><Badge value={b.status} /></td>
-                    <td>
-                      <div className="flex gap-2 flex-wrap">
-                        {b.status === 'CONFIRMED' && !label && (
-                          <button onClick={() => openAssign(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-blue-600/10 border border-blue-600/25 text-blue-400 hover:bg-blue-600/20 transition-all">
-                            <MapPin size={10} /> Assign
-                          </button>
-                        )}
-                        {b.status === 'CONFIRMED' && label && (
-                          <button onClick={() => openAssign(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
-                            <MapPin size={10} /> Reassign
-                          </button>
-                        )}
-                        {b.status === 'CONFIRMED' && !isPast(b.bookingDate, b.startTime) && (
-                          <button onClick={() => cancel(b.id)}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
-                            Cancel
-                          </button>
-                        )}
-                        {b.status === 'CONFIRMED' && isPast(b.bookingDate, b.startTime) && (
-                          <span className="text-[10px] text-muted italic">Session ended</span>
-                        )}
-                        {b.status === 'CANCELLED' && b.paymentStatus === 'PAID' &&
-                          (b.refundPolicy === 'FULL' || b.refundPolicy === 'HALF') &&
-                          !isPast(b.bookingDate, b.startTime) && (
-                          <button onClick={() => setRefundTarget(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all">
-                            <RotateCcw size={10} /> {b.refundPolicy === 'FULL' ? 'Full Refund' : '50% Refund'}
-                          </button>
-                        )}
-                        {b.status === 'CANCELLED' && b.paymentStatus === 'PAID' &&
-                          b.refundPolicy === 'NONE' && !isPast(b.bookingDate, b.startTime) && (
-                          <button onClick={() => setRefundTarget(b)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
-                            <Bell size={10} /> No Refund
-                          </button>
-                        )}
-                        {b.status === 'CANCELLED' && b.paymentStatus === 'PAID' &&
-                          isPast(b.bookingDate, b.startTime) && (
-                          <span className="text-[10px] text-muted italic">Session ended</span>
-                        )}
-                        {b.status === 'CANCELLED' && b.paymentStatus === 'REFUNDED' && (
-                          <span className="text-[11px] text-blue-400 font-semibold">✓ Full Refunded</span>
-                        )}
-                        {b.status === 'CANCELLED' && b.paymentStatus === 'PARTIAL_REFUND' && (
-                          <span className="text-[11px] text-yellow-700 font-semibold">
-                            ✓ 50% Refunded{b.refundAmount ? ` $${b.refundAmount}` : ''}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+                    {tab === 'upcoming' && b.status === 'CONFIRMED' && (
+                      <button onClick={() => cancel(b.id)}
+                        className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
+                        Cancel
+                      </button>
+                    )}
+                    {tab === 'cancelled' && b.paymentStatus === 'PAID' &&
+                      (b.refundPolicy === 'FULL' || b.refundPolicy === 'HALF') &&
+                      !isPast(b.bookingDate, b.startTime) && (
+                      <button onClick={() => setRefundTarget(b)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all">
+                        <RotateCcw size={10} /> {b.refundPolicy === 'FULL' ? 'Full Refund' : '50% Refund'}
+                      </button>
+                    )}
+                    {tab === 'cancelled' && b.paymentStatus === 'PAID' &&
+                      b.refundPolicy === 'NONE' && !isPast(b.bookingDate, b.startTime) && (
+                      <button onClick={() => setRefundTarget(b)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8faff] border border-[#dde8f8] text-[#5a6a8a] hover:bg-[#f0f5ff] transition-all">
+                        <Bell size={10} /> No Refund
+                      </button>
+                    )}
+                    {tab === 'cancelled' && b.paymentStatus === 'REFUNDED' && (
+                      <span className="text-[11px] text-blue-400 font-semibold">✓ Full Refunded</span>
+                    )}
+                    {tab === 'cancelled' && b.paymentStatus === 'PARTIAL_REFUND' && (
+                      <span className="text-[11px] text-yellow-700 font-semibold">
+                        ✓ 50% Refunded{b.refundAmount ? ` $${b.refundAmount}` : ''}
+                      </span>
+                    )}
+                  </div>
+                </td>
+              )}
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  </div>
+)}
 
       {/* -- Policy-aware Refund Modal -- */}
       <Modal open={!!refundTarget} onClose={() => setRefundTarget(null)}
@@ -577,94 +564,100 @@ export default function AdminBookings() {
       </Modal>
 
       {/* -- Assign modal -- */}
-      {assignTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setAssignTarget(null)} />
-          <div className="relative w-full max-w-sm bg-white border border-[#dde8f8] rounded-2xl p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <div className="font-bold text-sm text-[#0a1428]">Assign Court / Lane</div>
-                <div className="text-[11px] text-muted mt-0.5">
-                  #{assignTarget.id} · {assignTarget.userName} · {assignTarget.bookingType?.replace(/_/g, ' ')}
-                </div>
-              </div>
-              <button onClick={() => setAssignTarget(null)} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a]">
-                <X size={15} />
-              </button>
-            </div>
+{/* -- Assign modal -- */}
+{assignTarget && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setAssignTarget(null)} />
+    <div className="relative w-full max-w-sm bg-white border border-[#dde8f8] rounded-2xl p-6 shadow-2xl">
 
-            <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-xl p-3.5 mb-4 text-xs text-[#5a6a8a] space-y-1">
-              <div className="flex justify-between"><span>Time</span><span className="font-semibold text-[#0a1428]">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
-              <div className="flex justify-between"><span>Date</span><span className="font-semibold text-[#0a1428]">{assignTarget.bookingDate}</span></div>
-            </div>
-
-            {(() => {
-              const total = assignTarget.bookingType === 'PICKLEBALL' ? 3
-              : assignTarget.bookingType === 'BOX_CRICKET' ? 2 : 8
-              const isLane = assignTarget.bookingType === 'CRICKET_LANE'
-              const overlaps = (aS, aE, bS, bE) => aS < bE && aE > bS
-              return (
-              <div className="mb-4">
-              <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-3">
-                {isLane ? 'Select Lane' : 'Select Court'}
-              </label>
-              <div className={`grid gap-2 ${total === 8 ? 'grid-cols-4' : total === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-              {Array.from({ length: total }, (_, i) => i + 1).map(num => {
-              const takenBy = bookings.find(other => {
-                if (other.id === assignTarget.id || other.status === 'CANCELLED') return false
-                if (other.bookingDate !== assignTarget.bookingDate) return false
-                if (!overlaps(assignTarget.startTime, assignTarget.endTime, other.startTime, other.endTime)) return false
-                if (assignTarget.bookingType === 'CRICKET_LANE') return other.laneNumber === num
-                return other.courtNumber === num
-                })
-              const isSelected = parseInt(assignValue) === num
-              const isTaken = !!takenBy
-                return (
-                  <button key={num} disabled={isTaken}
-                  onClick={() => { setAssignValue(String(num)); setAssignConflict(null) }}
-                  className={`p-3 rounded-xl border text-center transition-all ${
-                    isTaken    ? 'bg-red-50 border-red-300 cursor-not-allowed'
-                    : isSelected ? 'bg-blue-600/15 border-blue-600 ring-1 ring-blue-600/40'
-                    : 'bg-green-50 border-green-400 hover:bg-green-100 cursor-pointer'
-                  }`}>
-                  <div className={`text-xs font-bold ${
-                  isTaken ? 'text-red-500' : isSelected ? 'text-blue-700' : 'text-green-700'
-                  }`}>
-                  {isLane ? `Lane ${num}` : `Court ${num}`}
-                  </div>
-                  {isTaken ? (
-                  <div className="text-[9px] text-red-400 mt-0.5 truncate" title={takenBy.userName}>
-                  {takenBy.userName?.split(' ')[0]}
-                  </div>
-                  ) : isSelected ? (
-                  <div className="text-[9px] text-blue-600 mt-0.5">✓ Selected</div>
-                  ) : (
-                  <div className="text-[9px] text-green-600 mt-0.5">Free</div>
-                  )}
-                  </button>
-                  )
-                  })}
-                </div>
-              {assignValue && (
-              <div className="flex items-center gap-1.5 text-[11px] text-green-700 mt-2">
-              <span>✓</span> {isLane ? `Lane ${assignValue}` : `Court ${assignValue}`} selected
-            </div>
-          )}
-          </div>
-          )
-          })()}   
-
-            <button onClick={submitAssign} disabled={assigning || !!assignConflict}
-              className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-                assignConflict
-                  ? 'bg-[#f8faff] border border-[#dde8f8] text-[#9aaac8] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white'
-              }`}>
-              {assigning ? 'Assigning…' : assignConflict ? '⛔ Resolve conflict to continue' : '✅ Confirm Assignment & Notify User'}
-            </button>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <div className="font-bold text-sm text-[#0a1428]">Assign Court / Lane</div>
+          <div className="text-[11px] text-muted mt-0.5">
+            #{assignTarget.id} · {assignTarget.userName} · {assignTarget.bookingType?.replace(/_/g, ' ')}
           </div>
         </div>
-      )}
+        <button onClick={() => setAssignTarget(null)} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-[#5a6a8a]">
+          <X size={15} />
+        </button>
+      </div>
+
+      {/* Booking info */}
+      <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-xl p-3.5 mb-4 text-xs text-[#5a6a8a] space-y-1">
+        <div className="flex justify-between"><span>Date</span><span className="font-semibold text-[#0a1428]">{assignTarget.bookingDate}</span></div>
+        <div className="flex justify-between"><span>Time</span><span className="font-semibold text-[#0a1428]">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
+      </div>
+
+      {/* Dropdown */}
+      <div className="mb-5">
+        <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-2">
+          {assignTarget.bookingType === 'CRICKET_LANE' ? 'Select Lane' : 'Select Court'}
+        </label>
+
+        {courtsLoading ? (
+          <div className="flex items-center gap-2 py-3 text-xs text-muted">
+            <span className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+            Loading available courts…
+          </div>
+        ) : availableCourts.length === 0 ? (
+          <div className="text-xs text-red-400 py-2">No active courts found for this sport.</div>
+        ) : (
+          <>
+            <select
+              value={assignValue}
+              onChange={e => setAssignValue(e.target.value)}
+              className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-3 py-2.5 text-sm text-[#0a1428] outline-none focus:border-accent transition-all cursor-pointer [color-scheme:light]">
+              <option value="">— Choose a {assignTarget.bookingType === 'CRICKET_LANE' ? 'lane' : 'court'} —</option>
+              {availableCourts.map(c => (
+                <option key={c.id} value={c.id} disabled={!c.available}>
+                  {c.name}
+                  {c.available
+                    ? ' ✓ Available'
+                    : ` ✗ Taken — ${c.takenBy?.userName?.split(' ')[0] || 'occupied'} (${c.takenBy?.startTime?.toString().slice(0,5)}–${c.takenBy?.endTime?.toString().slice(0,5)})`}
+                </option>
+              ))}
+            </select>
+
+            {/* Availability summary */}
+            <div className="flex gap-3 mt-2.5 text-[10px]">
+              <span className="text-green-700 font-semibold">
+                ✓ {availableCourts.filter(c => c.available).length} available
+              </span>
+              {availableCourts.filter(c => !c.available).length > 0 && (
+                <span className="text-red-400 font-semibold">
+                  ✗ {availableCourts.filter(c => !c.available).length} taken
+                </span>
+              )}
+            </div>
+
+            {/* Selected court info */}
+            {assignValue && (() => {
+              const sel = availableCourts.find(c => c.id === parseInt(assignValue))
+              return sel ? (
+                <div className="mt-3 bg-green-50 border border-green-300 rounded-xl px-3 py-2 text-xs text-green-700 font-semibold flex items-center gap-1.5">
+                  <Check size={12} /> {sel.name} selected
+                  {sel.location && <span className="font-normal text-green-600 ml-1">· {sel.location}</span>}
+                </div>
+              ) : null
+            })()}
+          </>
+        )}
+      </div>
+
+      <button onClick={submitAssign} disabled={assigning || !assignValue || courtsLoading}
+        className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+          !assignValue || courtsLoading
+            ? 'bg-[#f8faff] border border-[#dde8f8] text-[#9aaac8] cursor-not-allowed'
+            : 'bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white'
+        }`}>
+        {assigning
+          ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Assigning…</>
+          : '✅ Confirm Assignment & Notify User'}
+      </button>
+    </div>
+  </div>
+)}
     </div>
   )
 }

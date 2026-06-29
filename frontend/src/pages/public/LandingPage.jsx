@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState , useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import BookingModal from '../../components/booking/BookingModal'
@@ -25,34 +25,36 @@ const SPORT_IMAGES = {
   PICKLEBALL:   'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=900&q=90',
 }
 
-const SPORTS = [
+
+const NAV_LINKS = ['Home', 'About', 'Contact']
+
+const makeSports = counts => [
   {
     key: 'CRICKET_LANE', emoji: '🏏', name: 'Cricket Lane',
-    desc: '8 individual lanes across 2 boxes. Perfect for batting practice and net sessions.',
+    desc: `${counts.CRICKET_LANE} individual lanes across 2 boxes. Perfect for batting practice and net sessions.`,
     price: 30, memberPrice: 25, membershipFee: 50,
-    features: ['8 lanes (4 per box)', '55-min sessions', 'BOX A & BOX B'],
+    features: [`${counts.CRICKET_LANE} lanes (4 per box)`, '55-min sessions', 'BOX A & BOX B'],
     badgeBg: '#1352c9', badgeLabel: 'LIVE',
   },
   {
     key: 'BOX_CRICKET', emoji: '📦', name: 'Box Cricket',
-    desc: 'Book all 4 lanes of a full box — ideal for team matches and group play.',
+    desc: `${counts.BOX_CRICKET} independent courts for competitive box cricket matches and group play.`,
     price: 50, memberPrice: 40, membershipFee: 100,
-    features: ['2 full boxes', 'BOX A or BOX B', 'Up to 6 players'],
+    features: [`${counts.BOX_CRICKET} courts`, '55-min sessions', 'Up to 2 players/court'],
     badgeBg: '#15803d', badgeLabel: 'POPULAR',
   },
   {
     key: 'PICKLEBALL', emoji: '🏓', name: 'Pickleball',
-    desc: '3 full-size courts with premium surfaces. Open to all skill levels.',
+    desc: `${counts.PICKLEBALL} full-size courts with premium surfaces. Open to all skill levels.`,
     price: 30, memberPrice: 25, membershipFee: 50,
-    features: ['3 courts', '55-min sessions', 'All skill levels'],
+    features: [`${counts.PICKLEBALL} courts`, '55-min sessions', 'All skill levels'],
     badgeBg: '#d97706', badgeLabel: 'OPEN NOW',
   },
 ]
 
-const NAV_LINKS = ['Home', 'About', 'Contact']
-
 /* ── Home Section ─────────────────────────────────────────────────────────── */
-function HomeSection({ setBooking, user }) {
+function HomeSection({ setBooking, user, sports = [] }) {
+  const SPORTS = sports
   return (
     <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
 
@@ -233,7 +235,8 @@ function HomeSection({ setBooking, user }) {
 }
 
 /* ── About Section ────────────────────────────────────────────────────────── */
-function AboutSection({ setBooking }) {
+function AboutSection({ setBooking, sports = [] }) {
+  const SPORTS = sports
   const amenities = [
     { icon: '🏟️', title: 'World-Class Facility',  desc: 'Premium indoor infrastructure built to international standards.' },
     { icon: '🌡️', title: 'Climate Controlled',     desc: 'Fully air-conditioned courts for year-round comfortable play.' },
@@ -245,7 +248,7 @@ function AboutSection({ setBooking }) {
   const values = [
     { label: 'Founded', value: '2026' },
     { label: 'Location', value: 'Hyderabad' },
-    { label: 'Courts', value: '13 total' },
+    { label: 'Courts', value: `${sports.reduce((n, s) => n + (parseInt(s.features[0]) || 0), 0) || 13} total` },
     { label: 'Open', value: '7AM–10PM' },
   ]
   return (
@@ -426,6 +429,17 @@ export default function LandingPage() {
 
   const isAdmin = user && ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(user.role)
   const navTo   = page => { setActivePage(page); setMenuOpen(false) }
+  const [courtCounts, setCourtCounts] = useState({ CRICKET_LANE: 8, BOX_CRICKET: 2, PICKLEBALL: 3 })
+
+useEffect(() => {
+  publicAPI.courts().then(r => {
+    const counts = { CRICKET_LANE: 0, BOX_CRICKET: 0, PICKLEBALL: 0 }
+    r.data.forEach(c => { if (counts[c.type] !== undefined) counts[c.type]++ })
+    setCourtCounts(counts)
+  }).catch(() => {})
+}, [])
+
+  const SPORTS = makeSports(courtCounts)
 
   return (
     /* 100dvh = dynamic viewport height — correctly accounts for Chrome toolbar,
@@ -527,8 +541,8 @@ export default function LandingPage() {
       )}
 
       {/* ── Page sections — fills remaining height, no scroll ─────────── */}
-      {activePage === 'Home'    && <HomeSection    setBooking={setBooking} user={user} />}
-      {activePage === 'About'   && <AboutSection   setBooking={setBooking} />}
+      {activePage === 'Home'    && <HomeSection    setBooking={setBooking} user={user} sports={SPORTS} />}
+      {activePage === 'About'   && <AboutSection   setBooking={setBooking} sports={SPORTS} />}
       {activePage === 'Contact' && <ContactSection />}
 
       {booking && <BookingModal initialType={booking} onClose={() => setBooking(null)} />}

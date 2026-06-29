@@ -26,6 +26,7 @@ public class BookingService {
     private final EmailService emailService;
     private final RazorpayService razorpayService;
     private final NotificationService notificationService;
+    private final CourtRepository courtRepo;
 
     /* ── Create booking ── */
     @Transactional
@@ -182,10 +183,15 @@ public class BookingService {
         LocalTime current = openTime;
 
         LocalDateTime pendingCutoff = LocalDateTime.now().minusMinutes(10);
+        int capacity = courtRepo
+                .findByTypeAndStatus(Court.CourtType.valueOf(type), Court.CourtStatus.ACTIVE)
+                .size();
+        if (capacity < 1)
+            capacity = 1;
         while (!current.plusMinutes(55).isAfter(closeTime)) {
             LocalTime slotEnd = current.plusMinutes(55);
             List<Booking> conflicts = bookingRepo.findConflicting(date, current, slotEnd, pendingCutoff);
-            Map<String, Object> slot = buildSlot(type, boxGroup, current, slotEnd, conflicts);
+            Map<String, Object> slot = buildSlot(type, boxGroup, current, slotEnd, conflicts, capacity);
             slots.add(slot);
             current = current.plusMinutes(60); // 55 min session + 5 min buffer
         }
@@ -379,35 +385,16 @@ public class BookingService {
     }
 
     private Map<String, Object> buildSlot(String type, String boxGroup, LocalTime start, LocalTime end,
-            List<Booking> conflicts) {
+            List<Booking> conflicts, int capacity) {
         Map<String, Object> slot = new LinkedHashMap<>();
         slot.put("startTime", start.toString());
         slot.put("endTime", end.toString());
 
-        if ("CRICKET_LANE".equals(type)) {
-            long count = conflicts.stream()
-                    .filter(b -> "CRICKET_LANE".equals(b.getBookingType()))
-                    .count();
-            int capacity = 8;
-            slot.put("available", count < capacity);
-            slot.put("remaining", (int) Math.max(0, capacity - count));
-
-        } else if ("BOX_CRICKET".equals(type)) {
-            long count = conflicts.stream()
-                    .filter(b -> "BOX_CRICKET".equals(b.getBookingType()))
-                    .count();
-            int capacity = 2;
-            slot.put("available", count < capacity);
-            slot.put("remaining", (int) Math.max(0, capacity - count));
-
-        } else { // PICKLEBALL
-            long count = conflicts.stream()
-                    .filter(b -> "PICKLEBALL".equals(b.getBookingType()))
-                    .count();
-            int capacity = 3;
-            slot.put("available", count < capacity);
-            slot.put("remaining", (int) Math.max(0, capacity - count));
-        }
+        long count = conflicts.stream()
+                .filter(b -> type.equals(b.getBookingType()))
+                .count();
+        slot.put("available", count < capacity);
+        slot.put("remaining", (int) Math.max(0, capacity - count));
         return slot;
     }
 
