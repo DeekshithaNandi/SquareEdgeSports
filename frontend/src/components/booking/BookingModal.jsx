@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { publicAPI, bookingAPI, authAPI } from '../../api'
 import { useAuth } from '../../context/AuthContext'
 import { X, ChevronLeft, ChevronRight, CheckCircle, Clock, Loader, Calendar, Eye, EyeOff } from 'lucide-react'
@@ -72,7 +72,8 @@ export default function BookingModal({ initialType, onClose }) {
   const [signInLoading,  setSignInLoading]  = useState(false)
   const [signInErr,      setSignInErr]      = useState('')
 
-  const [authView,     setAuthView]     = useState('signin')  // 'signin' | 'register'
+  // Registration + OTP state
+  const [authView,     setAuthView]     = useState('signin')  // 'signin' | 'register' | 'verify-otp' | 'forgot'
   const [regName,      setRegName]      = useState('')
   const [regEmail,     setRegEmail]     = useState('')
   const [regPassword,  setRegPassword]  = useState('')
@@ -80,6 +81,15 @@ export default function BookingModal({ initialType, onClose }) {
   const [showRegPw,    setShowRegPw]    = useState(false)
   const [regLoading,   setRegLoading]   = useState(false)
   const [regErr,       setRegErr]       = useState('')
+  const [regOtp,       setRegOtp]       = useState(['', '', '', '', '', ''])
+
+  // Forgot password state
+  const [forgotEmail,         setForgotEmail]         = useState('')
+  const [forgotLoading,       setForgotLoading]       = useState(false)
+  const [forgotSent,          setForgotSent]          = useState(false)
+  const [forgotErr,           setForgotErr]           = useState('')
+  const [forgotNotRegistered, setForgotNotRegistered] = useState(false)
+  const regOtpRefs = useRef([])
 
   const typeInfo = TYPES[type]
 
@@ -231,31 +241,81 @@ export default function BookingModal({ initialType, onClose }) {
       setSignInErr(e.response?.data?.message || 'Sign in failed.')
     } finally { setSignInLoading(false) }
   }
-  async function handleRegister() {
-  if (!regName.trim() || !regEmail.trim() || !regPassword) {
-    setRegErr('Please fill in all fields.'); return
+
+  async function handleForgotPassword() {
+    if (!forgotEmail.trim()) { setForgotErr('Enter your email address.'); return }
+    setForgotLoading(true); setForgotErr(''); setForgotNotRegistered(false)
+    try {
+      await authAPI.forgotPassword(forgotEmail.trim())
+      setForgotSent(true)
+    } catch (e) {
+      const msg = e.response?.data?.message || ''
+      if (msg === 'USER_NOT_REGISTERED') setForgotNotRegistered(true)
+      else setForgotErr(msg || 'Something went wrong. Please try again.')
+    } finally { setForgotLoading(false) }
   }
-  if (regPassword !== regConfirm) {
-    setRegErr('Passwords do not match.'); return
+
+  async function sendRegisterOtp() {
+    if (!regName.trim() || !regEmail.trim() || !regPassword) {
+      setRegErr('Please fill in all fields.'); return
+    }
+    if (regPassword !== regConfirm) {
+      setRegErr('Passwords do not match.'); return
+    }
+    if (regPassword.length < 6) {
+      setRegErr('Password must be at least 6 characters.'); return
+    }
+    setRegLoading(true); setRegErr('')
+    try {
+      await authAPI.sendOtp(regEmail.trim(), regName.trim())
+      setAuthView('verify-otp')
+      toast.success('Code sent to ' + regEmail)
+    } catch (e) {
+      setRegErr(e.response?.data?.message || 'Failed to send verification code.')
+    } finally { setRegLoading(false) }
   }
-  if (regPassword.length < 6) {
-    setRegErr('Password must be at least 6 characters.'); return
+
+  async function verifyRegisterOtp() {
+    const code = regOtp.join('')
+    if (code.length < 6) { setRegErr('Enter the complete 6-digit code.'); return }
+    setRegLoading(true); setRegErr('')
+    try {
+      await authAPI.verifyOtp(regEmail.trim(), code)
+      await authAPI.register({ fullName: regName.trim(), email: regEmail.trim(), password: regPassword })
+      const loginRes = await authAPI.login({ email: regEmail.trim(), password: regPassword })
+      authLogin(loginRes.data.token, loginRes.data.user)
+      await createBookings()
+    } catch (e) {
+      setRegErr(e.response?.data?.message || 'Incorrect or expired code.')
+    } finally { setRegLoading(false) }
   }
-  setRegLoading(true); setRegErr('')
-  try {
-    await authAPI.register({ fullName: regName.trim(), email: regEmail.trim(), password: regPassword })
-    // Auto sign-in after registration
-    const loginRes = await authAPI.login({ email: regEmail.trim(), password: regPassword })
-    authLogin(loginRes.data.token, loginRes.data.user)
-    await createBookings()
-  } catch (e) {
-    setRegErr(e.response?.data?.message || 'Registration failed. Try a different email.')
-  } finally { setRegLoading(false) }
-}
+
+  function handleRegOtpChange(i, v) {
+    if (!/^[0-9]?$/.test(v)) return
+    const n = [...regOtp]; n[i] = v; setRegOtp(n); setRegErr('')
+    if (v && i < 5) regOtpRefs.current[i + 1]?.focus()
+  }
+  function handleRegOtpKey(i, e) {
+    if (e.key === 'Backspace' && !regOtp[i] && i > 0) regOtpRefs.current[i - 1]?.focus()
+    if (e.key === 'Enter') verifyRegisterOtp()
+  }
+
   function reviewBooking() {
     if (selSlots.length === 0) return
     if (!user) { setStep('auth'); return }
     createBookings()
+  }
+
+  function resetAuth() {
+    setStep('select')
+    setAuthView('signin')
+    setRegErr('')
+    setSignInErr('')
+    setRegOtp(['', '', '', '', '', ''])
+    setForgotEmail('')
+    setForgotSent(false)
+    setForgotErr('')
+    setForgotNotRegistered(false)
   }
 
   return (
@@ -410,125 +470,250 @@ export default function BookingModal({ initialType, onClose }) {
           )}
 
           {/* ── Auth step ── */}
-          {/* ── Auth step ── */}
-{step === 'auth' && (
-  <div>
-    {authView === 'signin' ? (
-      /* ── Sign In ── */
-      <div>
-        <div className="text-center mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">🔐</div>
-          <div className="font-bold text-base mb-1">Sign in to complete booking</div>
-          <p className="text-xs text-[#5a6a8a] leading-relaxed">
-            You've selected {selSlots.length} slot{selSlots.length > 1 ? 's' : ''} — sign in to confirm.
-          </p>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
-            <input type="email" value={signInEmail} onChange={e => setSignInEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Password</label>
-            <div className="relative">
-              <input type={showPw ? 'text' : 'password'} value={signInPassword}
-                onChange={e => setSignInPassword(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleGuestSignIn()}
-                placeholder="Your password"
-                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
-              <button type="button" onClick={() => setShowPw(p => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
-                {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
+          {step === 'auth' && (
+            <div>
+              {authView === 'signin' && (
+                /* ── Sign In ── */
+                <div>
+                  <div className="text-center mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">🔐</div>
+                    <div className="font-bold text-base mb-1">Sign in to complete booking</div>
+                    <p className="text-xs text-[#5a6a8a] leading-relaxed">
+                      You've selected {selSlots.length} slot{selSlots.length > 1 ? 's' : ''} — sign in to confirm.
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
+                      <input type="email" value={signInEmail} onChange={e => setSignInEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Password</label>
+                      <div className="relative">
+                        <input type={showPw ? 'text' : 'password'} value={signInPassword}
+                          onChange={e => setSignInPassword(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleGuestSignIn()}
+                          placeholder="Your password"
+                          className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
+                        <button type="button" onClick={() => setShowPw(p => !p)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
+                          {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex justify-end -mt-1">
+                      <button onClick={() => { setAuthView('forgot'); setForgotEmail(signInEmail); setForgotErr(''); setForgotSent(false); setForgotNotRegistered(false) }}
+                        className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold">
+                        Forgot password?
+                      </button>
+                    </div>
+                    {signInErr && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400">{signInErr}</div>
+                    )}
+                    <button onClick={handleGuestSignIn} disabled={signInLoading || !signInEmail || !signInPassword}
+                      className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+                        !signInLoading && signInEmail && signInPassword ? 'bg-accent hover:opacity-90 shadow-lg' : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
+                      }`}>
+                      {signInLoading ? <><Loader size={13} className="spin" /> Signing in…</> : 'Sign In & Confirm Booking'}
+                    </button>
+                    <p className="text-center text-[11px] text-[#9aaac8]">
+                      No account?{' '}
+                      <button onClick={() => { setAuthView('register'); setSignInErr('') }}
+                        className="text-blue-400 hover:text-blue-300 font-semibold underline">
+                        Register here
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {authView === 'register' && (
+                /* ── Register ── */
+                <div>
+                  <div className="text-center mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">✏️</div>
+                    <div className="font-bold text-base mb-1">Create your account</div>
+                    <p className="text-xs text-[#5a6a8a] leading-relaxed">
+                      Register to confirm your {selSlots.length} slot{selSlots.length > 1 ? 's' : ''}.
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Full Name</label>
+                      <input type="text" value={regName} onChange={e => setRegName(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
+                      <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Password</label>
+                      <div className="relative">
+                        <input type={showRegPw ? 'text' : 'password'} value={regPassword}
+                          onChange={e => setRegPassword(e.target.value)}
+                          placeholder="Min. 6 characters"
+                          className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
+                        <button type="button" onClick={() => setShowRegPw(p => !p)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
+                          {showRegPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Confirm Password</label>
+                      <input type={showRegPw ? 'text' : 'password'} value={regConfirm}
+                        onChange={e => setRegConfirm(e.target.value)}
+                        placeholder="Re-enter password"
+                        className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
+                    </div>
+                    {regErr && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400">{regErr}</div>
+                    )}
+                    <button onClick={sendRegisterOtp} disabled={regLoading || !regName || !regEmail || !regPassword || !regConfirm}
+                      className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+                        !regLoading && regName && regEmail && regPassword && regConfirm
+                          ? 'bg-accent hover:opacity-90 shadow-lg'
+                          : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
+                      }`}>
+                      {regLoading ? <><Loader size={13} className="spin" /> Sending code…</> : 'Continue →'}
+                    </button>
+                    <p className="text-center text-[11px] text-[#9aaac8]">
+                      Already have an account?{' '}
+                      <button onClick={() => { setAuthView('signin'); setRegErr('') }}
+                        className="text-blue-400 hover:text-blue-300 font-semibold underline">
+                        Sign in
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {authView === 'verify-otp' && (
+                /* ── Verify OTP ── */
+                <div>
+                  <div className="text-center mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">📧</div>
+                    <div className="font-bold text-base mb-1">Verify your email</div>
+                    <p className="text-xs text-[#5a6a8a] leading-relaxed">
+                      We sent a 6-digit code to<br /><strong className="text-[#0a1428]">{regEmail}</strong>
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 justify-center my-5">
+                    {regOtp.map((v, i) => (
+                      <input key={i} ref={el => regOtpRefs.current[i] = el}
+                        maxLength={1} value={v}
+                        onChange={e => handleRegOtpChange(i, e.target.value)}
+                        onKeyDown={e => handleRegOtpKey(i, e)}
+                        onFocus={e => e.target.select()}
+                        className="w-10 h-12 text-center text-lg font-bold bg-white border border-[#dde8f8] rounded-xl focus:outline-none focus:border-blue-600/50"
+                        style={{ color: '#0a1428' }} />
+                    ))}
+                  </div>
+                  
+                  {regErr && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400 mb-3 text-center">{regErr}</div>
+                  )}
+
+                  <button onClick={verifyRegisterOtp} disabled={regLoading}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-accent hover:opacity-90 shadow-lg transition-all disabled:opacity-60">
+                    {regLoading ? <><Loader size={13} className="spin" /> Verifying…</> : 'Verify & Confirm Booking'}
+                  </button>
+
+                  <div className="flex items-center justify-between mt-4 text-[11px] text-[#9aaac8]">
+                    <button onClick={() => { setAuthView('register'); setRegOtp(['', '', '', '', '', '']); setRegErr('') }}
+                      className="hover:text-[#5a6a8a] transition-colors">← Go back</button>
+                    <button onClick={() => { authAPI.sendOtp(regEmail, regName); toast.success('New code sent!') }}
+                      className="hover:text-[#5a6a8a] transition-colors">Resend code</button>
+                  </div>
+                </div>
+              )}
+
+              {authView === 'forgot' && (
+                /* ── Forgot Password ── */
+                <div>
+                  {!forgotSent ? (
+                    <>
+                      <div className="text-center mb-5">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">🔑</div>
+                        <div className="font-bold text-base mb-1">Forgot password?</div>
+                        <p className="text-xs text-[#5a6a8a] leading-relaxed">
+                          Enter your registered email and we'll send you a link to reset your password.
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
+                          <input type="email" value={forgotEmail}
+                            onChange={e => { setForgotEmail(e.target.value); setForgotErr(''); setForgotNotRegistered(false) }}
+                            onKeyDown={e => e.key === 'Enter' && handleForgotPassword()}
+                            placeholder="you@example.com"
+                            className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
+                        </div>
+
+                        {forgotNotRegistered && (
+                          <div className="bg-yellow-50 border border-yellow-300 rounded-xl px-4 py-3">
+                            <div className="text-xs font-bold text-yellow-700 mb-1">⚠️ Account not found</div>
+                            <p className="text-[11px] text-yellow-600 leading-relaxed">
+                              <strong>{forgotEmail}</strong> is not registered.{' '}
+                              <button onClick={() => { setAuthView('register'); setRegEmail(forgotEmail) }}
+                                className="underline font-semibold">Register here</button> instead.
+                            </p>
+                          </div>
+                        )}
+
+                        {forgotErr && (
+                          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400">{forgotErr}</div>
+                        )}
+
+                        <button onClick={handleForgotPassword} disabled={forgotLoading || !forgotEmail}
+                          className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+                            !forgotLoading && forgotEmail ? 'bg-accent hover:opacity-90 shadow-lg' : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
+                          }`}>
+                          {forgotLoading ? <><Loader size={13} className="spin" /> Sending…</> : 'Send Reset Link →'}
+                        </button>
+
+                        <p className="text-center text-[11px] text-[#9aaac8]">
+                          <button onClick={() => { setAuthView('signin'); setForgotErr('') }}
+                            className="text-blue-400 hover:text-blue-300 font-semibold underline">
+                            ← Back to Sign In
+                          </button>
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    /* ── Sent confirmation ── */
+                    <div className="text-center py-4">
+                      <div className="w-14 h-14 rounded-full bg-green-100 border border-green-300 flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle size={28} className="text-green-600" />
+                      </div>
+                      <div className="font-bold text-base mb-2">Check your inbox</div>
+                      <p className="text-xs text-[#5a6a8a] mb-1">If <strong className="text-[#0a1428]">{forgotEmail}</strong> is registered,</p>
+                      <p className="text-xs text-[#5a6a8a] mb-5 leading-relaxed">you'll receive a reset link shortly. It expires in 30 minutes.</p>
+                      <p className="text-[11px] text-[#9aaac8] mb-4">
+                        Didn't get it?{' '}
+                        <button onClick={() => setForgotSent(false)} className="text-blue-400 hover:text-blue-300 underline">try again</button>.
+                      </p>
+                      <p className="text-[11px] text-[#9aaac8]">
+                        Once reset, come back and{' '}
+                        <button onClick={() => { setAuthView('signin'); setForgotSent(false) }}
+                          className="text-blue-400 hover:text-blue-300 font-semibold underline">
+                          sign in
+                        </button>{' '}to confirm your booking.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-          {signInErr && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400">{signInErr}</div>
           )}
-          <button onClick={handleGuestSignIn} disabled={signInLoading || !signInEmail || !signInPassword}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-              !signInLoading && signInEmail && signInPassword ? 'bg-accent hover:opacity-90 shadow-lg' : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
-            }`}>
-            {signInLoading ? <><Loader size={13} className="spin" /> Signing in…</> : 'Sign In & Confirm Booking'}
-          </button>
-          <p className="text-center text-[11px] text-[#9aaac8]">
-            No account?{' '}
-            <button onClick={() => { setAuthView('register'); setSignInErr('') }}
-              className="text-blue-400 hover:text-blue-300 font-semibold underline">
-              Register here
-            </button>
-          </p>
-        </div>
-      </div>
-    ) : (
-      /* ── Register ── */
-      <div>
-        <div className="text-center mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center mx-auto mb-3">✏️</div>
-          <div className="font-bold text-base mb-1">Create your account</div>
-          <p className="text-xs text-[#5a6a8a] leading-relaxed">
-            Register to confirm your {selSlots.length} slot{selSlots.length > 1 ? 's' : ''}.
-          </p>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Full Name</label>
-            <input type="text" value={regName} onChange={e => setRegName(e.target.value)}
-              placeholder="John Doe"
-              className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Email</label>
-            <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600/50" style={{ color: '#0a1428' }} />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Password</label>
-            <div className="relative">
-              <input type={showRegPw ? 'text' : 'password'} value={regPassword}
-                onChange={e => setRegPassword(e.target.value)}
-                placeholder="Min. 6 characters"
-                className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 pr-10 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
-              <button type="button" onClick={() => setShowRegPw(p => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aaac8] hover:text-[#5a6a8a]">
-                {showRegPw ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            </div>
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider block mb-1.5">Confirm Password</label>
-            <input type={showRegPw ? 'text' : 'password'} value={regConfirm}
-              onChange={e => setRegConfirm(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleRegister()}
-              placeholder="Re-enter password"
-              className="w-full bg-[#f8faff] border border-[#dde8f8] rounded-xl px-4 py-3 text-sm text-[#0a1428] placeholder-[#8a9ab8] focus:outline-none focus:border-blue-600/50" />
-          </div>
-          {regErr && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-xs text-red-400">{regErr}</div>
-          )}
-          <button onClick={handleRegister} disabled={regLoading || !regName || !regEmail || !regPassword || !regConfirm}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-              !regLoading && regName && regEmail && regPassword && regConfirm
-                ? 'bg-accent hover:opacity-90 shadow-lg'
-                : 'bg-[#f8faff] text-[#9aaac8] cursor-not-allowed'
-            }`}>
-            {regLoading ? <><Loader size={13} className="spin" /> Creating account…</> : 'Register & Confirm Booking'}
-          </button>
-          <p className="text-center text-[11px] text-[#9aaac8]">
-            Already have an account?{' '}
-            <button onClick={() => { setAuthView('signin'); setRegErr('') }}
-              className="text-blue-400 hover:text-blue-300 font-semibold underline">
-              Sign in
-            </button>
-          </p>
-        </div>
-      </div>
-    )}
-  </div>
-)}
 
           {/* ── Step 4: Payment review ── */}
           {step === 4 && createdBookings.length > 0 && (
@@ -654,13 +839,13 @@ export default function BookingModal({ initialType, onClose }) {
         )}
 
         {step === 'auth' && (
-  <div className="px-6 py-3 border-t border-[#dde8f8] flex-shrink-0">
-    <button onClick={() => { setStep('select'); setAuthView('signin'); setRegErr(''); setSignInErr('') }}
-      className="flex items-center gap-1.5 text-xs text-[#9aaac8] hover:text-[#5a6a8a] transition-colors">
-      <ChevronLeft size={11} /> Back to slot selection
-    </button>
-  </div>
-)}
+          <div className="px-6 py-3 border-t border-[#dde8f8] flex-shrink-0">
+            <button onClick={resetAuth}
+              className="flex items-center gap-1.5 text-xs text-[#9aaac8] hover:text-[#5a6a8a] transition-colors">
+              <ChevronLeft size={11} /> Back to slot selection
+            </button>
+          </div>
+        )}
 
         {step === 4 && (
           <div className="px-6 py-4 border-t border-[#dde8f8] flex-shrink-0">
