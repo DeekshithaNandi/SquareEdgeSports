@@ -155,13 +155,13 @@ const openAssign = async b => {
       .filter(c => c.type === b.bookingType && c.status === 'ACTIVE')
       .sort((x, y) => (x.laneNumber || 0) - (y.laneNumber || 0))
       .map(c => {
-        const takenBy = bookings.find(other => {
-          if (other.id === b.id || other.status === 'CANCELLED') return false
-          if (other.bookingDate !== b.bookingDate) return false
-          if (!overlaps(b.startTime, b.endTime, other.startTime, other.endTime)) return false
-          const assignedNum = b.bookingType === 'CRICKET_LANE' ? other.laneNumber : other.courtNumber
-          return assignedNum === c.laneNumber
-        })
+      const takenBy = c.laneNumber == null ? null : bookings.find(other => {
+        if (other.id === b.id || other.status === 'CANCELLED') return false
+        if (other.bookingDate !== b.bookingDate) return false
+        if (!overlaps(b.startTime, b.endTime, other.startTime, other.endTime)) return false
+      const assignedNum = b.bookingType === 'CRICKET_LANE' ? other.laneNumber : other.courtNumber
+        return assignedNum != null && assignedNum === c.laneNumber
+      })
         return { ...c, available: !takenBy, takenBy: takenBy || null }
       })
     setAvailableCourts(courts)

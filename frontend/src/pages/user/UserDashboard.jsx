@@ -8,10 +8,16 @@ import { formatCurrency } from '../../utils/helpers'
 import { X, CheckCircle, Crown } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const MEMBERSHIP_SPORTS = [
-  { key: 'CRICKET_LANE', label: 'Cricket Lane', emoji: '🏏', memberKey: 'cricketLaneMember', fee: 50, save: 5, color: 'green' },
-  { key: 'BOX_CRICKET',  label: 'Box Cricket',  emoji: '📦', memberKey: 'boxCricketMember',  fee: 100, save: 10, color: 'violet' },
-  { key: 'PICKLEBALL',   label: 'Pickleball',   emoji: '🏓', memberKey: 'pickleballMember',  fee: 50, save: 5, color: 'orange' },
+const makeMembershipSports = (pricing = {}) => [
+  { key: 'CRICKET_LANE', label: 'Cricket Lane', emoji: '🏏', memberKey: 'cricketLaneMember',
+    fee: pricing.CRICKET_LANE_MEMBERSHIP ?? 50,
+    save: (pricing.CRICKET_LANE ?? 30) - (pricing.CRICKET_LANE_MEMBER ?? 25), color: 'green' },
+  { key: 'BOX_CRICKET',  label: 'Box Cricket',  emoji: '📦', memberKey: 'boxCricketMember',
+    fee: pricing.BOX_CRICKET_MEMBERSHIP ?? 100,
+    save: (pricing.BOX_CRICKET ?? 50) - (pricing.BOX_CRICKET_MEMBER ?? 40), color: 'violet' },
+  { key: 'PICKLEBALL',   label: 'Pickleball',   emoji: '🏓', memberKey: 'pickleballMember',
+    fee: pricing.PICKLEBALL_MEMBERSHIP ?? 50,
+    save: (pricing.PICKLEBALL ?? 30) - (pricing.PICKLEBALL_MEMBER ?? 25), color: 'orange' },
 ]
 
 // Renders a single CMS block based on its contentType
@@ -89,6 +95,9 @@ export default function UserDashboard() {
   const [cmsItems,  setCmsItems]  = useState([])
   const [dismissed, setDismissed] = useState(new Set())
   const [buyingMembership, setBuyingMembership] = useState(null) // sportType being purchased
+  const [pricing, setPricing] = useState({})
+
+  const MEMBERSHIP_SPORTS = makeMembershipSports(pricing)
 
   useEffect(() => {
     bookingAPI.myBookings().then(r => setBookings(r.data)).catch(() => {})
@@ -97,6 +106,11 @@ export default function UserDashboard() {
         .filter(i => i.active)
         .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
       setCmsItems(active)
+    }).catch(() => {})
+    publicAPI.pricing().then(r => {
+      const map = {}
+      r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+      setPricing(map)
     }).catch(() => {})
   }, [])
 

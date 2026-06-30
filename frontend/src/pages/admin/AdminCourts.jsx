@@ -9,7 +9,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 const TYPES = ["CRICKET_LANE","BOX_CRICKET","PICKLEBALL"]
 const STATUSES = ["ACTIVE","MAINTENANCE","INACTIVE"]
 const ICONS = { CRICKET_LANE:"🏏", BOX_CRICKET:"🏟️", PICKLEBALL:"🏓" }
-const empty = { name:"", type:"PICKLEBALL", location:"", description:"", pricePerSlot:"", memberPricePerSlot:"", capacity:"", status:"ACTIVE" }
+const empty = { name:"", type:"PICKLEBALL", location:"", description:"", pricePerSlot:"", memberPricePerSlot:"", capacity:"", status:"ACTIVE", laneNumber:"" }
 
 export default function AdminCourts() {
   const [courts,  setCourts]  = useState([])
@@ -17,9 +17,15 @@ export default function AdminCourts() {
   const [showAdd, setShowAdd] = useState(false)
   const [editItem,setEditItem]= useState(null)
   const [form,    setForm]    = useState(empty)
+  const [pricing, setPricing] = useState({})
 
   const load = () => { setLoading(true); adminAPI.allCourts().then(r=>setCourts(r.data)).finally(()=>setLoading(false)) }
-  useEffect(load,[])
+  const loadPricing = () => adminAPI.allPricing().then(r => {
+    const map = {}
+    r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+    setPricing(map)
+  }).catch(() => {})
+  useEffect(() => { load(); loadPricing() }, [])
 
   const sf = (k,v) => setForm(f=>({...f,[k]:v}))
 
@@ -36,7 +42,7 @@ export default function AdminCourts() {
     try { await adminAPI.deleteCourt(id); toast.success("Court deleted"); load() } catch { toast.error("Failed") }
   }
 
-  const openEdit = c => { setEditItem(c); setForm({...c, pricePerSlot:c.pricePerSlot||"", memberPricePerSlot:c.memberPricePerSlot||"", capacity:c.capacity||""}); }
+  const openEdit = c => { setEditItem(c); setForm({...c, pricePerSlot:c.pricePerSlot||"", memberPricePerSlot:c.memberPricePerSlot||"", capacity:c.capacity||"", laneNumber:c.laneNumber||""}); }
 
   return (
     <div className="page-wrap">
@@ -54,7 +60,7 @@ export default function AdminCourts() {
               <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-4" style={{background:"rgba(124,92,252,0.1)"}}>{ICONS[c.type]||"🏟️"}</div>
               <h4 className="font-display font-bold text-sm mb-1">{c.name}</h4>
               <div className="text-xs text-muted mb-1">📍 {c.location||"—"}</div>
-              <div className="text-xs text-muted mb-3">${c.pricePerSlot}/slot · Member: ${c.memberPricePerSlot||"—"}</div>
+              <div className="text-xs text-muted mb-3">${pricing[c.type] ?? c.pricePerSlot}/slot · Member: ${pricing[c.type+"_MEMBER"] ?? c.memberPricePerSlot ?? "—"}</div>
               <div className="flex items-center justify-between mb-4">
                 <Badge value={c.status||"ACTIVE"}/>
                 <span className="text-xs text-muted">Cap: {c.capacity||"—"}</span>
@@ -83,12 +89,18 @@ export default function AdminCourts() {
             <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Status</label>
               <select className="inp" value={form.status} onChange={e=>sf("status",e.target.value)}>{STATUSES.map(s=><option key={s}>{s}</option>)}</select></div>
           </div>
+          <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Court / Lane Number</label>
+            <input className="inp" type="number" min="1" placeholder="e.g. 4"
+              value={form.laneNumber||""} onChange={e=>sf("laneNumber", e.target.value ? parseInt(e.target.value) : "")}/>
+            <div className="text-[10px] text-muted mt-1">Must be unique among courts of the same sport — this is what the admin assign dropdown matches bookings against.</div>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price/Slot ($)</label>
               <input className="inp" type="number" value={form.pricePerSlot||""} onChange={e=>sf("pricePerSlot",e.target.value)}/></div>
             <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Member Price ($)</label>
               <input className="inp" type="number" value={form.memberPricePerSlot||""} onChange={e=>sf("memberPricePerSlot",e.target.value)}/></div>
           </div>
+          <div className="text-[10px] text-muted -mt-2">Actual booking prices are controlled sport-wide in Admin → Pricing, not per court. These fields are informational only.</div>
           <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Capacity</label>
             <input className="inp" type="number" value={form.capacity||""} onChange={e=>sf("capacity",e.target.value)}/></div>
         </div>

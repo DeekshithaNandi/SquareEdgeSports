@@ -5,10 +5,18 @@ import { X, ChevronLeft, ChevronRight, CheckCircle, Clock, Loader, Calendar, Eye
 import toast from 'react-hot-toast'
 
 const TYPES = {
-  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', prices: [30, 25], memberKey: 'cricketLaneMember',  bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
-  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', prices: [50, 40], memberKey: 'boxCricketMember',   bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
-  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', prices: [30, 25], memberKey: 'pickleballMember',   bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  CRICKET_LANE: { label: 'Cricket Lane',  emoji: '🏏', memberKey: 'cricketLaneMember',  bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  BOX_CRICKET:  { label: 'Box Cricket',   emoji: '📦', memberKey: 'boxCricketMember',   bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
+  PICKLEBALL:   { label: 'Pickleball',    emoji: '🏓', memberKey: 'pickleballMember',   bg: 'bg-blue-600/10', border: 'border-blue-600/30', text: 'text-blue-400' },
 }
+
+// PricingRule keys + fallback [full, member] prices if the API hasn't responded yet
+const PRICE_KEYS = {
+  CRICKET_LANE: ['CRICKET_LANE', 'CRICKET_LANE_MEMBER'],
+  BOX_CRICKET:  ['BOX_CRICKET', 'BOX_CRICKET_MEMBER'],
+  PICKLEBALL:   ['PICKLEBALL', 'PICKLEBALL_MEMBER'],
+}
+const DEFAULT_PRICES = { CRICKET_LANE: [30, 25], BOX_CRICKET: [50, 40], PICKLEBALL: [30, 25] }
 
 function today() { return new Date().toISOString().split('T')[0] }
 function maxDate() { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().split('T')[0] }
@@ -91,10 +99,23 @@ export default function BookingModal({ initialType, onClose }) {
   const [forgotNotRegistered, setForgotNotRegistered] = useState(false)
   const regOtpRefs = useRef([])
 
-  const typeInfo = TYPES[type]
+  const [pricing, setPricing] = useState({})
+
+  const typeInfo = {
+    ...TYPES[type],
+    prices: [
+      pricing[PRICE_KEYS[type][0]] ?? DEFAULT_PRICES[type][0],
+      pricing[PRICE_KEYS[type][1]] ?? DEFAULT_PRICES[type][1],
+    ],
+  }
 
   useEffect(() => {
     publicAPI.cms().then(r => setCmsItems(r.data || [])).catch(() => {})
+    publicAPI.pricing().then(r => {
+      const map = {}
+      r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+      setPricing(map)
+    }).catch(() => {})
   }, [])
 
   // Load slots whenever date or type changes (no step gate needed)
@@ -355,22 +376,25 @@ export default function BookingModal({ initialType, onClose }) {
               <div>
                 <div className="text-[10px] font-bold text-[#5a6a8a] uppercase tracking-wider mb-2">Sport</div>
                 <div className="flex gap-2">
-                  {Object.entries(TYPES).map(([key, info]) => (
-                    <button key={key} onClick={() => changeType(key)}
-                      className={`flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-center transition-all ${
-                        type === key
-                          ? `${info.bg} ${info.border} ring-1 ring-blue-600/30`
-                          : 'bg-[#f8faff] border-[#dde8f8] hover:border-blue-600/30'
-                      }`}>
-                      <span className="text-xl">{info.emoji}</span>
-                      <span className={`text-[10px] font-bold leading-tight ${type === key ? info.text : 'text-[#5a6a8a]'}`}>
-                        {info.label}
-                      </span>
-                      <span className={`text-[9px] ${type === key ? 'text-blue-400' : 'text-[#9aaac8]'}`}>
-                        ${info.prices[0]}/session
-                      </span>
-                    </button>
-                  ))}
+                  {Object.entries(TYPES).map(([key, info]) => {
+                    const keyPrice = pricing[PRICE_KEYS[key][0]] ?? DEFAULT_PRICES[key][0]
+                    return (
+                      <button key={key} onClick={() => changeType(key)}
+                        className={`flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-center transition-all ${
+                          type === key
+                            ? `${info.bg} ${info.border} ring-1 ring-blue-600/30`
+                            : 'bg-[#f8faff] border-[#dde8f8] hover:border-blue-600/30'
+                        }`}>
+                        <span className="text-xl">{info.emoji}</span>
+                        <span className={`text-[10px] font-bold leading-tight ${type === key ? info.text : 'text-[#5a6a8a]'}`}>
+                          {info.label}
+                        </span>
+                        <span className={`text-[9px] ${type === key ? 'text-blue-400' : 'text-[#9aaac8]'}`}>
+                          ${keyPrice}/session
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
                 {getUnitPrice().isMember && (
                   <div className="text-[10px] text-blue-400 mt-1.5 font-semibold">✓ Member price applied — ${typeInfo.prices[1]}/session</div>

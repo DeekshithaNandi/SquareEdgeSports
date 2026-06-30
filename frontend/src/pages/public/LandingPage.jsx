@@ -1,9 +1,10 @@
 import { useState , useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import BookingModal from '../../components/booking/BookingModal'
 import { Zap, Activity, ChevronRight, LayoutDashboard, MapPin, Phone, Mail, Clock, Send, CheckCircle, Loader } from 'lucide-react'
-import { publicAPI } from '../../api'
+import { publicAPI, userAPI } from '../../api'
+import toast from 'react-hot-toast'
 
 /* ── Arctic White colour tokens ───────────────────────────────────────────── */
 const AW = {
@@ -28,32 +29,32 @@ const SPORT_IMAGES = {
 
 const NAV_LINKS = ['Home', 'About', 'Contact']
 
-const makeSports = counts => [
+const makeSports = (counts, pricing = {}) => [
   {
     key: 'CRICKET_LANE', emoji: '🏏', name: 'Cricket Lane',
-    desc: `${counts.CRICKET_LANE} individual lanes across 2 boxes. Perfect for batting practice and net sessions.`,
-    price: 30, memberPrice: 25, membershipFee: 50,
-    features: [`${counts.CRICKET_LANE} lanes (4 per box)`, '55-min sessions', 'BOX A & BOX B'],
+    desc: `${counts.CRICKET_LANE} individual lanes. Perfect for batting practice and net sessions.`,
+    price: pricing.CRICKET_LANE ?? 30, memberPrice: pricing.CRICKET_LANE_MEMBER ?? 25, membershipFee: pricing.CRICKET_LANE_MEMBERSHIP ?? 50,
+    features: [`${counts.CRICKET_LANE} lanes`, '55-min sessions', 'Up to 6 players/lane'],
     badgeBg: '#1352c9', badgeLabel: 'LIVE',
   },
   {
     key: 'BOX_CRICKET', emoji: '📦', name: 'Box Cricket',
     desc: `${counts.BOX_CRICKET} independent courts for competitive box cricket matches and group play.`,
-    price: 50, memberPrice: 40, membershipFee: 100,
-    features: [`${counts.BOX_CRICKET} courts`, '55-min sessions', 'Up to 2 players/court'],
+    price: pricing.BOX_CRICKET ?? 50, memberPrice: pricing.BOX_CRICKET_MEMBER ?? 40, membershipFee: pricing.BOX_CRICKET_MEMBERSHIP ?? 100,
+    features: [`${counts.BOX_CRICKET} courts`, '55-min sessions', 'Up to 12 players/court'],
     badgeBg: '#15803d', badgeLabel: 'POPULAR',
   },
   {
     key: 'PICKLEBALL', emoji: '🏓', name: 'Pickleball',
     desc: `${counts.PICKLEBALL} full-size courts with premium surfaces. Open to all skill levels.`,
-    price: 30, memberPrice: 25, membershipFee: 50,
-    features: [`${counts.PICKLEBALL} courts`, '55-min sessions', 'All skill levels'],
+    price: pricing.PICKLEBALL ?? 30, memberPrice: pricing.PICKLEBALL_MEMBER ?? 25, membershipFee: pricing.PICKLEBALL_MEMBERSHIP ?? 50,
+    features: [`${counts.PICKLEBALL} courts`, '55-min sessions', 'Up to 4 players/court', 'All skill levels'],
     badgeBg: '#d97706', badgeLabel: 'OPEN NOW',
   },
 ]
 
 /* ── Home Section ─────────────────────────────────────────────────────────── */
-function HomeSection({ setBooking, user, sports = [] }) {
+function HomeSection({ setBooking, user, sports = [], courtCounts = {}, onMembershipClick, buyingMembership }) {
   const SPORTS = sports
   return (
     <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
@@ -101,9 +102,9 @@ function HomeSection({ setBooking, user, sports = [] }) {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2">
           {[
-            { val: '8',   label: 'Lanes',  emoji: '🏏' },
-            { val: '2',   label: 'Boxes',  emoji: '📦' },
-            { val: '3',   label: 'Courts', emoji: '🏓' },
+            { val: String(courtCounts.CRICKET_LANE ?? 8), label: 'Lanes',  emoji: '🏏' },
+            { val: String(courtCounts.BOX_CRICKET ?? 2),  label: 'Boxes',  emoji: '📦' },
+            { val: String(courtCounts.PICKLEBALL ?? 3),   label: 'Courts', emoji: '🏓' },
             { val: '15h', label: 'Daily',  emoji: '🕖' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-2 text-center border"
@@ -120,27 +121,31 @@ function HomeSection({ setBooking, user, sports = [] }) {
           <div className="flex items-center justify-between px-3 py-2 border-b"
             style={{ background: AW.dim, borderColor: AW.dbdr }}>
             <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: AW.blue }}>🎟 Membership Plans</span>
-            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold border"
-              style={{ background: AW.dim, borderColor: AW.dbdr, color: AW.blue }}>SAVE MORE</span>
+            {/* <span className="px-1.5 py-0.5 rounded text-[9px] font-bold border"
+              style={{ background: AW.dim, borderColor: AW.dbdr, color: AW.blue }}>SAVE MORE</span> */}
           </div>
           <div className="grid grid-cols-3" style={{ background: AW.s }}>
-            {SPORTS.map(s => (
-              <div key={s.key} className="relative overflow-hidden group cursor-pointer border-r last:border-r-0"
-                style={{ borderColor: AW.bd }} onClick={() => setBooking(s.key)}>
-                <div className="absolute inset-0">
-                  <img src={SPORT_IMAGES[s.key]} alt={s.name}
-                    className="w-full h-full object-cover opacity-[0.35] group-hover:opacity-[0.55] transition-opacity duration-300" />
-                </div>
-                <div className="relative px-2 py-2.5 text-center">
-                  <div className="text-base mb-0.5">{s.emoji}</div>
-                  <div className="text-[9px] font-bold mb-0.5 leading-tight" style={{ color: AW.t2 }}>{s.name}</div>
-                  <div className="text-xs font-extrabold leading-tight" style={{ color: AW.blue }}>
-                    ${s.membershipFee}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
+            {SPORTS.map(s => {
+              const buying = buyingMembership === s.key
+              return (
+                <button key={s.key} disabled={buying}
+                  className="relative overflow-hidden group cursor-pointer border-r last:border-r-0 disabled:opacity-70 disabled:cursor-wait"
+                  style={{ borderColor: AW.bd }} onClick={() => onMembershipClick?.(s)}>
+                  <div className="absolute inset-0">
+                    <img src={SPORT_IMAGES[s.key]} alt={s.name}
+                      className="w-full h-full object-cover opacity-[0.35] group-hover:opacity-[0.55] transition-opacity duration-300" />
                   </div>
-                  <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
-                </div>
-              </div>
-            ))}
+                  <div className="relative px-2 py-2.5 text-center">
+                    <div className="text-base mb-0.5">{s.emoji}</div>
+                    <div className="text-[9px] font-bold mb-0.5 leading-tight" style={{ color: AW.t2 }}>{s.name}</div>
+                    <div className="text-xs font-extrabold leading-tight" style={{ color: AW.blue }}>
+                      ${s.membershipFee}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
+                    </div>
+                    <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
+                  </div>
+                </button>
+              )
+            })}
           </div>
           <div className="px-3 py-1.5 text-[9px] border-t" style={{ color: AW.t3, borderColor: AW.bd, background: AW.s }}>
             Contact admin to activate membership.
@@ -235,7 +240,7 @@ function HomeSection({ setBooking, user, sports = [] }) {
 }
 
 /* ── About Section ────────────────────────────────────────────────────────── */
-function AboutSection({ setBooking, sports = [] }) {
+function AboutSection({ setBooking, sports = [], courtCounts = {} }) {
   const SPORTS = sports
   const amenities = [
     { icon: '🏟️', title: 'World-Class Facility',  desc: 'Premium indoor infrastructure built to international standards.' },
@@ -248,7 +253,7 @@ function AboutSection({ setBooking, sports = [] }) {
   const values = [
     { label: 'Founded', value: '2026' },
     { label: 'Location', value: 'Hyderabad' },
-    { label: 'Courts', value: `${sports.reduce((n, s) => n + (parseInt(s.features[0]) || 0), 0) || 13} total` },
+    { label: 'Courts', value: `${(courtCounts.CRICKET_LANE ?? 0) + (courtCounts.BOX_CRICKET ?? 0) + (courtCounts.PICKLEBALL ?? 0) || 13} total` },
     { label: 'Open', value: '7AM–10PM' },
   ]
   return (
@@ -274,11 +279,11 @@ function AboutSection({ setBooking, sports = [] }) {
             </div>
           ))}
         </div>
-        <button onClick={() => setBooking('CRICKET_LANE')}
+        {/* <button onClick={() => setBooking('CRICKET_LANE')}
           className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white transition-all hover:opacity-90 self-start"
           style={{ background: AW.blue }}>
           Book a Session <ChevronRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        </button> */}
       </div>
       <div className="w-full lg:w-[55%] flex items-center justify-center px-6 lg:px-10 py-6 overflow-y-auto">
         <div className="w-full">
@@ -294,10 +299,9 @@ function AboutSection({ setBooking, sports = [] }) {
           </div>
           <div className="mt-3 flex gap-2 h-20">
             {SPORTS.map(s => (
-              <div key={s.key} className="flex-1 relative rounded-xl overflow-hidden group cursor-pointer"
-                onClick={() => setBooking(s.key)}>
+              <div key={s.key} className="flex-1 relative rounded-xl overflow-hidden">
                 <img src={SPORT_IMAGES[s.key]} alt={s.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0"
                   style={{ background: 'linear-gradient(to top,rgba(10,20,40,.80) 0%,transparent 60%)' }} />
                 <div className="absolute bottom-2 left-0 right-0 text-center">
@@ -423,6 +427,7 @@ function ContactSection() {
 /* ── Main LandingPage ────────────────────────────────────────────────────── */
 export default function LandingPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [booking,    setBooking]    = useState(null)
   const [menuOpen,   setMenuOpen]   = useState(false)
   const [activePage, setActivePage] = useState('Home')
@@ -430,6 +435,50 @@ export default function LandingPage() {
   const isAdmin = user && ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(user.role)
   const navTo   = page => { setActivePage(page); setMenuOpen(false) }
   const [courtCounts, setCourtCounts] = useState({ CRICKET_LANE: 8, BOX_CRICKET: 2, PICKLEBALL: 3 })
+  const [pricing, setPricing] = useState({})
+  const [buyingMembership, setBuyingMembership] = useState(null)
+
+  const handleMembershipClick = async (sport) => {
+    if (!user) { navigate('/login'); return }
+    setBuyingMembership(sport.key)
+    try {
+      const orderRes = await userAPI.membershipOrder({ sportType: sport.key })
+      const { orderId, amount, currency, keyId } = orderRes.data
+      if (!window.Razorpay) {
+        toast.error('Payment system not available. Please refresh the page and try again.')
+        return
+      }
+      await new Promise((resolve, reject) => {
+        const options = {
+          key: keyId, amount, currency, order_id: orderId,
+          name: 'SquareEdgeSports',
+          description: `${sport.name} Membership — 30 days`,
+          handler: async (response) => {
+            try {
+              await userAPI.membershipConfirm({
+                sportType:         sport.key,
+                razorpayOrderId:   response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              })
+              toast.success(`${sport.emoji} ${sport.name} membership activated!`)
+              resolve()
+            } catch (e) { reject(e) }
+          },
+          prefill: { email: user?.email, name: user?.fullName },
+          theme: { color: '#1352c9' },
+          modal: { ondismiss: () => reject(new Error('dismissed')) },
+        }
+        new window.Razorpay(options).open()
+      })
+    } catch (e) {
+      if (e.message !== 'dismissed') {
+        toast.error(e.response?.data?.message || 'Could not start membership purchase.')
+      }
+    } finally {
+      setBuyingMembership(null)
+    }
+  }
 
 useEffect(() => {
   publicAPI.courts().then(r => {
@@ -437,9 +486,14 @@ useEffect(() => {
     r.data.forEach(c => { if (counts[c.type] !== undefined) counts[c.type]++ })
     setCourtCounts(counts)
   }).catch(() => {})
+  publicAPI.pricing().then(r => {
+    const map = {}
+    r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+    setPricing(map)
+  }).catch(() => {})
 }, [])
 
-  const SPORTS = makeSports(courtCounts)
+  const SPORTS = makeSports(courtCounts, pricing)
 
   return (
     /* 100dvh = dynamic viewport height — correctly accounts for Chrome toolbar,
@@ -541,8 +595,8 @@ useEffect(() => {
       )}
 
       {/* ── Page sections — fills remaining height, no scroll ─────────── */}
-      {activePage === 'Home'    && <HomeSection    setBooking={setBooking} user={user} sports={SPORTS} />}
-      {activePage === 'About'   && <AboutSection   setBooking={setBooking} sports={SPORTS} />}
+      {activePage === 'Home'    && <HomeSection    setBooking={setBooking} user={user} sports={SPORTS} courtCounts={courtCounts} onMembershipClick={handleMembershipClick} buyingMembership={buyingMembership} />}
+      {activePage === 'About'   && <AboutSection   setBooking={setBooking} sports={SPORTS} courtCounts={courtCounts} />}
       {activePage === 'Contact' && <ContactSection />}
 
       {booking && <BookingModal initialType={booking} onClose={() => setBooking(null)} />}
