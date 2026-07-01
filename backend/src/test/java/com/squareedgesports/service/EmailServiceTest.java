@@ -1,33 +1,22 @@
 package com.squareedgesports.service;
 
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
-import java.util.Properties;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class EmailServiceTest {
 
     EmailService emailService;
-    JavaMailSender mailSender;
 
     @BeforeEach
     void setUp() {
-        mailSender = mock(JavaMailSender.class);
-        when(mailSender.createMimeMessage()).thenAnswer(invocation ->
-                new MimeMessage(Session.getInstance(new Properties())));
-
-        emailService = new EmailService(mailSender);
+        emailService = new EmailService();
         ReflectionTestUtils.setField(emailService, "frontendUrl", "http://localhost:5174");
-        ReflectionTestUtils.setField(emailService, "emailEnabled", true);
-        ReflectionTestUtils.setField(emailService, "fromEmail", "deekshithalakshmi2@gmail.com");
+        ReflectionTestUtils.setField(emailService, "emailEnabled", false);
+        ReflectionTestUtils.setField(emailService, "fromEmail", "test@example.com");
+        ReflectionTestUtils.setField(emailService, "brevoApiKey", "");
     }
 
     @Test
