@@ -221,6 +221,21 @@ public class AdminController {
         return ResponseEntity.ok(courtRepo.findAll());
     }
 
+    private void clearAssignmentsForCourt(Court c) {
+        if (c.getLaneNumber() == null)
+            return;
+        java.time.LocalDate today = java.time.LocalDate.now();
+        if (c.getType() == Court.CourtType.CRICKET_LANE) {
+            List<Booking> affected = bookingRepo.findUpcomingByLane(today, c.getType().name(), c.getLaneNumber());
+            affected.forEach(b -> b.setLaneNumber(null));
+            bookingRepo.saveAll(affected);
+        } else {
+            List<Booking> affected = bookingRepo.findUpcomingByCourt(today, c.getType().name(), c.getLaneNumber());
+            affected.forEach(b -> b.setCourtNumber(null));
+            bookingRepo.saveAll(affected);
+        }
+    }
+
     // WRITE: admin only
     @PostMapping("/courts")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
@@ -232,6 +247,7 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> updateCourt(@PathVariable Long id, @RequestBody Court body) {
         Court c = courtRepo.findById(id).orElseThrow(() -> new RuntimeException("Court not found"));
+        Court.CourtStatus oldStatus = c.getStatus();
         c.setName(body.getName());
         c.setType(body.getType());
         c.setLocation(body.getLocation());
@@ -240,12 +256,18 @@ public class AdminController {
         c.setMemberPricePerSlot(body.getMemberPricePerSlot());
         c.setCapacity(body.getCapacity());
         c.setStatus(body.getStatus());
+        c.setLaneNumber(body.getLaneNumber());
+        if (body.getStatus() != Court.CourtStatus.ACTIVE && oldStatus == Court.CourtStatus.ACTIVE) {
+            clearAssignmentsForCourt(c);
+        }
         return ResponseEntity.ok(courtRepo.save(c));
     }
 
     @DeleteMapping("/courts/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> deleteCourt(@PathVariable Long id) {
+        Court c = courtRepo.findById(id).orElseThrow(() -> new RuntimeException("Court not found"));
+        clearAssignmentsForCourt(c);
         courtRepo.deleteById(id);
         return ResponseEntity.ok(ApiResponse.ok("Court deleted"));
     }
