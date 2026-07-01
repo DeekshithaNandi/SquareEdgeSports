@@ -1,25 +1,25 @@
 package com.squareedgesports.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
+// import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+// import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+// @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    // private final JavaMailSender mailSender;
+    private final org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
 
     @Value("${app.email.enabled:true}")
     private boolean emailEnabled;
+
+    @Value("${brevo.api.key:}")
+    private String brevoApiKey;
 
     @Value("${app.email.from}")
     private String fromEmail;
@@ -27,39 +27,6 @@ public class EmailService {
     @Value("${app.frontend.url:http://localhost:5174}")
     private String frontendUrl;
 
-    // @Async
-    // public void sendOtp(String to, String otp, String name) {
-    // if (!emailEnabled) {
-    // log.info("Email disabled - OTP for {}: {}", to, otp);
-    // return;
-    // }
-    // sendHtml(to, "SquareEdgeSports - Email Verification Code", buildOtpHtml(name,
-    // otp));
-    // }
-
-    // @Async
-    // public void sendPasswordResetEmail(String to, String name, String token) {
-    // if (!emailEnabled) {
-    // log.info("Email disabled - password reset token for {}: {}", to, token);
-    // return;
-    // }
-    // String resetLink = frontendUrl + "/reset-password?token=" + token;
-    // sendHtml(to, "SquareEdgeSports - Password Reset Request",
-    // buildPasswordResetHtml(name, resetLink));
-    // }
-
-    // @Async
-    // public void sendAdminInviteEmail(String to, String name, String token, String
-    // role) {
-    // if (!emailEnabled) {
-    // log.info("Email disabled - invite token for {}: {}", to, token);
-    // return;
-    // }
-    // String setupLink = frontendUrl + "/reset-password?token=" + token +
-    // "&invite=true";
-    // sendHtml(to, "SquareEdgeSports - You've Been Invited", buildInviteHtml(name,
-    // role, setupLink));
-    // }
     @Async
     public void sendOtp(String to, String otp, String name) {
         if (!emailEnabled) {
@@ -189,34 +156,35 @@ public class EmailService {
         sendHtml(fromEmail, "SquareEdgeSports - Contact: " + safeSubject(subject), html, senderEmail);
     }
 
-    // @Async
-    // public void sendEmailChangeOtp(String to, String name, String otp) {
-    // if (!emailEnabled) {
-    // log.info("Email disabled - email change OTP for {}: {}", to, otp);
-    // return;
-    // }
-    // sendHtml(to, "SquareEdgeSports - Verify Your New Email", buildOtpHtml(name,
-    // otp));
-    // }
-
     private void sendHtml(String to, String subject, String html) {
         sendHtml(to, subject, html, null);
     }
 
     private void sendHtml(String to, String subject, String html, String replyTo) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(html, true);
-            if (replyTo != null && !replyTo.isBlank()) {
-                helper.setReplyTo(replyTo);
-            }
-            mailSender.send(message);
+            String url = "https://api.brevo.com/v3/smtp/email";
+
+            String replyToJson = replyTo != null && !replyTo.isBlank()
+                    ? ",\"replyTo\":{\"email\":\"" + replyTo + "\"}"
+                    : "";
+
+            String body = "{"
+                    + "\"sender\":{\"email\":\"" + fromEmail + "\"},"
+                    + "\"to\":[{\"email\":\"" + to + "\"}],"
+                    + "\"subject\":\"" + subject.replace("\"", "\\\"") + "\","
+                    + "\"htmlContent\":\""
+                    + html.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "") + "\""
+                    + replyToJson
+                    + "}";
+
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("api-key", brevoApiKey);
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+
+            restTemplate.postForEntity(url,
+                    new org.springframework.http.HttpEntity<>(body, headers), String.class);
             log.info("Email sent to {} - {}", to, subject);
-        } catch (MailException | MessagingException e) {
+        } catch (Exception e) {
             log.error("Failed to send email to {} - {}: {}", to, subject, e.getMessage(), e);
         }
     }
