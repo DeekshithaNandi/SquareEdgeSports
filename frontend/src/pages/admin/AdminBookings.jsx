@@ -176,6 +176,10 @@ const openAssign = async b => {
   if (!assignValue) { toast.error('Select a court/lane first'); return }
   const selectedCourt = availableCourts.find(c => c.id === parseInt(assignValue))
   if (!selectedCourt) { toast.error('Invalid selection'); return }
+  if (!selectedCourt.laneNumber) {
+  toast.error('This court has no lane number — go to Admin → Courts, edit it, and set a lane number first')
+  return
+  }
   if (!selectedCourt.available) { toast.error('That court is already taken'); return }
   setAssigning(true)
   try {

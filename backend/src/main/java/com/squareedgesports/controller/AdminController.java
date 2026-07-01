@@ -225,15 +225,27 @@ public class AdminController {
         if (c.getLaneNumber() == null)
             return;
         java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalTime now = java.time.LocalTime.now();
+
+        List<Booking> affected;
         if (c.getType() == Court.CourtType.CRICKET_LANE) {
-            List<Booking> affected = bookingRepo.findUpcomingByLane(today, c.getType().name(), c.getLaneNumber());
-            affected.forEach(b -> b.setLaneNumber(null));
-            bookingRepo.saveAll(affected);
+            affected = bookingRepo.findUpcomingByLane(today, c.getType().name(), c.getLaneNumber());
         } else {
-            List<Booking> affected = bookingRepo.findUpcomingByCourt(today, c.getType().name(), c.getLaneNumber());
-            affected.forEach(b -> b.setCourtNumber(null));
-            bookingRepo.saveAll(affected);
+            affected = bookingRepo.findUpcomingByCourt(today, c.getType().name(), c.getLaneNumber());
         }
+
+        // Keep only truly upcoming — future date, OR today but not yet started
+        affected = affected.stream()
+                .filter(b -> b.getBookingDate().isAfter(today) ||
+                        (b.getBookingDate().isEqual(today) && b.getStartTime().isAfter(now)))
+                .collect(java.util.stream.Collectors.toList());
+
+        if (c.getType() == Court.CourtType.CRICKET_LANE) {
+            affected.forEach(b -> b.setLaneNumber(null));
+        } else {
+            affected.forEach(b -> b.setCourtNumber(null));
+        }
+        bookingRepo.saveAll(affected);
     }
 
     // WRITE: admin only
