@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { pingBackend } from './api/axios'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Spinner from './components/common/Spinner'
@@ -55,6 +57,7 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
+  useEffect(() => { pingBackend() }, [])
   return (
     <Routes>
       {/* Landing page — accessible to everyone */}

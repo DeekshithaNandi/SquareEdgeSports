@@ -85,7 +85,7 @@ export default function AddressAutocomplete({
       const { suggestions: results } =
         await window.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
           input: q,
-          includedRegionCodes: ['in'],
+          includedRegionCodes: ['in', 'us'],
           sessionToken: sessionToken.current,
         })
 
@@ -148,13 +148,13 @@ export default function AddressAutocomplete({
         city:    getComp(comps, ['locality', 'administrative_area_level_3', 'administrative_area_level_2']),
         state:   getComp(comps, ['administrative_area_level_1']),
         zipCode: extractPincode(line1) || serviceZip,
-        country: getComp(comps, ['country']) || 'India',
+        country: getComp(comps, ['country']) || ['India','USA'],
       })
     } catch {
       // Details fetch failed — still set what we have
       setConfirmed(true)
       onChange?.(line1)
-      onSelect?.({ addressLine1: line1, addressLine2: '', city: '', state: '', zipCode: '', country: 'India' })
+      onSelect?.({ addressLine1: line1, addressLine2: '', city: '', state: '', zipCode: '', country: ['India','USA'] })
     } finally {
       setLoading(false)
     }

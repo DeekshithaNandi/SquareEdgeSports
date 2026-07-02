@@ -47,10 +47,14 @@ export default function LoginPage() {
     navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
   } catch (e) {
     clearTimeout(slowTimer)
+    if (!e.response) {
+    setErr('Server is taking too long to respond. Please try again in a moment.')
+  } else {
     const msg = e.response?.data?.message || ''
     if (msg === 'USER_NOT_REGISTERED') setNotRegistered(true)
     else setErr(msg || 'Invalid credentials.')
-  } finally { setLoading(false) }
+  } }
+  finally { setLoading(false) }
 }
 
 
