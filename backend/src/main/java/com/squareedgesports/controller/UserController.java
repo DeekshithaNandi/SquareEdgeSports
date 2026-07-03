@@ -124,8 +124,10 @@ public class UserController {
                             "folder", "avatars",
                             "public_id", u.getEmail().replaceAll("[^a-zA-Z0-9]", "_"),
                             "overwrite", true,
-                            "resource_type", "image",
-                            "transformation", Map.of("width", 300, "height", 300, "crop", "fill", "gravity", "face")));
+                            "resource_type", "image"
+                    // "transformation", Map.of("width", 300, "height", 300, "crop", "fill",
+                    // "gravity", "face")
+                    ));
 
             String url = (String) uploadResult.get("secure_url");
             u.setProfilePicture(url);
