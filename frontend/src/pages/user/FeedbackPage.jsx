@@ -11,7 +11,7 @@ const CATEGORIES = [
   'Staff & Service',
   'Facilities',
   'Pricing',
-  'General',
+  'Other',
 ]
 
 export default function FeedbackPage() {
@@ -79,7 +79,7 @@ export default function FeedbackPage() {
               {[1, 2, 3, 4, 5].map(i => (
                 <span key={i}
                   className="text-3xl cursor-pointer transition-transform hover:scale-110 select-none"
-                  style={{ color: (hover || rating) >= i ? '#f5c842' : 'rgba(255,255,255,.15)' }}
+                  style={{ color: (hover || rating) >= i ? '#f5c842' : '#d1d5db' }}
                   onClick={() => setRating(i)}
                   onMouseEnter={() => setHover(i)}
                   onMouseLeave={() => setHover(0)}>

@@ -97,6 +97,22 @@ public class EmailService {
     }
 
     @Async
+    public void sendBookingReminder(String to, String name, String sportType, String date, String startTime) {
+        if (!emailEnabled) {
+            log.info("Email disabled - booking reminder for {}: sport={} date={} time={}", to, sportType, date,
+                    startTime);
+            return;
+        }
+        String html = header("Upcoming Booking Reminder")
+                + "<p>Hi " + escape(name) + ",</p>"
+                + "<p>This is a reminder that you have a " + escape(label(sportType)) + " slot booked.</p>"
+                + "<p><strong>Date:</strong> " + escape(date) + "<br/>"
+                + "<strong>Time:</strong> " + escape(startTime) + "</p>"
+                + footer();
+        sendHtml(to, "SquareEdgeSports - Reminder: Your Booking on " + date, html);
+    }
+
+    @Async
     public void sendMembershipActivation(String to, String name, String sportType, String expiresAt) {
         if (!emailEnabled) {
             log.info("Email disabled - membership activation for {}: sport={}", to, sportType);

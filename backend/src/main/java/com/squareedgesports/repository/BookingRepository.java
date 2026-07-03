@@ -91,4 +91,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
        @Query("SELECT b FROM Booking b JOIN FETCH b.user WHERE b.bookingDate >= :from AND b.status <> 'CANCELLED' AND b.bookingType = :type AND b.courtNumber = :court")
        List<Booking> findUpcomingByCourt(@Param("from") LocalDate from, @Param("type") String type,
                      @Param("court") int court);
+
+       /**
+        * Candidates for the 24h-ahead reminder email: not yet reminded, not
+        * cancelled, slot date within the scan range. Exact slot-start filtering
+        * (against bookingDate + startTime) is done in Java by the scheduler.
+        */
+       @Query("SELECT b FROM Booking b JOIN FETCH b.user WHERE b.reminderSent = false " +
+                     "AND b.status <> 'CANCELLED' AND b.bookingDate BETWEEN :from AND :to")
+       List<Booking> findReminderCandidates(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

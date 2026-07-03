@@ -51,6 +51,7 @@ public class Booking {
     private LocalDateTime cancelledAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean reminderSent;
 
     @PrePersist  protected void onCreate() { createdAt = updatedAt = LocalDateTime.now(); }
     @PreUpdate   protected void onUpdate() { updatedAt = LocalDateTime.now(); }

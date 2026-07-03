@@ -796,24 +796,6 @@ export default function BookingModal({ initialType, onClose }) {
               <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-3.5 text-xs text-[#9aaac8] leading-relaxed">
                 <strong className="text-[#5a6a8a]">Cancellation:</strong> · 24+ hrs → Full refund · 1–24 hrs → 50% refund · &lt;1 hr → No refund
               </div>
-
-              <div className="bg-amber-50 border border-amber-300 rounded-xl p-3.5 text-xs space-y-2">
-                <div className="flex items-center gap-1.5 font-bold text-amber-700 mb-2">🧪 Test Mode — Use these credentials</div>
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                  <div className="text-[10px] text-green-400 font-bold mb-0.5">✅ Easiest — UPI</div>
-                  <div className="font-mono font-bold text-m2">success@razorpay</div>
-                </div>
-                <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-lg px-3 py-2 space-y-1.5">
-                  <div className="text-[10px] text-[#5a6a8a] font-bold">💳 Domestic Mastercard</div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
-                    <div><div className="text-[#9aaac8] mb-0.5">Card Number</div><div className="font-mono font-bold text-m2">5267 3181 8797 5449</div></div>
-                    <div><div className="text-[#9aaac8] mb-0.5">Expiry / CVV</div><div className="font-mono font-bold text-m2">12/29 · 123</div></div>
-                    <div><div className="text-[#9aaac8] mb-0.5">Name</div><div className="font-mono font-bold text-m2">Any name</div></div>
-                    <div><div className="text-[#9aaac8] mb-0.5">OTP</div><div className="font-mono font-bold text-m2">Any 6 digits</div></div>
-                  </div>
-                </div>
-                <div className="text-[10px] text-[#9aaac8] pt-0.5">Net banking: select any bank → proceed → success</div>
-              </div>
             </div>
           )}
 

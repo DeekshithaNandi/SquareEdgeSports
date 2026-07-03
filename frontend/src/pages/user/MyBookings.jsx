@@ -33,6 +33,15 @@ function isPast(bookingDate, startTime) {
   return session <= new Date()
 }
 
+/** Returns true if the booking session has already ended */
+function hasEnded(bookingDate, endTime) {
+  if (!bookingDate || !endTime) return false
+  const [h, m] = endTime.toString().split(':').map(Number)
+  const session = new Date(bookingDate)
+  session.setHours(h, m, 0, 0)
+  return session <= new Date()
+}
+
 function fmtDateTime(dt) {
   if (!dt) return '—'
   const d = new Date(dt)
@@ -86,11 +95,11 @@ export default function MyBookings() {
   const active    = bookings.filter(b =>
     ['CONFIRMED', 'IN_PROGRESS'].includes(b.status) &&
     !(b.paymentStatus === 'PENDING' && isPendingExpired(b.createdAt)) &&
-    !isPast(b.bookingDate, b.startTime?.toString())
+    !hasEnded(b.bookingDate, b.endTime?.toString())
   )
   const history   = bookings.filter(b =>
     ['COMPLETED', 'NO_SHOW'].includes(b.status) ||
-    (['CONFIRMED', 'IN_PROGRESS'].includes(b.status) && isPast(b.bookingDate, b.startTime?.toString()))
+    (['CONFIRMED', 'IN_PROGRESS'].includes(b.status) && hasEnded(b.bookingDate, b.endTime?.toString()))
   )
   const cancelled = bookings.filter(b => b.status === 'CANCELLED')
 
