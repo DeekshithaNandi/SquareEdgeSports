@@ -21,9 +21,9 @@ const AW = {
 }
 
 const SPORT_IMAGES = {
-  CRICKET_LANE: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=900&q=90',
-  BOX_CRICKET:  'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1100&q=90',
-  PICKLEBALL:   'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=900&q=90',
+  CRICKET_LANE: 'images/cricket-lane.jpeg',
+  BOX_CRICKET:  'images/box-cricket.jpeg',
+  PICKLEBALL:   'images/pickleball.jpeg',
 }
 
 

@@ -170,7 +170,7 @@ export default function MyBookings() {
     <div className="page-wrap">
       <div className="flex items-center justify-between mb-1">
         <div className="section-title">My Bookings</div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {[
             { type: 'CRICKET_LANE', label: '🏏 Book Cricket Lane' },
             { type: 'BOX_CRICKET',  label: '📦 Book Box Cricket'  },
@@ -247,9 +247,9 @@ export default function MyBookings() {
           <option value="BOX_CRICKET">Box Cricket</option>
           <option value="PICKLEBALL">Pickleball</option>
         </select>
-        <input type="date" className="inp !py-1.5 !px-3 text-xs w-auto [color-scheme:dark]"
+        <input type="date" className="inp !py-1.5 !px-3 text-xs w-auto [color-scheme:light]"
           value={filterFrom} onChange={e => setFilterFrom(e.target.value)} placeholder="From" title="From date" />
-        <input type="date" className="inp !py-1.5 !px-3 text-xs w-auto [color-scheme:dark]"
+        <input type="date" className="inp !py-1.5 !px-3 text-xs w-auto [color-scheme:light]"
           value={filterTo}   onChange={e => setFilterTo(e.target.value)}   placeholder="To"   title="To date" />
         <select className="inp !py-1.5 !px-3 text-xs w-auto" value={sortDir} onChange={e => setSortDir(e.target.value)}>
           <option value="desc">Newest First</option>
@@ -322,7 +322,7 @@ export default function MyBookings() {
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
                   <span className="flex items-center gap-1"><Clock size={10} /> {fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}</span>
                   <span>📅 {b.bookingDate}</span>
-                  <span className="font-mono">{b.paymentReference?.slice(0, 18)}</span>
+                  <span className="font-mono">{b.paymentReference?.slice(0, 18)}</span> 
                 </div>
 
                 {/* Court/Lane assignment status */}
@@ -430,9 +430,9 @@ export default function MyBookings() {
         </>}>
         {target && <>
           <p className="text-sm text-muted leading-relaxed mb-4">
-            Cancel <strong className="text-white">{typeEmoji(target.bookingType)} {target.bookingType?.replace('_', ' ')}</strong> on <strong className="text-white">{target.bookingDate}</strong> at <strong className="text-white">{fmtTime(target.startTime?.toString())}</strong>?
+            Cancel <strong className="text-[#0a1428]">{typeEmoji(target.bookingType)} {target.bookingType?.replace('_', ' ')}</strong> on <strong className="text-white">{target.bookingDate}</strong> at <strong className="text-white">{fmtTime(target.startTime?.toString())}</strong>?
           </p>
-          <div className="bg-red-500/5 border border-red-500/15 rounded-xl p-4 text-xs text-red-300 leading-relaxed mb-4">
+          <div className="bg-red-500/5 border border-red-500/15 rounded-xl p-4 text-xs text-red-600 leading-relaxed mb-4">
             <strong>Refund Policy:</strong><br />
             · 24+ hrs before → Full refund<br />
             · 1–24 hrs before → 50% refund<br />

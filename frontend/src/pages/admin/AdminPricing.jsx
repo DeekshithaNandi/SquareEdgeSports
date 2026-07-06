@@ -51,6 +51,7 @@ export default function AdminPricing() {
 
       <div className="card overflow-hidden mt-6">
         <div className="p-5 border-b border-[#dde8f8] font-display font-bold text-sm">Pricing Summary</div>
+        <div className="overflow-x-auto">
         <table className="data-table">
           <thead><tr><th>Rule Key</th><th>Description</th><th>Price</th><th>Last Updated</th></tr></thead>
           <tbody>
@@ -64,6 +65,7 @@ export default function AdminPricing() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

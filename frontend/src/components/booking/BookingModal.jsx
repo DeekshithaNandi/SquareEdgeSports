@@ -408,6 +408,11 @@ export default function BookingModal({ initialType, onClose }) {
                 </div>
                 <input type="date" value={date} min={today()} max={maxDate()}
                   onChange={e => { setDate(e.target.value); setSelSlots([]) }}
+                  onBlur={e => {
+                    const val = e.target.value
+                    if (!val || val < today()) { setDate(today()); setSelSlots([]) }
+                    else if (val > maxDate()) { setDate(maxDate()); setSelSlots([]) }
+                  }}
                   className="w-full bg-white border border-[#dde8f8] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 [color-scheme:light] cursor-pointer"
                   style={{ color: '#0a1428' }} />
               </div>

@@ -46,6 +46,12 @@
     &:hover { background: rgba(19,82,201,.07); color: #0a1428; }
     &.active { background: rgba(19,82,201,.12); color: #1352c9; border: 0.5px solid rgba(19,82,201,.28); font-weight: 600; }
   }
+  .dark-sidebar .nav-item {
+    color: rgba(255,255,255,0.6);
+    border: none;
+    &:hover { background: rgba(255,255,255,0.09); color: #ffffff; }
+    &.active { background: rgba(255,255,255,0.14); color: #ffffff; border: 0.5px solid rgba(255,255,255,0.18); font-weight: 600; }
+  }
   .data-table { @apply w-full; }
   .data-table th { @apply px-4 py-3 text-left text-xs font-bold uppercase tracking-widest border-b; color: #5a6a8a; border-color: #dde8f8; }
   .data-table td { @apply px-4 py-3 text-sm border-b; border-color: #dde8f8; color: #0a1428; }

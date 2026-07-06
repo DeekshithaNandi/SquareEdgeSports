@@ -56,6 +56,7 @@ export default function AdminOverview() {
         {displayBookings.length === 0 ? (
           <div className="text-center py-12 text-muted text-sm">No confirmed bookings today</div>
         ) : (
+          <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr><th>User</th><th>Sport · Assignment</th><th>Time</th><th>Amount</th><th>Status</th></tr>
@@ -84,6 +85,7 @@ export default function AdminOverview() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

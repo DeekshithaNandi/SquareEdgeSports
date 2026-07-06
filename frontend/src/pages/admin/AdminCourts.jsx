@@ -60,6 +60,7 @@ export default function AdminCourts() {
               <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-4" style={{background:"rgba(124,92,252,0.1)"}}>{ICONS[c.type]||"🏟️"}</div>
               <h4 className="font-display font-bold text-sm mb-1">{c.name}</h4>
               <div className="text-xs text-muted mb-1">📍 {c.location||"—"}</div>
+              {c.laneNumber && <div className="text-xs text-muted mb-1">🔢 Lane / Court #{c.laneNumber}</div>}
               <div className="text-xs text-muted mb-3">${pricing[c.type] ?? c.pricePerSlot}/slot · Member: ${pricing[c.type+"_MEMBER"] ?? c.memberPricePerSlot ?? "—"}</div>
               <div className="flex items-center justify-between mb-4">
                 <Badge value={c.status||"ACTIVE"}/>
