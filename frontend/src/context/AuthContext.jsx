@@ -63,8 +63,8 @@ useEffect(() => {
 
   const stored = localStorage.getItem(USER_KEY)
   const parsed = stored ? JSON.parse(stored) : null
-  // skip /me if data is less than 5 minutes old
-  if (parsed?._cachedAt && Date.now() - parsed._cachedAt < 5 * 60 * 1000) {
+  // skip /me if data is less than 30 seconds old
+  if (parsed?._cachedAt && Date.now() - parsed._cachedAt < 30 * 1000) {
     setUser(resolveUser(parsed))
     setLoading(false)
     return

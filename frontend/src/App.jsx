@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+﻿import { useEffect } from 'react'
 import { pingBackend } from './api/axios'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -19,7 +19,8 @@ import UserDashboard from './pages/user/UserDashboard'
 import MyBookings    from './pages/user/MyBookings'
 import EditProfile   from './pages/user/EditProfile'
 import FeedbackPage  from './pages/user/FeedbackPage'
-import PaymentsPage  from './pages/user/PaymentsPage'
+import PaymentsPage      from './pages/user/PaymentsPage'
+import UserMemberships from './pages/user/UserMemberships'
 import LiveCourtView from './pages/user/LiveCourtView'
 
 // Admin pages
@@ -34,6 +35,7 @@ import AdminCourts   from './pages/admin/AdminCourts'
 import AdminPricing  from './pages/admin/AdminPricing'
 import AdminFeedback from './pages/admin/AdminFeedback'
 import AdminCMS      from './pages/admin/AdminCMS'
+import AdminMemberships from './pages/admin/AdminMemberships'
 
 function PrivateRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth()
@@ -60,7 +62,7 @@ export default function App() {
   useEffect(() => { pingBackend() }, [])
   return (
     <Routes>
-      {/* Landing page — accessible to everyone */}
+      {/* Landing page â€” accessible to everyone */}
       <Route path="/" element={<LandingPage />} />
 
       {/* Public auth routes */}
@@ -69,7 +71,7 @@ export default function App() {
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
       <Route path="/reset-password"  element={<ResetPasswordPage />} />
 
-      {/* Live court view — public */}
+      {/* Live court view â€” public */}
       <Route path="/live" element={<LiveCourtView />} />
 
       {/* User routes */}
@@ -78,7 +80,8 @@ export default function App() {
         <Route path="bookings"  element={<MyBookings />} />
         <Route path="profile"   element={<EditProfile />} />
         <Route path="feedback"  element={<FeedbackPage />} />
-        <Route path="payments"  element={<PaymentsPage />} />
+        <Route path="payments"     element={<PaymentsPage />} />
+        <Route path="memberships" element={<UserMemberships />} />
       </Route>
 
       {/* Admin routes */}
@@ -93,9 +96,11 @@ export default function App() {
         <Route path="pricing"  element={<AdminPricing />} />
         <Route path="feedback" element={<AdminFeedback />} />
         <Route path="cms"      element={<AdminCMS />} />
+        <Route path="memberships" element={<AdminMemberships />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
+

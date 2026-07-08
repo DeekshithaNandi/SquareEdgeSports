@@ -4,11 +4,17 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "users")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -42,15 +48,32 @@ public class User {
     private boolean active = true;
 
     private boolean cricketLaneMember = false;
-    private boolean boxCricketMember  = false;
-    private boolean pickleballMember  = false;
+    private LocalDateTime cricketLaneExpiry;
+    private LocalDateTime cricketLaneGrantedAt;
 
-    private LocalDateTime membershipExpiry;
+    private boolean boxCricketMember = false;
+    private LocalDateTime boxCricketExpiry;
+    private LocalDateTime boxCricketGrantedAt;
+
+    private boolean pickleballMember = false;
+    private LocalDateTime pickleballExpiry;
+    private LocalDateTime pickleballGrantedAt;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @PrePersist  protected void onCreate() { createdAt = LocalDateTime.now(); updatedAt = LocalDateTime.now(); }
-    @PreUpdate   protected void onUpdate() { updatedAt = LocalDateTime.now(); }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
-    public enum Role { SUPER_ADMIN, ADMINISTRATOR, EMPLOYEE, PLAYER }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public enum Role {
+        SUPER_ADMIN, ADMINISTRATOR, EMPLOYEE, PLAYER
+    }
 }

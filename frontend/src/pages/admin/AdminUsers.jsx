@@ -60,9 +60,6 @@ export default function AdminUsers() {
   const [permLoading,  setPermLoading]  = useState(false)
   const [deleteTarget,  setDeleteTarget]  = useState(null)
   const [deleting,      setDeleting]      = useState(false)
-  const [memberUser,    setMemberUser]    = useState(null)
-  const [memberForm,    setMemberForm]    = useState({ cricketLaneMember: false, boxCricketMember: false, pickleballMember: false })
-  const [memberLoading, setMemberLoading] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -273,18 +270,34 @@ export default function AdminUsers() {
                           onClick={() => { setEdit(u); setEf({ fullName: u.fullName, phone: u.phone || '', addressLine1: u.addressLine1 || '', city: u.city || '', state: u.state || '', country: u.country || '', zipCode: u.zipCode || '', active: u.active, role: u.role }) }}>
                           Edit
                         </button>
+                        {u.role === 'PLAYER' && (() => {
+                          const tod = new Date(); tod.setHours(0,0,0,0)
+                          const expAfterToday = (d) => { const e = new Date(d); e.setHours(0,0,0,0); return e >= tod }
+                          const active = [
+                            { emoji: '🏏', ok: u.cricketLaneMember && (!u.cricketLaneExpiry || expAfterToday(u.cricketLaneExpiry)), label: 'Cricket Lane' },
+                            { emoji: '📦', ok: u.boxCricketMember  && (!u.boxCricketExpiry  || expAfterToday(u.boxCricketExpiry)),  label: 'Box Cricket'  },
+                            { emoji: '🏓', ok: u.pickleballMember  && (!u.pickleballExpiry  || expAfterToday(u.pickleballExpiry)),  label: 'Pickleball'   },
+                          ].filter(s => s.ok)
+                          if (!active.length) return null
+                          return active.map(s => (
+                            <span key={s.emoji} title={`${s.label} Member`}
+                              className="inline-flex items-center gap-0.5 px-1.5 py-1.5 rounded-lg bg-yellow-50 border border-yellow-300 text-[10px] font-bold text-yellow-700">
+                              <Crown size={9} /> {s.emoji}
+                            </span>
+                          ))
+                        })()}
                         {u.role === 'EMPLOYEE' && (
                           <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-100 border border-purple-300 text-purple-700 hover:bg-purple-200 transition-all"
                             onClick={() => openPermissions(u)}>
                             <Shield size={11} className="inline mr-1" />Perms
                           </button>
                         )}
-                        {u.role === 'PLAYER' && (
+                        {/* {u.role === 'PLAYER' && (
                           <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-100 border border-yellow-300 text-yellow-700 hover:bg-yellow-200 transition-all"
                             onClick={() => openMembership(u)}>
                             <Crown size={11} className="inline mr-1" />Member
                           </button>
-                        )}
+                        )}* */}
                         {/* Delete — disabled with tooltip when not permitted */}
                         <div className="relative group/del inline-block">
                           <button
@@ -587,72 +600,6 @@ export default function AdminUsers() {
               </div>
             </button>
           ))}
-        </div>
-      </Modal>
-
-      {/* Membership Modal */}
-      <Modal open={!!memberUser} onClose={() => setMemberUser(null)} title={`👑 Membership — ${memberUser?.fullName || ''}`}
-        footer={<>
-          <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff]" onClick={() => setMemberUser(null)}>Cancel</button>
-          <button disabled={memberLoading} onClick={saveMembership}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-700 to-blue-600 text-white hover:opacity-90 disabled:opacity-60 flex items-center gap-2">
-            {memberLoading ? <span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" /> : <Crown size={13} />}
-            Save Membership
-          </button>
-        </>}>
-        <div className="space-y-3">
-          <p className="text-xs text-muted mb-1">Toggle sport memberships for this player. An email notification will be sent for each newly activated sport.</p>
-          {[
-            { key: 'cricketLaneMember', label: 'Cricket Lane',  emoji: '🏏', desc: 'Access to cricket lane at member rates' },
-            { key: 'boxCricketMember',  label: 'Box Cricket',   emoji: '🏟️', desc: 'Access to box cricket at member rates'  },
-            { key: 'pickleballMember',  label: 'Pickleball',    emoji: '🏓', desc: 'Access to pickleball at member rates'  },
-          ].map(sport => (
-            <button key={sport.key} onClick={() => toggleMember(sport.key)}
-              className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all ${
-                memberForm[sport.key]
-                  ? 'bg-yellow-100 border-yellow-300'
-                  : 'bg-[#f8faff] border-[#dde8f8] hover:bg-[#f8faff]'
-              }`}>
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{sport.emoji}</span>
-                <div className="text-left">
-                  <div className={`text-sm font-bold ${memberForm[sport.key] ? 'text-yellow-700' : 'text-[#0a1428]'}`}>{sport.label}</div>
-                  <div className="text-xs text-muted">{sport.desc}</div>
-                </div>
-              </div>
-              <div className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${memberForm[sport.key] ? 'bg-yellow-500' : 'bg-[#f0f5ff]'}`}>
-                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${memberForm[sport.key] ? 'left-5' : 'left-0.5'}`} />
-              </div>
-            </button>
-          ))}
-          {memberUser && (
-            <div className="mt-3 p-3 rounded-xl bg-[#f8faff] border border-[#dde8f8]">
-              <div className="text-xs text-muted font-semibold mb-1.5">Current Membership Status</div>
-              <div className="flex gap-2 flex-wrap">
-                {[
-                  { key: 'cricketLaneMember', label: 'Cricket Lane' },
-                  { key: 'boxCricketMember',  label: 'Box Cricket'  },
-                  { key: 'pickleballMember',  label: 'Pickleball'   },
-                ].map(s => (
-                  <span key={s.key} className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    memberUser[s.key] ? 'bg-yellow-100 text-yellow-700' : 'bg-[#f8faff] text-muted'
-                  }`}>
-                    {s.label}: {memberUser[s.key] ? '✓ Active' : '✗ None'}
-                  </span>
-                ))}
-                {memberUser.membershipExpiry && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    new Date(memberUser.membershipExpiry + 'Z') < new Date()
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {new Date(memberUser.membershipExpiry + 'Z') < new Date() ? 'Expired: ' : 'Expires: '}
-                    {memberUser.membershipExpiry?.slice(0, 10)}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </Modal>
 

@@ -149,9 +149,14 @@ public class AuthService {
         dto.setActive(u.isActive());
         dto.setProfilePicture(u.getProfilePicture());
         dto.setCricketLaneMember(u.isCricketLaneMember());
+        dto.setCricketLaneExpiry(u.getCricketLaneExpiry());
+        dto.setCricketLaneGrantedAt(u.getCricketLaneGrantedAt());
         dto.setBoxCricketMember(u.isBoxCricketMember());
+        dto.setBoxCricketExpiry(u.getBoxCricketExpiry());
+        dto.setBoxCricketGrantedAt(u.getBoxCricketGrantedAt());
         dto.setPickleballMember(u.isPickleballMember());
-        dto.setMembershipExpiry(u.getMembershipExpiry());
+        dto.setPickleballExpiry(u.getPickleballExpiry());
+        dto.setPickleballGrantedAt(u.getPickleballGrantedAt());
         dto.setCreatedAt(u.getCreatedAt());
         // Include permissions for employees
         if (u.getRole() == User.Role.EMPLOYEE) {

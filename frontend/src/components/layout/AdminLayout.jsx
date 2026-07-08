@@ -4,10 +4,11 @@ import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, CalendarDays, Users, CreditCard,
   TrendingUp, Building2, DollarSign, Star, FileText,
-  LogOut, ShieldCheck, Zap
+  LogOut, ShieldCheck, Zap, Crown
 } from 'lucide-react'
 import { userAPI } from '../../api'
 import NotificationBell from '../common/NotificationBell'
+
 
 const ALL_NAV = [
   { section: 'OVERVIEW' },
@@ -15,6 +16,7 @@ const ALL_NAV = [
   { section: 'MANAGE' },
   { path: '/admin/bookings', icon: CalendarDays,    label: 'Bookings',  perm: 'canManageBookings' },
   { path: '/admin/users',    icon: Users,           label: 'Users',     perm: 'canManageUsers'    },
+  { path: '/admin/memberships',  icon: Crown,    label: 'Memberships', perm: 'canManageUsers'    },
   { path: '/admin/payments', icon: CreditCard,      label: 'Payments',  perm: 'canManagePayments' },
   { section: 'ANALYTICS' },
   { path: '/admin/revenue',  icon: TrendingUp,      label: 'Revenue',   perm: 'canViewReports'    },

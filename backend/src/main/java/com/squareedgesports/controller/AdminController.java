@@ -31,12 +31,101 @@ public class AdminController {
     private final PasswordResetTokenRepository resetTokenRepo;
     private final OtpRepository otpRepo;
     private final BookingRepository bookingRepo;
+    private final NotificationRepository notificationRepo;
     private final AuthService authService;
     private final EmailService emailService;
     private final PasswordEncoder encoder;
 
     // ── Users ─────────────────────────────────────────────────────────────────
     // READ: employee with canManageUsers OR admin
+
+    @PostMapping("/users/{id}/grant-membership")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageUsers(authentication)")
+    public ResponseEntity<?> grantMembership(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> body) {
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String sport = (String) body.get("sport");
+        if (sport == null || sport.isBlank())
+            return ResponseEntity.badRequest().body("sport is required");
+        Object monthsObj = body.get("months");
+        if (monthsObj == null)
+            return ResponseEntity.badRequest().body("months is required");
+        int months = ((Number) monthsObj).intValue();
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+        switch (sport) {
+            case "CRICKET_LANE" -> {
+                user.setCricketLaneMember(true);
+                java.time.LocalDateTime clBase;
+                if (user.getCricketLaneExpiry() != null && user.getCricketLaneExpiry().isAfter(now)) {
+                    clBase = user.getCricketLaneExpiry(); // extending — keep original grantedAt
+                } else {
+                    clBase = now;
+                    user.setCricketLaneGrantedAt(now); // fresh grant
+                }
+                user.setCricketLaneExpiry(clBase.plusMonths(months));
+            }
+            case "BOX_CRICKET" -> {
+                user.setBoxCricketMember(true);
+                java.time.LocalDateTime bcBase;
+                if (user.getBoxCricketExpiry() != null && user.getBoxCricketExpiry().isAfter(now)) {
+                    bcBase = user.getBoxCricketExpiry();
+                } else {
+                    bcBase = now;
+                    user.setBoxCricketGrantedAt(now);
+                }
+                user.setBoxCricketExpiry(bcBase.plusMonths(months));
+            }
+            case "PICKLEBALL" -> {
+                user.setPickleballMember(true);
+                java.time.LocalDateTime pbBase;
+                if (user.getPickleballExpiry() != null && user.getPickleballExpiry().isAfter(now)) {
+                    pbBase = user.getPickleballExpiry();
+                } else {
+                    pbBase = now;
+                    user.setPickleballGrantedAt(now);
+                }
+                user.setPickleballExpiry(pbBase.plusMonths(months));
+            }
+            default -> {
+                return ResponseEntity.badRequest().body("Invalid sport: " + sport);
+            }
+        }
+
+        userRepo.save(user);
+
+        // Create payment record for all grant types
+        String paymentType = body.containsKey("paymentType") ? (String) body.get("paymentType") : "CASH";
+        String ruleKey = sport + "_MEMBERSHIP";
+        BigDecimal monthlyFee = pricingRepo.findByRuleKey(ruleKey)
+                .map(r -> r.getPrice()).orElse(BigDecimal.ZERO);
+        boolean isCash = "CASH".equals(paymentType);
+        BigDecimal totalAmount = isCash ? monthlyFee.multiply(BigDecimal.valueOf(months)) : BigDecimal.ZERO;
+        paymentRepo.save(Payment.builder()
+                .user(user)
+                .amount(totalAmount)
+                .paymentMethod(isCash ? "CASH" : "COMPLIMENTARY")
+                .paymentReference((isCash ? "CASH" : "COMP") + "-" + id + "-" + System.currentTimeMillis())
+                .status(Payment.PaymentStatus.PAID)
+                .description(formatSport(sport) + " Membership – " + months + " month(s) [" + (isCash ? "Cash" : "Complimentary") + "]")
+                .paidAt(now)
+                .build());
+        return ResponseEntity.ok().build();
+    }
+
+    private String formatSport(String sport) {
+        return switch (sport) {
+            case "CRICKET_LANE" -> "Cricket Lane";
+            case "BOX_CRICKET"  -> "Box Cricket";
+            case "PICKLEBALL"   -> "Pickleball";
+            default -> sport;
+        };
+    }
+
     @GetMapping("/users")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR') or @permCheck.canManageUsers(authentication)")
     public ResponseEntity<?> getUsers() {
@@ -102,6 +191,7 @@ public class AdminController {
         // Remove related records in FK order before deleting user
         otpRepo.deleteByEmail(email);
         resetTokenRepo.deleteByEmail(email);
+        notificationRepo.deleteByUserId(id);
         permRepo.findByUserId(id).ifPresent(permRepo::delete);
         feedbackRepo.findByUserIdOrderByCreatedAtDesc(id).forEach(feedbackRepo::delete);
         paymentRepo.findByUserIdOrderByCreatedAtDesc(id).forEach(paymentRepo::delete);
@@ -165,52 +255,6 @@ public class AdminController {
         perm.setCanManageUsers(req.isCanManageUsers());
         permRepo.save(perm);
         return ResponseEntity.ok(ApiResponse.ok("Permissions updated", toDto(perm)));
-    }
-
-    @PatchMapping("/users/{id}/membership")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
-    public ResponseEntity<?> updateMembership(@PathVariable Long id, @RequestBody Map<String, Object> body) {
-        User u = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Track which sports were newly activated
-        java.util.List<String> newlyActivated = new java.util.ArrayList<>();
-        if (body.containsKey("cricketLaneMember")) {
-            boolean val = Boolean.TRUE.equals(body.get("cricketLaneMember"));
-            if (val && !u.isCricketLaneMember())
-                newlyActivated.add("CRICKET_LANE");
-            u.setCricketLaneMember(val);
-        }
-        if (body.containsKey("boxCricketMember")) {
-            boolean val = Boolean.TRUE.equals(body.get("boxCricketMember"));
-            if (val && !u.isBoxCricketMember())
-                newlyActivated.add("BOX_CRICKET");
-            u.setBoxCricketMember(val);
-        }
-        if (body.containsKey("pickleballMember")) {
-            boolean val = Boolean.TRUE.equals(body.get("pickleballMember"));
-            if (val && !u.isPickleballMember())
-                newlyActivated.add("PICKLEBALL");
-            u.setPickleballMember(val);
-        }
-        // Set/extend expiry if anything newly activated
-        if (!newlyActivated.isEmpty()) {
-            LocalDateTime newExpiry = LocalDateTime.now().plusDays(30);
-            u.setMembershipExpiry(
-                    u.getMembershipExpiry() != null && u.getMembershipExpiry().isAfter(LocalDateTime.now())
-                            ? u.getMembershipExpiry().plusDays(30)
-                            : newExpiry);
-        }
-        userRepo.save(u);
-
-        // Send activation email for each newly activated sport
-        String expiresAt = u.getMembershipExpiry() != null
-                ? u.getMembershipExpiry().toLocalDate().toString()
-                : "30 days";
-        for (String sport : newlyActivated) {
-            emailService.sendMembershipActivation(u.getEmail(), u.getFullName(), sport, expiresAt);
-        }
-
-        return ResponseEntity.ok(ApiResponse.ok("Membership updated", authService.mapUser(u)));
     }
 
     // ── Courts ────────────────────────────────────────────────────────────────

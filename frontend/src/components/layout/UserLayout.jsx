@@ -1,14 +1,15 @@
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+﻿import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, CalendarDays, CreditCard, Star, LogOut, User, Zap, ChevronDown } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, CreditCard, Star, LogOut, User, Zap, ChevronDown, Crown } from 'lucide-react'
 import NotificationBell from '../common/NotificationBell'
 
 const NAV = [
-  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard'   },
-  { path: '/bookings',  icon: CalendarDays,    label: 'My Bookings' },
-  { path: '/payments',  icon: CreditCard,      label: 'Payments'    },
-  { path: '/feedback',  icon: Star,            label: 'Feedback'    },
+  { path: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard'   },
+  { path: '/bookings',    icon: CalendarDays,    label: 'My Bookings' },
+  { path: '/memberships', icon: Crown,           label: 'Memberships' },
+  { path: '/payments',    icon: CreditCard,      label: 'Payments'    },
+  { path: '/feedback',    icon: Star,            label: 'Feedback'    },
 ]
 
 export default function UserLayout() {
@@ -129,3 +130,4 @@ export default function UserLayout() {
     </div>
   )
 }
+

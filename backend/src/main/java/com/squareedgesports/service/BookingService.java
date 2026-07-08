@@ -50,12 +50,14 @@ public class BookingService {
         // case "PICKLEBALL" -> user.isPickleballMember();
         // default -> false;
         // };
-        boolean membershipActive = user.getMembershipExpiry() == null
-                || user.getMembershipExpiry().isAfter(LocalDateTime.now());
-        boolean isMember = membershipActive && switch (req.getBookingType()) {
-            case "CRICKET_LANE" -> user.isCricketLaneMember();
-            case "BOX_CRICKET" -> user.isBoxCricketMember();
-            case "PICKLEBALL" -> user.isPickleballMember();
+        LocalDateTime now = LocalDateTime.now();
+        boolean isMember = switch (req.getBookingType()) {
+            case "CRICKET_LANE" -> user.isCricketLaneMember()
+                    && (user.getCricketLaneExpiry() == null || user.getCricketLaneExpiry().isAfter(now));
+            case "BOX_CRICKET"  -> user.isBoxCricketMember()
+                    && (user.getBoxCricketExpiry()  == null || user.getBoxCricketExpiry().isAfter(now));
+            case "PICKLEBALL"   -> user.isPickleballMember()
+                    && (user.getPickleballExpiry()   == null || user.getPickleballExpiry().isAfter(now));
             default -> false;
         };
 
@@ -80,7 +82,7 @@ public class BookingService {
                 .amount(price).paymentMethod("PENDING")
                 .paymentReference(b.getPaymentReference())
                 .status(Payment.PaymentStatus.PENDING)
-                .description(req.getBookingType() + " booking " + req.getBookingDate())
+                .description(label(req.getBookingType()) + " booking " + req.getBookingDate())
                 .build());
         notificationService.notifyUser(user.getId(), "BOOKING_CONFIRMED",
                 "Your " + label(req.getBookingType()) + " slot on " + req.getBookingDate() + " at "

@@ -21,7 +21,7 @@ export default function PaymentsPage() {
       <div className="section-sub mb-6">All your transactions in one place</div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[{l:'Total Paid',v:'$'+total.toFixed(2),c:'#22c55e'},{l:'Refunded',v:'$'+refunded.toFixed(2),c:'#f5c842'},{l:'Transactions',v:payments.length,c:'#7c5cfc'}].map(s=>(
+        {[{l:'Total Paid',v:'$'+total.toFixed(2),c:'#22c55e'},{l:'Refunded',v:'$'+refunded.toFixed(2),c:'#f5c842'},{l:'Transactions',v:visible.length,c:'#7c5cfc'}].map(s=>(
           <div key={s.l} className="card p-5 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 rounded-full -translate-y-4 translate-x-4 opacity-15" style={{background:s.c}}/>
             <div className="text-xs text-muted uppercase tracking-widest font-semibold mb-2">{s.l}</div>
@@ -53,7 +53,7 @@ export default function PaymentsPage() {
                   </td>
                   <td><span className="badge-blue text-[10px]">{p.method||'—'}</span></td>
                   <td className="font-mono text-[10px] text-muted">{p.reference?.slice(0,16)}</td>
-                  <td className="text-xs text-muted">{p.createdAt?.slice(0,10)}</td>
+                  <td className="text-xs text-muted">{(p.paidAt || p.createdAt)?.slice(0,10)}</td>
                   <td><Badge value={p.status}/></td>
                 </tr>
               ))}

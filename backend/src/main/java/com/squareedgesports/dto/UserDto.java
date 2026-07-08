@@ -21,9 +21,14 @@ public class UserDto {
     private boolean emailVerified;
     private boolean active;
     private boolean cricketLaneMember;
+    private LocalDateTime cricketLaneExpiry;
+    private LocalDateTime cricketLaneGrantedAt;
     private boolean boxCricketMember;
+    private LocalDateTime boxCricketExpiry;
+    private LocalDateTime boxCricketGrantedAt;
     private boolean pickleballMember;
-    private LocalDateTime membershipExpiry;
+    private LocalDateTime pickleballExpiry;
+    private LocalDateTime pickleballGrantedAt;
     private LocalDateTime createdAt;
     private PermissionsDto permissions;
 }

@@ -270,22 +270,49 @@ public class UserController {
 
         User u = userRepo.findByEmail(auth.getName()).orElseThrow();
 
-        // Activate the correct membership flag
+        // Activate the correct membership flag and extend expiry by +1 month
+        LocalDateTime nowTs = LocalDateTime.now();
+        LocalDateTime sportExpiry;
         switch (sportType != null ? sportType : "") {
-            case "CRICKET_LANE" -> u.setCricketLaneMember(true);
-            case "BOX_CRICKET" -> u.setBoxCricketMember(true);
-            case "PICKLEBALL" -> u.setPickleballMember(true);
+            case "CRICKET_LANE" -> {
+                u.setCricketLaneMember(true);
+                LocalDateTime clBase;
+                if (u.getCricketLaneExpiry() != null && u.getCricketLaneExpiry().isAfter(nowTs)) {
+                    clBase = u.getCricketLaneExpiry(); // extending — keep original grantedAt
+                } else {
+                    clBase = nowTs;
+                    u.setCricketLaneGrantedAt(nowTs); // fresh grant
+                }
+                sportExpiry = clBase.plusMonths(1);
+                u.setCricketLaneExpiry(sportExpiry);
+            }
+            case "BOX_CRICKET" -> {
+                u.setBoxCricketMember(true);
+                LocalDateTime bcBase;
+                if (u.getBoxCricketExpiry() != null && u.getBoxCricketExpiry().isAfter(nowTs)) {
+                    bcBase = u.getBoxCricketExpiry();
+                } else {
+                    bcBase = nowTs;
+                    u.setBoxCricketGrantedAt(nowTs);
+                }
+                sportExpiry = bcBase.plusMonths(1);
+                u.setBoxCricketExpiry(sportExpiry);
+            }
+            case "PICKLEBALL" -> {
+                u.setPickleballMember(true);
+                LocalDateTime pbBase;
+                if (u.getPickleballExpiry() != null && u.getPickleballExpiry().isAfter(nowTs)) {
+                    pbBase = u.getPickleballExpiry();
+                } else {
+                    pbBase = nowTs;
+                    u.setPickleballGrantedAt(nowTs);
+                }
+                sportExpiry = pbBase.plusMonths(1);
+                u.setPickleballExpiry(sportExpiry);
+            }
             default -> {
                 return ResponseEntity.badRequest().body(ApiResponse.error("Unknown sportType"));
             }
-        }
-
-        // Set/extend expiry to 30 days from now
-        LocalDateTime newExpiry = LocalDateTime.now().plusDays(30);
-        if (u.getMembershipExpiry() == null || u.getMembershipExpiry().isBefore(LocalDateTime.now())) {
-            u.setMembershipExpiry(newExpiry);
-        } else {
-            u.setMembershipExpiry(u.getMembershipExpiry().plusDays(30));
         }
         userRepo.save(u);
 
@@ -299,11 +326,20 @@ public class UserController {
                 .paymentReference(orderId)
                 .gatewayPaymentId(paymentId)
                 .status(Payment.PaymentStatus.PAID)
-                .description(sportType + " Membership – 30 days")
+                .description(formatSport(sportType) + " Membership – 1 month(s) [Razorpay]")
                 .paidAt(LocalDateTime.now())
                 .build());
 
         return ResponseEntity.ok(ApiResponse.ok("Membership activated!",
-                Map.of("sportType", sportType, "expiresAt", u.getMembershipExpiry().toString())));
+                Map.of("sportType", sportType, "expiresAt", sportExpiry.toString())));
+    }
+
+    private String formatSport(String sport) {
+        return switch (sport) {
+            case "CRICKET_LANE" -> "Cricket Lane";
+            case "BOX_CRICKET"  -> "Box Cricket";
+            case "PICKLEBALL"   -> "Pickleball";
+            default -> sport;
+        };
     }
 }
