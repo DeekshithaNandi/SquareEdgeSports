@@ -55,6 +55,8 @@ public class AdminController {
         if (monthsObj == null)
             return ResponseEntity.badRequest().body("months is required");
         int months = ((Number) monthsObj).intValue();
+        if (months < 1 || months > 24)
+            return ResponseEntity.badRequest().body("months must be between 1 and 24");
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
 
         switch (sport) {
@@ -432,6 +434,12 @@ public class AdminController {
     @PostMapping("/cms")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
     public ResponseEntity<?> createCms(@RequestBody CmsContent content) {
+        if (content.getContentKey() == null || content.getContentKey().isBlank()) {
+            String base = content.getTitle() != null
+                ? content.getTitle().toLowerCase().replaceAll("[^a-z0-9]+", "_")
+                : "content";
+            content.setContentKey(base + "_" + System.currentTimeMillis());
+        }
         return ResponseEntity.ok(cmsRepo.save(content));
     }
 

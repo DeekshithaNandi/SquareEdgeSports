@@ -79,7 +79,7 @@ public class AuthService {
     // ── Login ────────────────────────────────────────────────────────────────
     public AuthResponse login(LoginRequest req) {
         var user = userRepo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("USER_NOT_REGISTERED"));
+                .orElseThrow(() -> new RuntimeException("Invalid email or password."));
         if (!encoder.matches(req.getPassword(), user.getPassword()))
             throw new RuntimeException("Invalid email or password.");
         if (!user.isEmailVerified())
@@ -95,7 +95,7 @@ public class AuthService {
     public ApiResponse forgotPassword(String email) {
         var user = userRepo.findByEmail(email).orElse(null);
         if (user == null)
-            throw new RuntimeException("USER_NOT_REGISTERED");
+            return ApiResponse.ok("If this email is registered, a reset link has been sent.");
         resetTokenRepo.deleteByEmail(email);
         String token = UUID.randomUUID().toString();
         resetTokenRepo.save(PasswordResetToken.builder()

@@ -32,6 +32,10 @@ public class BookingService {
     @Transactional
     public BookingDto create(Long userId, CreateBookingRequest req) {
         User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (req.getBookingDate() == null)
+            throw new IllegalArgumentException("bookingDate is required");
+        if (req.getBookingDate().isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("Cannot book a slot for a past date");
         if (req.getStartTime() == null || req.getStartTime().isBlank())
             throw new IllegalArgumentException("startTime is required");
         LocalTime start;
