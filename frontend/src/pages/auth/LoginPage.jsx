@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { authAPI } from '../../api'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Zap, UserX } from 'lucide-react'
+import { Eye, EyeOff, Zap } from 'lucide-react'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -12,32 +12,14 @@ export default function LoginPage() {
   const [showPw, setShowPw]       = useState(false)
   const [loading, setLoading]     = useState(false)
   const [err, setErr]             = useState('')
-  const [notRegistered, setNotRegistered] = useState(false)
 
-  const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErr(''); setNotRegistered(false) }
+  const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErr('') }
 
-  // const handleSubmit = async e => {
-  //   e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
-  //   try {
-  //     const r = await authAPI.login(form)
-  //     login(r.data.token, r.data.user)
-  //     toast.success('Welcome back, ' + r.data.user.fullName + '!')
-  //     const isAdmin = ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(r.data.user.role)
-  //     navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
-  //   } catch (e) {
-  //     const msg = e.response?.data?.message || ''
-  //     if (msg === 'USER_NOT_REGISTERED') {
-  //       setNotRegistered(true)
-  //     } else {
-  //       setErr(msg || 'Invalid credentials.')
-  //     }
-  //   } finally { setLoading(false) }
-  // }
   const handleSubmit = async e => {
-  e.preventDefault(); setLoading(true); setErr(''); setNotRegistered(false)
+  e.preventDefault(); setLoading(true); setErr('')
   const slowTimer = setTimeout(() => {
-    // toast('Backend is waking up, please wait...', { icon: '⏳', duration: 10000 })
-  }, 4000)  // show after 4 seconds
+    toast('Server is starting up — this may take up to 30 seconds on first load.', { icon: '⏳', duration: 20000 })
+  }, 4000)
   try {
     const r = await authAPI.login(form)
     clearTimeout(slowTimer)
@@ -51,8 +33,7 @@ export default function LoginPage() {
     setErr('Server is taking too long to respond. Please try again in a moment.')
   } else {
     const msg = e.response?.data?.message || ''
-    if (msg === 'USER_NOT_REGISTERED') setNotRegistered(true)
-    else setErr(msg || 'Invalid credentials.')
+    setErr(msg || 'Invalid credentials.')
   } }
   finally { setLoading(false) }
 }
@@ -102,21 +83,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Not registered — banner */}
-            {notRegistered && (
-              <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <UserX size={15} className="text-amber-600 flex-shrink-0" />
-                  <span className="text-xs font-bold text-amber-700">Account not found</span>
-                </div>
-                <p className="text-[11px] text-amber-700 leading-relaxed">
-                  No account exists for <strong className="text-amber-800">{form.email}</strong>.
-                  Please register below before signing in.
-                </p>
-              </div>
-            )}
-
-            {/* Generic error */}
+            {/* Error */}
             {err && <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-xs text-red-400">{err}</div>}
 
             <button type="submit" disabled={loading} className="btn-primary flex items-center justify-center gap-2 mt-2">
