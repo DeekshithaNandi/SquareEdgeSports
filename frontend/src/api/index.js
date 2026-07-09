@@ -76,6 +76,7 @@ export const adminAPI = {
   deleteUser:        (id)          => API.delete(`/admin/users/${id}`),
   inviteUser:        (data)        => API.post('/admin/users/invite', data),
   grantMembership:   (id, data) => API.post(`/admin/users/${id}/grant-membership`, data),
+  revokeMembership:  (id, sport) => API.post(`/admin/users/${id}/revoke-membership`, { sport }),
   getPermissions:    (id)          => API.get(`/admin/users/${id}/permissions`),
   updatePermissions: (id, data)    => API.put(`/admin/users/${id}/permissions`, data),
   // Courts

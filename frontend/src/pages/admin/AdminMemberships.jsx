@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { adminAPI, publicAPI } from '../../api'
 import Spinner from '../../components/common/Spinner'
 import toast from 'react-hot-toast'
-import { Crown, Search, X, CheckCircle, Clock } from 'lucide-react'
+import { Crown, Search, X, CheckCircle, Clock, Trash2 } from 'lucide-react'
 
 const SPORTS = [
   { key: 'CRICKET_LANE', memberKey: 'cricketLaneMember', expiryKey: 'cricketLaneExpiry', grantedKey: 'cricketLaneGrantedAt', label: 'Cricket Lane', emoji: '🏏' },
@@ -71,9 +71,10 @@ function SportBadges({ u }) {
 
 // ── Right-side panel ───────────────────────────────────────────────────────
 function PlayerPanel({ player, onClose, onGranted }) {
-  const [form,    setForm]    = useState({ sport: 'CRICKET_LANE', months: 1, paymentType: 'CASH' })
-  const [loading, setLoading] = useState(false)
-  const [pricing, setPricing] = useState({})
+  const [form,     setForm]     = useState({ sport: 'CRICKET_LANE', months: 1, paymentType: 'CASH' })
+  const [loading,  setLoading]  = useState(false)
+  const [revoking, setRevoking] = useState(null)   // sport key being revoked
+  const [pricing,  setPricing]  = useState({})
 
   useEffect(() => {
     publicAPI.pricing()
@@ -91,6 +92,18 @@ function PlayerPanel({ player, onClose, onGranted }) {
   }, [player?.id])
 
   if (!player) return null
+
+  const handleRevoke = async (sportKey, sportLabel) => {
+    if (!window.confirm(`Remove ${sportLabel} membership from ${player.fullName}?`)) return
+    setRevoking(sportKey)
+    try {
+      await adminAPI.revokeMembership(player.id, sportKey)
+      toast.success(`${sportLabel} membership removed`)
+      onGranted()
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Failed to revoke')
+    } finally { setRevoking(null) }
+  }
 
   const handleGrant = async () => {
     setLoading(true)
@@ -153,10 +166,21 @@ function PlayerPanel({ player, onClose, onGranted }) {
                       <span className="font-semibold text-xs text-[#0a1428] flex items-center gap-1.5">
                         <span>{sport.emoji}</span> {sport.label}
                       </span>
-                      {st === 'none' && <span className="text-[10px] text-muted">No membership</span>}
-                      {st === 'active' && <span className="flex items-center gap-1 text-[10px] font-bold text-green-700"><CheckCircle size={9} /> Active</span>}
-                      {st === 'expiring' && <span className="flex items-center gap-1 text-[10px] font-bold text-orange-600"><Clock size={9} /> Expiring</span>}
-                      {st === 'expired' && <span className="text-[10px] font-bold text-red-500">Expired</span>}
+                      <div className="flex items-center gap-2">
+                        {st === 'none' && <span className="text-[10px] text-muted">No membership</span>}
+                        {st === 'active' && <span className="flex items-center gap-1 text-[10px] font-bold text-green-700"><CheckCircle size={9} /> Active</span>}
+                        {st === 'expiring' && <span className="flex items-center gap-1 text-[10px] font-bold text-orange-600"><Clock size={9} /> Expiring</span>}
+                        {st === 'expired' && <span className="text-[10px] font-bold text-red-500">Expired</span>}
+                        {st !== 'none' && (
+                          <button
+                            onClick={() => handleRevoke(sport.key, sport.label)}
+                            disabled={revoking === sport.key}
+                            title="Revoke membership"
+                            className="p-1 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600 transition-colors disabled:opacity-40">
+                            <Trash2 size={11} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {st !== 'none' && (
                       <div className="grid grid-cols-2 gap-1 mt-1.5">

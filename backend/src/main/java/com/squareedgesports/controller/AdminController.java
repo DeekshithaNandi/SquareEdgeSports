@@ -119,6 +119,40 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/users/{id}/revoke-membership")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
+    public ResponseEntity<?> revokeMembership(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> body) {
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        String sport = (String) body.get("sport");
+        if (sport == null || sport.isBlank())
+            return ResponseEntity.badRequest().body("sport is required");
+
+        switch (sport) {
+            case "CRICKET_LANE" -> {
+                user.setCricketLaneMember(false);
+                user.setCricketLaneExpiry(null);
+                user.setCricketLaneGrantedAt(null);
+            }
+            case "BOX_CRICKET" -> {
+                user.setBoxCricketMember(false);
+                user.setBoxCricketExpiry(null);
+                user.setBoxCricketGrantedAt(null);
+            }
+            case "PICKLEBALL" -> {
+                user.setPickleballMember(false);
+                user.setPickleballExpiry(null);
+                user.setPickleballGrantedAt(null);
+            }
+            default -> { return ResponseEntity.badRequest().body("Invalid sport: " + sport); }
+        }
+        userRepo.save(user);
+        return ResponseEntity.ok(ApiResponse.ok("Membership revoked"));
+    }
+
     private String formatSport(String sport) {
         return switch (sport) {
             case "CRICKET_LANE" -> "Cricket Lane";
