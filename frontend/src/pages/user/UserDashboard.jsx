@@ -5,7 +5,7 @@ import { bookingAPI, publicAPI } from '../../api'
 import StatCard from '../../components/common/StatCard'
 import Badge from '../../components/common/Badge'
 import { formatCurrency } from '../../utils/helpers'
-import { X } from 'lucide-react'
+import { X, LayoutList, PlayCircle, BadgeDollarSign, Ban } from 'lucide-react'
 
 function CmsBlock({ item, onDismiss }) {
   if (item.contentType === 'BANNER') {
@@ -116,10 +116,10 @@ export default function UserDashboard() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
-        <StatCard label="Total Bookings" value={bookings.length}       icon="📅" color="#7c5cfc" sub="All time" />
-        <StatCard label="Active"         value={active.length}         icon="✅" color="#4f8ef7" sub="Upcoming sessions" />
-        <StatCard label="Total Spent"    value={formatCurrency(spent)} icon="💰" color="#f5c842" sub="Confirmed bookings" />
-        <StatCard label="Cancelled"      value={cancelled.length}      icon="🚫" color="#22c55e" sub="Past cancellations" />
+        <StatCard label="Total Bookings" value={bookings.length}       icon={LayoutList}       color="#7c5cfc" sub="All time" />
+        <StatCard label="Active"         value={active.length}         icon={PlayCircle}       color="#4f8ef7" sub="Upcoming sessions" />
+        <StatCard label="Total Spent"    value={formatCurrency(spent)} icon={BadgeDollarSign}  color="#f5c842" sub="Confirmed bookings" />
+        <StatCard label="Cancelled"      value={cancelled.length}      icon={Ban}              color="#22c55e" sub="Past cancellations" />
       </div>
 
       {/* Cancellation policy */}

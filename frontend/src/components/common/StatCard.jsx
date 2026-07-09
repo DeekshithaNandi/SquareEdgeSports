@@ -19,12 +19,8 @@ export default function StatCard({ title, label, value, icon, color, sub }) {
   return (
     <div className="stat-card">
       <div
-        className="absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-4 translate-x-4 opacity-15"
-        style={{ background: resolvedColor }}
-      />
-      <div
-        className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-[#f8faff] flex items-center justify-center text-lg"
-        style={{ color: resolvedColor }}
+        className="absolute top-4 right-4 w-9 h-9 rounded-xl flex items-center justify-center"
+        style={{ background: resolvedColor + '22', color: resolvedColor }}
       >
         {Icon ? <Icon size={18} /> : icon}
       </div>

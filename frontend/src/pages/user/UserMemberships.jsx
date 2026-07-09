@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { publicAPI } from '../../api'
-import { Crown, CheckCircle, XCircle, Clock, Info } from 'lucide-react'
+import { publicAPI, userAPI } from '../../api'
+import { Crown, CheckCircle, XCircle, Clock, Info, X, CreditCard } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const SPORTS = [
   { key: 'CRICKET_LANE', label: 'Cricket Lane', emoji: '🏏',
@@ -33,6 +34,28 @@ function daysLeft(expiry) {
   return Math.round((exp - now) / 86400000)
 }
 
+function loadRazorpayScript() {
+  return new Promise((resolve, reject) => {
+    if (window.Razorpay) { resolve(true); return }
+    const existing = document.querySelector('script[src*="checkout.razorpay.com"]')
+    if (existing) {
+      let tries = 0
+      const check = setInterval(() => {
+        tries++
+        if (window.Razorpay) { clearInterval(check); resolve(true) }
+        else if (tries > 30) { clearInterval(check); reject(new Error('Payment gateway could not be loaded.')) }
+      }, 200)
+      return
+    }
+    const s = document.createElement('script')
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    s.async = true
+    s.onload  = () => resolve(true)
+    s.onerror = () => reject(new Error('Failed to load payment gateway.'))
+    document.head.appendChild(s)
+  })
+}
+
 function DaysRing({ days, total, warning }) {
   const max    = total > 0 ? total : 30
   const capped = Math.min(Math.max(days, 0), max)
@@ -51,9 +74,119 @@ function DaysRing({ days, total, warning }) {
   )
 }
 
+// ── Payment modal ────────────────────────────────────────────────────────────
+function GetMembershipModal({ sport, fee, user, onClose, onSuccess }) {
+  const [paying, setPaying] = useState(false)
+
+  const handlePay = async () => {
+    setPaying(true)
+    try {
+      await loadRazorpayScript()
+      if (!window.Razorpay) throw new Error('Payment system not available.')
+
+      const orderRes = await userAPI.membershipOrder({ sportType: sport.key })
+      const { orderId, amount, currency, keyId } = orderRes.data
+
+      const options = {
+        key: keyId,
+        amount,
+        currency,
+        order_id: orderId,
+        name: 'SquareEdgeSports',
+        description: `${sport.label} Membership – 1 month`,
+        prefill: { name: user?.fullName, email: user?.email },
+        theme: { color: '#2563eb' },
+        handler: async (response) => {
+          try {
+            await userAPI.membershipConfirm({
+              sportType:          sport.key,
+              razorpayOrderId:    response.razorpay_order_id,
+              razorpayPaymentId:  response.razorpay_payment_id,
+              razorpaySignature:  response.razorpay_signature,
+            })
+            toast.success(`${sport.emoji} ${sport.label} membership activated!`)
+            onSuccess()
+          } catch {
+            toast.error('Payment received but activation failed. Contact support.')
+          }
+        },
+        modal: { ondismiss: () => setPaying(false) },
+      }
+
+      const rzp = new window.Razorpay(options)
+      rzp.on('payment.failed', () => {
+        toast.error('Payment failed. Please try again.')
+        setPaying(false)
+      })
+      rzp.open()
+    } catch (e) {
+      toast.error(e.message || 'Could not start payment.')
+      setPaying(false)
+    }
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/40 z-40 flex items-end sm:items-center justify-center p-4"
+        onClick={onClose}>
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+          onClick={e => e.stopPropagation()}>
+
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[#dde8f8]">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{sport.emoji}</span>
+              <div>
+                <div className="font-bold text-sm text-[#0a1428]">{sport.label} Membership</div>
+                <div className="text-xs text-muted">1 month · ₹{fee ?? '—'}</div>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-muted transition-all">
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="px-5 py-4 space-y-3">
+            <div className="bg-[#f8faff] rounded-xl p-3 text-xs text-muted border border-[#dde8f8] space-y-1">
+              <div className="flex justify-between">
+                <span>{sport.label} membership</span>
+                <span className="font-semibold text-[#0a1428]">₹{fee ?? '—'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Duration</span>
+                <span className="font-semibold text-[#0a1428]">1 month</span>
+              </div>
+              <div className="border-t border-[#dde8f8] pt-1 flex justify-between font-bold text-[#0a1428]">
+                <span>Total</span>
+                <span>₹{fee ?? '—'}</span>
+              </div>
+            </div>
+
+            <button onClick={handlePay} disabled={paying}
+              className="w-full py-3 rounded-xl text-sm font-bold bg-accent text-white hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all">
+              {paying
+                ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : <CreditCard size={15} />}
+              {paying ? 'Opening payment…' : `Pay ₹${fee ?? '—'} via Razorpay`}
+            </button>
+
+            <p className="text-center text-[11px] text-muted">
+              Or visit the front desk to pay cash / get a complimentary membership
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Main page ────────────────────────────────────────────────────────────────
 export default function UserMemberships() {
   const { user, refreshUser } = useAuth()
-  const [pricing, setPricing] = useState({})
+  const [pricing,    setPricing]    = useState({})
+  const [buyingSport, setBuyingSport] = useState(null)   // sport object being purchased
 
   useEffect(() => {
     refreshUser()
@@ -65,6 +198,11 @@ export default function UserMemberships() {
       })
       .catch(() => {})
   }, [])
+
+  const handlePaymentSuccess = async () => {
+    setBuyingSport(null)
+    await refreshUser()
+  }
 
   const activeSports = SPORTS.filter(s => {
     const days = daysLeft(user?.[s.expiryKey])
@@ -80,7 +218,7 @@ export default function UserMemberships() {
         <h1 className="font-display text-xl font-bold text-[#0a1428]">My Memberships</h1>
       </div>
       <p className="text-sm text-muted mb-6">
-        Your sport membership status and expiry dates. Visit the front desk to get or extend a membership.
+        Your sport membership status and expiry dates.
       </p>
 
       {/* Active summary */}
@@ -95,7 +233,7 @@ export default function UserMemberships() {
       ) : (
         <div className="mb-5 px-4 py-3 rounded-xl border border-[#dde8f8] bg-[#f8faff] flex items-center gap-3">
           <Info size={15} className="text-muted flex-shrink-0" />
-          <span className="text-sm text-muted">You don't have any active memberships. Visit the front desk to get started.</span>
+          <span className="text-sm text-muted">You don't have any active memberships. Get one below to start saving.</span>
         </div>
       )}
 
@@ -108,7 +246,7 @@ export default function UserMemberships() {
           const expired  = days !== null && days < 0
           const isMember = user?.[sport.memberKey] && !expired
           const warning  = isMember && days !== null && days <= 7
-          const fee      = pricing[sport.ruleKey] ?? '—'
+          const fee      = pricing[sport.ruleKey] ?? null
 
           return (
             <div key={sport.key} className="card border p-5 flex items-center gap-5 transition-all"
@@ -162,14 +300,23 @@ export default function UserMemberships() {
                 )}
 
                 {expired && (
-                  <div className="text-xs text-red-500">
-                    Expired on {fmtDate(expiry)} · {Math.abs(days)} days ago · Visit the front desk to renew
+                  <div className="text-xs text-red-500 mb-2">
+                    Expired on {fmtDate(expiry)} · {Math.abs(days)} days ago
                   </div>
                 )}
 
-                {!isMember && !expired && (
-                  <div className="text-xs text-muted">
-                    ${fee}/month · Save on every session as a member
+                {/* NOT A MEMBER or EXPIRED → show price + Get Membership button */}
+                {(!isMember) && (
+                  <div className="flex items-center gap-3 mt-1">
+                    {fee && (
+                      <span className="text-xs text-muted">₹{fee}/month</span>
+                    )}
+                    <button
+                      onClick={() => setBuyingSport(sport)}
+                      className="px-3 py-1 rounded-lg text-xs font-bold bg-accent text-white hover:opacity-90 transition-all flex items-center gap-1.5">
+                      <CreditCard size={11} />
+                      {expired ? 'Renew Membership' : 'Get Membership'}
+                    </button>
                   </div>
                 )}
               </div>
@@ -194,10 +341,21 @@ export default function UserMemberships() {
         <Info size={13} className="text-accent flex-shrink-0 mt-0.5" />
         <div>
           <span className="font-semibold text-[#0a1428]">How memberships work — </span>
-          Each sport has its own independent membership and expiry. Memberships are granted by the front desk
-          (cash or complimentary). They expire automatically — no cancellation needed.
+          Each sport has its own independent membership and expiry. Pay online for 1 month, or visit the
+          front desk for cash or complimentary grants. They expire automatically — no cancellation needed.
         </div>
       </div>
+
+      {/* Payment modal */}
+      {buyingSport && (
+        <GetMembershipModal
+          sport={buyingSport}
+          fee={pricing[buyingSport.ruleKey] ?? null}
+          user={user}
+          onClose={() => setBuyingSport(null)}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   )
 }

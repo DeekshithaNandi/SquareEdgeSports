@@ -144,10 +144,10 @@ export default function FeedbackPage() {
               Clear
             </button>
             <button type="submit" disabled={loading}
-              className="flex-[2] btn-primary flex items-center justify-center gap-2">
+              className="flex-1 btn-primary flex items-center justify-center gap-2">
               {loading
                 ? <><span className="w-4 h-4 border-2 border-[#dde8f8] border-t-white rounded-full spin" />Submitting…</>
-                : 'Submit Feedback ⭐'}
+                : 'Submit'}
             </button>
           </div>
         </form>
