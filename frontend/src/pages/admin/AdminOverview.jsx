@@ -5,7 +5,7 @@ import StatCard from '../../components/common/StatCard'
 import Spinner from '../../components/common/Spinner'
 import Badge from '../../components/common/Badge'
 import { Users, Building2, Star, UserCheck, Activity, CalendarDays } from 'lucide-react'
-import { fmtLocal } from '../../utils/helpers'
+import { fmtLocal, fmtTime } from '../../utils/helpers'
 
 export default function AdminOverview() {
   const [stats,    setStats]    = useState(null)
@@ -77,7 +77,7 @@ export default function AdminOverview() {
                       <div className="text-xs font-semibold">{b.bookingType?.replace(/_/g, ' ')}</div>
                       <div className={`text-[10px] mt-0.5 ${b.laneNumber || b.courtNumber ? 'text-green-700' : 'text-yellow-600'}`}>{courtLabel}</div>
                     </td>
-                    <td className="text-xs text-muted">{b.startTime?.toString().slice(0,5)} – {b.endTime?.toString().slice(0,5)}</td>
+                    <td className="text-xs text-muted">{fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}</td>
                     <td className="text-sm font-bold">${parseFloat(b.amountPaid || 0).toFixed(2)}</td>
                     <td><Badge value={b.status} /></td>
                   </tr>

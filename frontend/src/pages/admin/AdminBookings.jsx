@@ -6,6 +6,7 @@ import Spinner from '../../components/common/Spinner'
 import Modal from '../../components/common/Modal'
 import toast from 'react-hot-toast'
 import { MapPin, X, Check, RotateCcw, Clock, Search, ChevronDown, ArrowUpDown, SlidersHorizontal, Bell } from 'lucide-react'
+import { fmtTime } from '../../utils/helpers'
 
 function refundLabel(policy, amount) {
   if (!policy) return null
@@ -409,7 +410,7 @@ const hasFilters = search || sportFilter !== 'ALL'
               </td>
               <td className="text-xs text-muted">
                 <div>{b.bookingDate}</div>
-                <div>{b.startTime?.toString().slice(0, 5)} – {b.endTime?.toString().slice(0, 5)}</div>
+                <div>{fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}</div>
               </td>
               <td>
                 <div className="font-bold">${b.amountPaid}</div>
@@ -434,7 +435,7 @@ const hasFilters = search || sportFilter !== 'ALL'
                     ? <span className="flex items-center gap-1"><Clock size={9} /> {fmtDateTime(b.cancelledAt)}</span>
                     : <span className="italic opacity-50">—</span>}
                   {b.cancellationReason && (
-                    <div className="text-[10px] text-[#5a6a8a] mt-0.5 max-w-[120px] truncate" title={b.cancellationReason}>
+                    <div className="text-[10px] text-[#5a6a8a] mt-0.5 whitespace-normal break-words max-w-[160px]">
                       {b.cancellationReason}
                     </div>
                   )}
@@ -540,7 +541,7 @@ const hasFilters = search || sportFilter !== 'ALL'
               <div className="bg-[#f8faff] border border-[#dde8f8] rounded-xl p-4 text-xs space-y-2">
                 <div className="flex justify-between"><span className="text-muted">Player</span><span className="font-semibold">{refundTarget.userName}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Sport</span><span className="font-semibold">{refundTarget.bookingType?.replace(/_/g,' ')}</span></div>
-                <div className="flex justify-between"><span className="text-muted">Session</span><span className="font-semibold">{refundTarget.bookingDate} · {refundTarget.startTime?.toString().slice(0,5)}</span></div>
+                <div className="flex justify-between"><span className="text-muted">Session</span><span className="font-semibold">{refundTarget.bookingDate} · {fmtTime(refundTarget.startTime?.toString())}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Paid</span><span className="font-semibold">${refundTarget.amountPaid}</span></div>
               </div>
               {policy === 'FULL' && (
@@ -590,7 +591,7 @@ const hasFilters = search || sportFilter !== 'ALL'
       {/* Booking info */}
       <div className="bg-[#f0f5ff] border border-[#dde8f8] rounded-xl p-3.5 mb-4 text-xs text-[#5a6a8a] space-y-1">
         <div className="flex justify-between"><span>Date</span><span className="font-semibold text-[#0a1428]">{assignTarget.bookingDate}</span></div>
-        <div className="flex justify-between"><span>Time</span><span className="font-semibold text-[#0a1428]">{assignTarget.startTime?.toString().slice(0,5)} – {assignTarget.endTime?.toString().slice(0,5)}</span></div>
+        <div className="flex justify-between"><span>Time</span><span className="font-semibold text-[#0a1428]">{fmtTime(assignTarget.startTime?.toString())} – {fmtTime(assignTarget.endTime?.toString())}</span></div>
       </div>
 
       {/* Dropdown */}
@@ -618,7 +619,7 @@ const hasFilters = search || sportFilter !== 'ALL'
                   {c.name}
                   {c.available
                     ? ' ✓ Available'
-                    : ` ✗ Taken — ${c.takenBy?.userName?.split(' ')[0] || 'occupied'} (${c.takenBy?.startTime?.toString().slice(0,5)}–${c.takenBy?.endTime?.toString().slice(0,5)})`}
+                    : ` ✗ Taken — ${c.takenBy?.userName?.split(' ')[0] || 'occupied'} (${fmtTime(c.takenBy?.startTime?.toString())}–${fmtTime(c.takenBy?.endTime?.toString())})`}
                 </option>
               ))}
             </select>

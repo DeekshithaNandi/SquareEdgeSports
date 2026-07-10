@@ -2,21 +2,27 @@ import { useEffect, useState } from 'react'
 import { adminAPI } from '../../api'
 import Spinner from '../../components/common/Spinner'
 import toast from 'react-hot-toast'
+import { Trash2, CheckCircle } from 'lucide-react'
 
-const STARS = n => Array.from({length:5},(_,i)=><span key={i} style={{color:i<n?"#f5c842":"rgba(255,255,255,0.15)"}}>★</span>)
+const STARS = n => Array.from({length:5},(_,i)=><span key={i} style={{color:i<n?"#f5c842":"rgba(200,200,200,0.4)"}}>★</span>)
 
 export default function AdminFeedback() {
   const [feedback, setFeedback] = useState([])
   const [loading,  setLoading]  = useState(true)
 
   const load = () => { setLoading(true); adminAPI.allFeedback().then(r=>setFeedback(r.data)).finally(()=>setLoading(false)) }
-  useEffect(load,[])
+  useEffect(load, [])
 
   const markReviewed = async id => {
-    try { await adminAPI.markReviewed(id); toast.success("Marked as reviewed"); load() } catch { toast.error("Failed") }
+    try { await adminAPI.markReviewed(id); toast.success('Marked as reviewed'); load() } catch { toast.error('Failed') }
   }
 
-  const avg = feedback.length ? (feedback.reduce((s,f)=>s+f.rating,0)/feedback.length).toFixed(1) : "—"
+  const deleteFb = async (id, name) => {
+    if (!window.confirm(`Delete feedback from ${name}? This cannot be undone.`)) return
+    try { await adminAPI.deleteFeedback(id); toast.success('Feedback deleted'); load() } catch { toast.error('Failed to delete') }
+  }
+
+  const avg = feedback.length ? (feedback.reduce((s,f)=>s+f.rating,0)/feedback.length).toFixed(1) : '—'
 
   return (
     <div className="page-wrap">
@@ -37,11 +43,24 @@ export default function AdminFeedback() {
                 <tr key={f.id}>
                   <td className="font-semibold text-xs">{f.userName}</td>
                   <td><div className="flex text-sm">{STARS(f.rating)}</div></td>
-                  <td><span className="badge-blue text-[10px]">{f.category||"General"}</span></td>
-                  <td className="text-xs text-muted max-w-[220px] truncate">{f.comment}</td>
+                  <td><span className="badge-blue text-[10px]">{f.category||'General'}</span></td>
+                  <td className="text-xs text-muted whitespace-normal break-words max-w-[300px]">{f.comment}</td>
                   <td className="text-xs text-muted">{f.createdAt?.slice(0,10)}</td>
                   <td>{f.reviewed ? <span className="badge-green">Reviewed</span> : <span className="badge-yellow">Pending</span>}</td>
-                  <td>{!f.reviewed && <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f8faff] border border-[#dde8f8] hover:bg-[#f0f5ff] transition-all" onClick={()=>markReviewed(f.id)}>Mark Reviewed</button>}</td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      {!f.reviewed && (
+                        <button onClick={()=>markReviewed(f.id)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 transition-all">
+                          <CheckCircle size={11}/> Review
+                        </button>
+                      )}
+                      <button onClick={()=>deleteFb(f.id, f.userName)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 transition-all">
+                        <Trash2 size={11}/> Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

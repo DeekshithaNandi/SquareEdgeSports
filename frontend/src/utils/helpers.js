@@ -1,3 +1,11 @@
+// ── Time ──────────────────────────────────────────────────────────────────────
+export const fmtTime = (t) => {
+  if (!t) return ''
+  const [h, m] = t.toString().split(':')
+  const hour = parseInt(h)
+  return `${hour % 12 || 12}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+}
+
 // ── Currency ──────────────────────────────────────────────────────────────────
 export const formatCurrency = (amount) => {
   const n = parseFloat(amount || 0)

@@ -9,7 +9,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 const TYPES = ["CRICKET_LANE","BOX_CRICKET","PICKLEBALL"]
 const STATUSES = ["ACTIVE","MAINTENANCE","INACTIVE"]
 const ICONS = { CRICKET_LANE:"🏏", BOX_CRICKET:"🏟️", PICKLEBALL:"🏓" }
-const empty = { name:"", type:"PICKLEBALL", location:"", description:"", pricePerSlot:"", memberPricePerSlot:"", capacity:"", status:"ACTIVE", laneNumber:"" }
+const empty = { name:"", type:"PICKLEBALL", location:"", description:"", capacity:"", status:"ACTIVE", laneNumber:"" }
 
 export default function AdminCourts() {
   const [courts,  setCourts]  = useState([])
@@ -42,7 +42,7 @@ export default function AdminCourts() {
     try { await adminAPI.deleteCourt(id); toast.success("Court deleted"); load() } catch { toast.error("Failed") }
   }
 
-  const openEdit = c => { setEditItem(c); setForm({...c, pricePerSlot:c.pricePerSlot||"", memberPricePerSlot:c.memberPricePerSlot||"", capacity:c.capacity||"", laneNumber:c.laneNumber||""}); }
+  const openEdit = c => { setEditItem(c); setForm({...c, capacity:c.capacity||"", laneNumber:c.laneNumber||""}); }
 
   return (
     <div className="page-wrap">
@@ -96,12 +96,20 @@ export default function AdminCourts() {
             <div className="text-[10px] text-muted mt-1">Must be unique among courts of the same sport — this is what the admin assign dropdown matches bookings against.</div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price/Slot ($)</label>
-              <input className="inp" type="number" value={form.pricePerSlot||""} onChange={e=>sf("pricePerSlot",e.target.value)}/></div>
-            <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Member Price ($)</label>
-              <input className="inp" type="number" value={form.memberPricePerSlot||""} onChange={e=>sf("memberPricePerSlot",e.target.value)}/></div>
+            <div>
+              <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Price/Slot</label>
+              <div className="inp bg-[#f8faff] text-[#0a1428] font-semibold cursor-default select-none">
+                {pricing[form.type] != null ? `$${pricing[form.type]}` : '—'}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Member Price</label>
+              <div className="inp bg-[#f8faff] text-[#0a1428] font-semibold cursor-default select-none">
+                {pricing[form.type + '_MEMBER'] != null ? `$${pricing[form.type + '_MEMBER']}` : '—'}
+              </div>
+            </div>
           </div>
-          <div className="text-[10px] text-muted -mt-2">Actual booking prices are controlled sport-wide in Admin → Pricing, not per court. These fields are informational only.</div>
+          <div className="text-[10px] text-muted -mt-2">Prices are set sport-wide in <span className="text-accent font-semibold">Admin → Pricing</span>. Changes there reflect everywhere instantly.</div>
           <div><label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Capacity</label>
             <input className="inp" type="number" value={form.capacity||""} onChange={e=>sf("capacity",e.target.value)}/></div>
         </div>

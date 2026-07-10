@@ -15,28 +15,26 @@ export default function LoginPage() {
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErr('') }
 
-  const handleSubmit = async e => {
-  e.preventDefault(); setLoading(true); setErr('')
-  const slowTimer = setTimeout(() => {
-    toast('Server is starting up — this may take up to 30 seconds on first load.', { icon: '⏳', duration: 20000 })
-  }, 4000)
-  try {
+  const doLogin = async () => {
     const r = await authAPI.login(form)
-    clearTimeout(slowTimer)
     login(r.data.token, r.data.user)
     toast.success('Welcome back, ' + r.data.user.fullName + '!')
     const isAdmin = ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(r.data.user.role)
     navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
-  } catch (e) {
-    clearTimeout(slowTimer)
-    if (!e.response) {
-    setErr('Server is taking too long to respond. Please try again in a moment.')
-  } else {
-    const msg = e.response?.data?.message || ''
-    setErr(msg || 'Invalid credentials.')
-  } }
-  finally { setLoading(false) }
-}
+  }
+
+  const handleSubmit = async e => {
+    e.preventDefault(); setLoading(true); setErr('')
+    try {
+      await doLogin()
+    } catch (err) {
+      if (!err.response) {
+        try { await doLogin() } catch { setErr('Unable to connect. Please try again.') }
+      } else {
+        setErr(err.response?.data?.message || 'Invalid credentials.')
+      }
+    } finally { setLoading(false) }
+  }
 
 
   return (

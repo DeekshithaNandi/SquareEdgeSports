@@ -5,6 +5,7 @@ import StatCard from '../../components/common/StatCard'
 import Spinner from '../../components/common/Spinner'
 import toast from 'react-hot-toast'
 import { Search, ChevronDown, ArrowUpDown, X } from 'lucide-react'
+import { fmtTime } from '../../utils/helpers'
 
 function isSessionPast(bookingDate, bookingStart) {
   if (!bookingDate) return false
@@ -278,11 +279,11 @@ export default function AdminPayments() {
                       <div>
                         <div className="font-semibold">{p.bookingType.replace(/_/g, ' ')}</div>
                         {p.bookingStart && (
-                          <div className="text-[10px] text-muted">{p.bookingStart?.toString().slice(0, 5)}</div>
+                          <div className="text-[10px] text-muted">{fmtTime(p.bookingStart?.toString())}</div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-muted">{p.description?.slice(0, 20) || '—'}</span>
+                      <span className="text-muted whitespace-normal break-words max-w-[180px] block">{p.description || '—'}</span>
                     )}
                   </td>
                   <td>

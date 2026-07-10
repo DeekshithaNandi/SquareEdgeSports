@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { bookingAPI, publicAPI } from '../../api'
 import StatCard from '../../components/common/StatCard'
 import Badge from '../../components/common/Badge'
-import { formatCurrency } from '../../utils/helpers'
+import { formatCurrency, fmtTime } from '../../utils/helpers'
 import { X, LayoutList, PlayCircle, BadgeDollarSign, Ban } from 'lucide-react'
 
 function CmsBlock({ item, onDismiss }) {
@@ -157,7 +157,7 @@ export default function UserDashboard() {
                   {b.courtName || (b.laneNumber ? 'Lane ' + b.laneNumber : b.courtNumber ? 'Court ' + b.courtNumber : '—')}
                 </td>
                 <td className="text-xs">{b.bookingDate}</td>
-                <td className="text-xs text-muted">{b.startTime} – {b.endTime}</td>
+                <td className="text-xs text-muted">{fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}</td>
                 <td className="font-bold">{formatCurrency(b.amountPaid)}</td>
                 <td><Badge value={b.status} /></td>
               </tr>

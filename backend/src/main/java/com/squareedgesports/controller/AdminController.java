@@ -418,6 +418,15 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.ok("Marked as reviewed"));
     }
 
+    @DeleteMapping("/feedback/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
+    public ResponseEntity<?> deleteFeedback(@PathVariable Long id) {
+        if (!feedbackRepo.existsById(id))
+            return ResponseEntity.notFound().build();
+        feedbackRepo.deleteById(id);
+        return ResponseEntity.ok(ApiResponse.ok("Feedback deleted"));
+    }
+
     // ── Payments ──────────────────────────────────────────────────────────────
     // READ: employee with canManagePayments OR admin
     @GetMapping("/payments")

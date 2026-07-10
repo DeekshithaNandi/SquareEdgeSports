@@ -90,6 +90,7 @@ export const adminAPI = {
   // Feedback
   allFeedback:       ()            => API.get('/admin/feedback'),
   markReviewed:      (id)          => API.patch(`/admin/feedback/${id}/reviewed`),
+  deleteFeedback:    (id)          => API.delete(`/admin/feedback/${id}`),
   // Payments
   allPayments:       ()            => API.get('/admin/payments'),
   refundPayment:     (id)          => API.patch(`/admin/payments/${id}/refund`),
