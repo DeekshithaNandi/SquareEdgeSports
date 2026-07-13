@@ -9,6 +9,14 @@ function iconFor(type) {
   return <Bell size={13} className="text-[#9aaac8]" />
 }
 
+function fmt12hr(msg) {
+  if (!msg) return msg
+  return msg.replace(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g, (_, h, m) => {
+    const hour = parseInt(h)
+    return `${hour % 12 || 12}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+  })
+}
+
 function timeAgo(dt) {
   if (!dt) return ''
   const diff = (Date.now() - new Date(dt).getTime()) / 1000
@@ -93,7 +101,7 @@ export default function NotificationBell() {
               <div className="mt-0.5 flex-shrink-0">{iconFor(item.type)}</div>
               <div className="flex-1 min-w-0">
                 <div className={`text-xs leading-snug ${item.read ? 'text-[#5a6a8a]' : 'font-semibold'}`} style={{ color: item.read ? '#5a6a8a' : '#0a1428' }}>
-                  {item.message}
+                  {fmt12hr(item.message)}
                 </div>
                 <div className="text-[10px] text-[#9aaac8] mt-0.5">{timeAgo(item.createdAt)}</div>
               </div>

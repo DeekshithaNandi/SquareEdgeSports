@@ -434,6 +434,10 @@ export default function LandingPage() {
 
   const isAdmin = user && ['SUPER_ADMIN', 'ADMINISTRATOR', 'EMPLOYEE'].includes(user.role)
   const navTo   = page => { setActivePage(page); setMenuOpen(false) }
+  const handleBookSlot = (type) => {
+    if (isAdmin) { navigate('/admin/bookings/new'); return }
+    setBooking(type)
+  }
   const [courtCounts, setCourtCounts] = useState({ CRICKET_LANE: 8, BOX_CRICKET: 2, PICKLEBALL: 3 })
   const [pricing, setPricing] = useState({})
   const [buyingMembership, setBuyingMembership] = useState(null)
@@ -537,7 +541,7 @@ useEffect(() => {
                 style={{ color: AW.blue }}>
                 <LayoutDashboard size={14} /> Dashboard
               </Link>
-              <button onClick={() => setBooking('CRICKET_LANE')}
+              <button onClick={() => handleBookSlot('CRICKET_LANE')}
                 className="px-5 py-2 rounded-xl text-sm font-bold text-white hover:opacity-90"
                 style={{ background: AW.blue }}>Book Slot →</button>
             </>
@@ -546,7 +550,7 @@ useEffect(() => {
               <Link to="/login" className="px-4 py-2 text-sm font-semibold" style={{ color: AW.t2 }}>Sign In</Link>
               <Link to="/register" className="px-4 py-2 rounded-xl text-sm font-bold border hover:shadow-md"
                 style={{ background: AW.dim, borderColor: AW.dbdr, color: AW.blue }}>Register</Link>
-              <button onClick={() => setBooking('CRICKET_LANE')}
+              <button onClick={() => handleBookSlot('CRICKET_LANE')}
                 className="px-5 py-2 rounded-xl text-sm font-bold text-white hover:opacity-90"
                 style={{ background: AW.blue }}>Book Slot →</button>
             </>
@@ -576,7 +580,7 @@ useEffect(() => {
               </button>
             ))}
           </div>
-          <button onClick={() => { setBooking('CRICKET_LANE'); setMenuOpen(false) }}
+          <button onClick={() => { handleBookSlot('CRICKET_LANE'); setMenuOpen(false) }}
             className="w-full py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: AW.blue }}>
             Book Slot →
           </button>
@@ -595,8 +599,8 @@ useEffect(() => {
       )}
 
       {/* ── Page sections — fills remaining height, no scroll ─────────── */}
-      {activePage === 'Home'    && <HomeSection    setBooking={setBooking} user={user} sports={SPORTS} courtCounts={courtCounts} onMembershipClick={handleMembershipClick} buyingMembership={buyingMembership} />}
-      {activePage === 'About'   && <AboutSection   setBooking={setBooking} sports={SPORTS} courtCounts={courtCounts} />}
+      {activePage === 'Home'    && <HomeSection    setBooking={handleBookSlot} user={user} sports={SPORTS} courtCounts={courtCounts} onMembershipClick={handleMembershipClick} buyingMembership={buyingMembership} />}
+      {activePage === 'About'   && <AboutSection   setBooking={handleBookSlot} sports={SPORTS} courtCounts={courtCounts} />}
       {activePage === 'Contact' && <ContactSection />}
 
       {booking && <BookingModal initialType={booking} onClose={() => setBooking(null)} />}

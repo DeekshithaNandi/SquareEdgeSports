@@ -1,7 +1,7 @@
-﻿import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+﻿import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, CalendarDays, CreditCard, Star, LogOut, User, Zap, ChevronDown, Crown } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, CreditCard, Star, LogOut, User, Zap, ChevronDown, Crown, Home } from 'lucide-react'
 import NotificationBell from '../common/NotificationBell'
 
 const NAV = [
@@ -39,7 +39,7 @@ export default function UserLayout() {
         style={{ background: '#ffffff', borderRight: '1px solid #dde8f8' }}>
 
         <div className="px-5 py-6" style={{ borderBottom: '1px solid #dde8f8' }}>
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-75 transition-opacity">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: '#1352c9' }}>
               <Zap size={14} className="text-white" fill="white" />
@@ -47,11 +47,14 @@ export default function UserLayout() {
             <div className="font-display text-base font-bold leading-tight" style={{ color: '#0a1428' }}>
               Square<span style={{ color: '#1352c9' }}>Edge</span>Sports
             </div>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 py-3 overflow-y-auto">
           <div className="text-[9px] font-bold px-5 pt-2 pb-2 uppercase tracking-widest" style={{ color: '#9aaac8' }}>MENU</div>
+          <div className="nav-item" onClick={() => navigate('/')}>
+            <Home size={16} className="flex-shrink-0" />Home
+          </div>
           {NAV.map(item => (
             <div key={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}

@@ -85,7 +85,12 @@ export default function UserDashboard() {
   const announcements = visible.filter(i => i.contentType === 'ANNOUNCEMENT')
   const pages         = visible.filter(i => i.contentType === 'PAGE')
 
-  const active    = bookings.filter(b => b.status === 'CONFIRMED' || b.status === 'IN_PROGRESS')
+  const now       = new Date()
+  const active    = bookings.filter(b => {
+    if (b.status !== 'CONFIRMED' && b.status !== 'IN_PROGRESS') return false
+    const sessionEnd = new Date(`${b.bookingDate}T${b.endTime}`)
+    return sessionEnd > now
+  })
   const cancelled = bookings.filter(b => b.status === 'CANCELLED')
   const spent     = bookings.filter(b => b.status !== 'CANCELLED').reduce((s, b) => s + (b.amountPaid || 0), 0)
 

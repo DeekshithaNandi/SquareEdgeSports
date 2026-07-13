@@ -1,10 +1,10 @@
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, CalendarDays, Users, CreditCard,
   TrendingUp, Building2, DollarSign, Star, FileText,
-  LogOut, ShieldCheck, Zap, Crown
+  LogOut, ShieldCheck, Zap, Crown, Home
 } from 'lucide-react'
 import { userAPI } from '../../api'
 import NotificationBell from '../common/NotificationBell'
@@ -96,7 +96,7 @@ export default function AdminLayout() {
         style={{ background: '#ffffff', borderRight: '1px solid #dde8f8' }}>
 
         <div className="px-5 py-6" style={{ borderBottom: '1px solid #dde8f8' }}>
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-75 transition-opacity">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: '#1352c9' }}>
               <Zap size={14} className="text-white" fill="white" />
@@ -107,10 +107,13 @@ export default function AdminLayout() {
               </div>
               <div className="text-[9px] uppercase tracking-widest" style={{ color: '#9aaac8' }}>Admin Panel</div>
             </div>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 py-3 overflow-y-auto">
+          <div className="nav-item" onClick={() => navigate('/')}>
+            <Home size={16} className="flex-shrink-0" />Home
+          </div>
           {visibleNav.map((item, i) => item.section ? (
             <div key={i} className="text-[9px] font-bold px-5 pt-4 pb-2 uppercase tracking-widest"
               style={{ color: '#9aaac8' }}>{item.section}</div>

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,7 +91,7 @@ public class BookingService {
                 .build());
         notificationService.notifyUser(user.getId(), "BOOKING_CONFIRMED",
                 "Your " + label(req.getBookingType()) + " slot on " + req.getBookingDate() + " at "
-                        + start.toString().substring(0, 5) + " is booked successfully.",
+                        + start.format(DateTimeFormatter.ofPattern("h:mm a")) + " is booked successfully.",
                 b.getId());
         return toDto(b);
     }
@@ -297,7 +298,7 @@ public class BookingService {
         emailService.sendNoRefundNotification(
                 b.getUser().getEmail(), b.getUser().getFullName(),
                 b.getBookingType(), b.getBookingDate().toString(),
-                b.getStartTime().toString().substring(0, 5));
+                b.getStartTime().format(DateTimeFormatter.ofPattern("h:mm a")));
         return Map.of("message", "No-refund notification sent to " + b.getUser().getEmail());
     }
 
@@ -344,7 +345,7 @@ public class BookingService {
         emailService.sendCourtAssignment(
                 b.getUser().getEmail(), b.getUser().getFullName(),
                 b.getBookingType(), b.getBookingDate().toString(),
-                b.getStartTime().toString(), laneNumber, courtNumber, b.getBoxGroup());
+                b.getStartTime().format(DateTimeFormatter.ofPattern("h:mm a")), laneNumber, courtNumber, b.getBoxGroup());
 
         notificationService.notifyUser(b.getUser().getId(), "COURT_ASSIGNED",
                 "Your court/lane for the " + label(b.getBookingType()) + " session on " + b.getBookingDate()

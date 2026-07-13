@@ -139,7 +139,7 @@ function GetMembershipModal({ sport, fee, user, onClose, onSuccess }) {
               <span className="text-2xl">{sport.emoji}</span>
               <div>
                 <div className="font-bold text-sm text-[#0a1428]">{sport.label} Membership</div>
-                <div className="text-xs text-muted">1 month · ₹{fee ?? '—'}</div>
+                <div className="text-xs text-muted">1 month · ${fee ?? '—'}</div>
               </div>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f0f5ff] text-muted transition-all">
@@ -152,7 +152,7 @@ function GetMembershipModal({ sport, fee, user, onClose, onSuccess }) {
             <div className="bg-[#f8faff] rounded-xl p-3 text-xs text-muted border border-[#dde8f8] space-y-1">
               <div className="flex justify-between">
                 <span>{sport.label} membership</span>
-                <span className="font-semibold text-[#0a1428]">₹{fee ?? '—'}</span>
+                <span className="font-semibold text-[#0a1428]">${fee ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span>Duration</span>
@@ -160,7 +160,7 @@ function GetMembershipModal({ sport, fee, user, onClose, onSuccess }) {
               </div>
               <div className="border-t border-[#dde8f8] pt-1 flex justify-between font-bold text-[#0a1428]">
                 <span>Total</span>
-                <span>₹{fee ?? '—'}</span>
+                <span>${fee ?? '—'}</span>
               </div>
             </div>
 
@@ -169,7 +169,7 @@ function GetMembershipModal({ sport, fee, user, onClose, onSuccess }) {
               {paying
                 ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 : <CreditCard size={15} />}
-              {paying ? 'Opening payment…' : `Pay ₹${fee ?? '—'} via Razorpay`}
+              {paying ? 'Opening payment…' : `Pay $${fee ?? '—'} via Razorpay`}
             </button>
 
             <p className="text-center text-[11px] text-muted">
@@ -309,7 +309,7 @@ export default function UserMemberships() {
                 {(!isMember) && (
                   <div className="flex items-center gap-3 mt-1">
                     {fee && (
-                      <span className="text-xs text-muted">₹{fee}/month</span>
+                      <span className="text-xs text-muted">${fee}/month</span>
                     )}
                     <button
                       onClick={() => setBuyingSport(sport)}
