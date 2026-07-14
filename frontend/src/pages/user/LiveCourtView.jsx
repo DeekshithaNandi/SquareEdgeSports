@@ -74,17 +74,17 @@ export default function LiveCourtView() {
   const active   = bookings.filter(isActive)
   const upcoming = bookings.filter(isUpcoming)
 
-  // Build lane grid: Cricket Lanes 1-8 + Box status
+  // Build lane grid: Cricket Lanes 1-8
   const laneGrid = Array.from({ length: 8 }, (_, i) => {
     const lane = i + 1
-    const activeLane = active.find(b =>
-      (b.bookingType === 'CRICKET_LANE' && b.laneNumber === lane) ||
-      (b.bookingType === 'BOX_CRICKET' && (
-        (lane <= 4 && b.boxGroup === 'BOX_A') ||
-        (lane > 4  && b.boxGroup === 'BOX_B')
-      ))
-    )
+    const activeLane = active.find(b => b.bookingType === 'CRICKET_LANE' && b.laneNumber === lane)
     return { lane, booking: activeLane, box: lane <= 4 ? 'BOX_A' : 'BOX_B' }
+  })
+
+  const boxCricketGrid = Array.from({ length: 2 }, (_, i) => {
+    const court = i + 1
+    const activeC = active.find(b => b.bookingType === 'BOX_CRICKET' && b.courtNumber === court)
+    return { court, booking: activeC }
   })
 
   const pickleGrid = Array.from({ length: 3 }, (_, i) => {
@@ -192,6 +192,39 @@ export default function LiveCourtView() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* -- Box Cricket Courts --------------------------------------------- */}
+            <div>
+              <h2 className="text-sm font-bold text-[#5a6a8a] uppercase tracking-wider mb-4 flex items-center gap-2">
+                📦 Box Cricket Courts
+                <span className="text-[10px] font-normal text-[#9aaac8] normal-case">2 courts</span>
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {boxCricketGrid.map(({ court, booking: b }) => (
+                  <div key={court} className={`rounded-2xl border p-4 transition-all ${
+                    b
+                      ? 'bg-amber-500/[0.08] border-amber-500/25'
+                      : 'bg-[#f8faff] border-[#dde8f8]'
+                  }`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-[#5a6a8a]">Court {court}</span>
+                      <span className={`w-2.5 h-2.5 rounded-full ${b ? 'bg-amber-500 animate-pulse' : 'bg-[#f0f5ff]'}`} />
+                    </div>
+                    {b ? (
+                      <>
+                        <div className="text-xs font-semibold truncate">{b.userName}</div>
+                        <div className="text-[10px] text-[#5a6a8a] mt-0.5">
+                          {fmtTime(b.startTime?.toString())} – {fmtTime(b.endTime?.toString())}
+                        </div>
+                        <div className="text-[10px] text-amber-600 mt-1 font-semibold">● Playing</div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-[#9aaac8] mt-1">Available</div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* -- Pickleball Courts -------------------------------------------- */}
