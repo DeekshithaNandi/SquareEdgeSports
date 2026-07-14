@@ -223,7 +223,7 @@ export default function BookingModal({ initialType, onClose }) {
           key: keyId, amount, currency, order_id: orderId,
           name: 'SquareEdgeSports',
           description: `${typeInfo.label} · ${createdBookings.length} slot${createdBookings.length > 1 ? 's' : ''} · ${createdBookings[0]?.bookingDate}`,
-          image: '/ses-favicon.svg',
+          image: `${window.location.origin}/ses-favicon.svg`,
           handler: async (response) => {
             paymentHandled = true
             try {
