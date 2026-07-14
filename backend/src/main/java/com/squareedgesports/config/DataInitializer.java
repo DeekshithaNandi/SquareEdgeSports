@@ -56,7 +56,7 @@ public class DataInitializer implements CommandLineRunner {
         upsertPricing("CRICKET_LANE_MEMBERSHIP", "Cricket Lane Membership / month", "50");
         upsertPricing("BOX_CRICKET_MEMBERSHIP", "Box Cricket Membership / month", "100");
         upsertPricing("PICKLEBALL_MEMBERSHIP", "Pickleball Membership / month", "50");
-        log.info("Pricing rules updated (INR)");
+        log.info("Pricing rules updated (USD)");
     }
 
     private void upsertPricing(String key, String desc, String price) {
@@ -100,7 +100,7 @@ public class DataInitializer implements CommandLineRunner {
                         .capacity(1).status(Court.CourtStatus.ACTIVE).build());
             log.info("Courts seeded");
         } else {
-            // Always update existing court prices to reflect current INR values
+            // Always update existing court prices to reflect current USD values
             courtRepo.findAll().forEach(c -> {
                 if (c.getType() == Court.CourtType.CRICKET_LANE) {
                     c.setPricePerSlot(new BigDecimal("30"));

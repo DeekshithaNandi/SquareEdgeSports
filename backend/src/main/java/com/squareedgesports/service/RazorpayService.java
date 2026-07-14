@@ -19,14 +19,14 @@ public class RazorpayService {
     @Value("${razorpay.key.secret}")
     private String keySecret;
 
-    public Map<String, Object> createOrder(BigDecimal amountInRupees, String receipt) {
+    public Map<String, Object> createOrder(BigDecimal amountInDollars, String receipt) {
         try {
             RazorpayClient client = new RazorpayClient(keyId, keySecret);
             JSONObject options = new JSONObject();
-            // Razorpay expects amount in paise (1 INR = 100 paise)
-            int paise = amountInRupees.multiply(BigDecimal.valueOf(100)).intValue();
-            options.put("amount", paise);
-            options.put("currency", "INR");
+            // Razorpay expects amount in cents (1 USD = 100 cents)
+            int cents = amountInDollars.multiply(BigDecimal.valueOf(100)).intValue();
+            options.put("amount", cents);
+            options.put("currency", "USD");
             options.put("receipt", receipt);
             Order order = client.orders.create(options);
             JSONObject json = order.toJson();
@@ -67,19 +67,19 @@ public class RazorpayService {
     /**
      * Initiate a full or partial refund via Razorpay.
      * @param gatewayPaymentId the razorpay_payment_id from the original transaction
-     * @param amountInRupees   amount to refund (in ₹, will be converted to paise)
-     * @return map containing refundId and amount (paise)
+     * @param amountInDollars  amount to refund (in $, will be converted to cents)
+     * @return map containing refundId and amount (cents)
      */
-    public Map<String, Object> refund(String gatewayPaymentId, BigDecimal amountInRupees) {
+    public Map<String, Object> refund(String gatewayPaymentId, BigDecimal amountInDollars) {
         try {
             RazorpayClient client = new RazorpayClient(keyId, keySecret);
             JSONObject options = new JSONObject();
-            int paise = amountInRupees.multiply(BigDecimal.valueOf(100)).intValue();
-            options.put("amount", paise);
+            int cents = amountInDollars.multiply(BigDecimal.valueOf(100)).intValue();
+            options.put("amount", cents);
             Refund refund = client.payments.refund(gatewayPaymentId, options);
             JSONObject json = refund.toJson();
-            log.info("Razorpay refund initiated: id={} amount={} paise", json.getString("id"), paise);
-            return Map.of("refundId", json.getString("id"), "amount", paise);
+            log.info("Razorpay refund initiated: id={} amount={} cents", json.getString("id"), cents);
+            return Map.of("refundId", json.getString("id"), "amount", cents);
         } catch (RazorpayException e) {
             log.error("Razorpay refund failed for payment {}: {}", gatewayPaymentId, e.getMessage());
             throw new RuntimeException("Razorpay refund failed: " + e.getMessage());

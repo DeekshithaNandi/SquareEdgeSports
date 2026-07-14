@@ -344,13 +344,6 @@ export default function MyBookings() {
 
               {/* Amount + action */}
               <div className="flex sm:flex-col items-center sm:items-end gap-3 flex-shrink-0">
-                {/* <div className="text-right">
-                  <div className="text-lg font-extrabold">₹{b.amountPaid}</div>
-                  <div className={`text-[10px] font-bold ${
-                    b.paymentStatus === 'PAID' ? 'text-green-700' :
-                    b.paymentStatus === 'REFUNDED' ? 'text-blue-400' : 'text-yellow-400'
-                  }`}>{b.paymentStatus}</div>
-                </div> */}
                 <div className="text-right">
                   <div className="text-lg font-extrabold">${b.amountPaid}</div>
                   <div className={`text-[10px] font-bold ${

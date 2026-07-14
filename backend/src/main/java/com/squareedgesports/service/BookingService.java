@@ -129,9 +129,9 @@ public class BookingService {
         BigDecimal refundAmount = calcRefundAmount(b, policy);
         String userMsg = switch (policy) {
             case "FULL" -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
-                    + " was cancelled — full refund of ₹" + refundAmount + " will be processed.";
+                    + " was cancelled — full refund of $" + refundAmount + " will be processed.";
             case "HALF" -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
-                    + " was cancelled — 50% refund of ₹" + refundAmount + " will be processed.";
+                    + " was cancelled — 50% refund of $" + refundAmount + " will be processed.";
             default -> "Your " + label(b.getBookingType()) + " booking on " + b.getBookingDate()
                     + " was cancelled less than 1 hour before the session — no refund is applicable.";
         };
@@ -140,7 +140,7 @@ public class BookingService {
         notificationService.notifyAdmins("BOOKING_CANCELLED",
                 b.getUser().getFullName() + " cancelled a " + label(b.getBookingType()) + " booking (#" + b.getId()
                         + ") on " + b.getBookingDate() + " — refund: " + policy
-                        + (refundAmount.compareTo(BigDecimal.ZERO) > 0 ? " (₹" + refundAmount + ")" : ""),
+                        + (refundAmount.compareTo(BigDecimal.ZERO) > 0 ? " ($" + refundAmount + ")" : ""),
                 b.getId());
 
         return toDto(b);
