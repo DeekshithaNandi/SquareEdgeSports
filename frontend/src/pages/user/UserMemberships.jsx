@@ -190,13 +190,19 @@ export default function UserMemberships() {
 
   useEffect(() => {
     refreshUser()
-    publicAPI.pricing()
-      .then(r => {
-        const map = {}
-        r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
-        setPricing(map)
-      })
-      .catch(() => {})
+    const loadPricing = () => {
+      publicAPI.pricing()
+        .then(r => {
+          const map = {}
+          r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+          setPricing(map)
+        })
+        .catch(() => {})
+    }
+    loadPricing()
+    // Picks up admin-side price changes without needing a manual refresh.
+    const poll = setInterval(loadPricing, 30000)
+    return () => clearInterval(poll)
   }, [])
 
   const handlePaymentSuccess = async () => {

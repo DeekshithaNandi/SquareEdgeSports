@@ -29,25 +29,28 @@ const SPORT_IMAGES = {
 
 const NAV_LINKS = ['Home', 'About', 'Contact']
 
+/** Live pricing hasn't loaded yet — show a neutral placeholder instead of a stale/wrong number. */
+const fmtPrice = v => v == null ? '···' : v
+
 const makeSports = (counts, pricing = {}) => [
   {
     key: 'CRICKET_LANE', emoji: '🏏', name: 'Cricket Lane',
     desc: `${counts.CRICKET_LANE} individual lanes. Perfect for batting practice and net sessions.`,
-    price: pricing.CRICKET_LANE ?? 30, memberPrice: pricing.CRICKET_LANE_MEMBER ?? 25, membershipFee: pricing.CRICKET_LANE_MEMBERSHIP ?? 50,
+    price: pricing.CRICKET_LANE ?? null, memberPrice: pricing.CRICKET_LANE_MEMBER ?? null, membershipFee: pricing.CRICKET_LANE_MEMBERSHIP ?? null,
     features: [`${counts.CRICKET_LANE} lanes`, '55-min sessions', 'Up to 6 players/lane'],
     badgeBg: '#1352c9', badgeLabel: 'LIVE',
   },
   {
     key: 'BOX_CRICKET', emoji: '📦', name: 'Box Cricket',
     desc: `${counts.BOX_CRICKET} independent courts for competitive box cricket matches and group play.`,
-    price: pricing.BOX_CRICKET ?? 50, memberPrice: pricing.BOX_CRICKET_MEMBER ?? 40, membershipFee: pricing.BOX_CRICKET_MEMBERSHIP ?? 100,
+    price: pricing.BOX_CRICKET ?? null, memberPrice: pricing.BOX_CRICKET_MEMBER ?? null, membershipFee: pricing.BOX_CRICKET_MEMBERSHIP ?? null,
     features: [`${counts.BOX_CRICKET} courts`, '55-min sessions', 'Up to 12 players/court'],
     badgeBg: '#15803d', badgeLabel: 'POPULAR',
   },
   {
     key: 'PICKLEBALL', emoji: '🏓', name: 'Pickleball',
     desc: `${counts.PICKLEBALL} full-size courts with premium surfaces. Open to all skill levels.`,
-    price: pricing.PICKLEBALL ?? 30, memberPrice: pricing.PICKLEBALL_MEMBER ?? 25, membershipFee: pricing.PICKLEBALL_MEMBERSHIP ?? 50,
+    price: pricing.PICKLEBALL ?? null, memberPrice: pricing.PICKLEBALL_MEMBER ?? null, membershipFee: pricing.PICKLEBALL_MEMBERSHIP ?? null,
     features: [`${counts.PICKLEBALL} courts`, '55-min sessions', 'Up to 4 players/court', 'All skill levels'],
     badgeBg: '#d97706', badgeLabel: 'OPEN NOW',
   },
@@ -139,9 +142,11 @@ function HomeSection({ setBooking, user, sports = [], courtCounts = {}, onMember
                     <div className="text-base mb-0.5">{s.emoji}</div>
                     <div className="text-[9px] font-bold mb-0.5 leading-tight" style={{ color: AW.t2 }}>{s.name}</div>
                     <div className="text-xs font-extrabold leading-tight" style={{ color: AW.blue }}>
-                      ${s.membershipFee}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
+                      ${fmtPrice(s.membershipFee)}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
                     </div>
-                    <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
+                    {s.price != null && s.memberPrice != null && (
+                      <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
+                    )}
                   </div>
                 </button>
               )
@@ -186,10 +191,10 @@ function HomeSection({ setBooking, user, sports = [], courtCounts = {}, onMember
                 <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: AW.bd }}>
                   <div>
                     <div className="text-base font-extrabold leading-none" style={{ color: AW.t1 }}>
-                      ${s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span>
+                      ${fmtPrice(s.price)}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span>
                     </div>
                     <div className="text-[9px] mt-0.5" style={{ color: AW.t3 }}>
-                      Members <b style={{ color: AW.blue }}>${s.memberPrice}</b>
+                      Members <b style={{ color: AW.blue }}>${fmtPrice(s.memberPrice)}</b>
                     </div>
                   </div>
                   <button
@@ -224,8 +229,8 @@ function HomeSection({ setBooking, user, sports = [], courtCounts = {}, onMember
             </div>
             <div className="px-3 py-2.5 flex items-center justify-between">
               <div>
-                <div className="text-sm font-extrabold" style={{ color: AW.t1 }}>${s.price}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span></div>
-                <div className="text-[9px]" style={{ color: AW.t3 }}>Members <b style={{ color: AW.blue }}>${s.memberPrice}</b></div>
+                <div className="text-sm font-extrabold" style={{ color: AW.t1 }}>${fmtPrice(s.price)}<span className="text-[9px] font-normal" style={{ color: AW.t3 }}>/session</span></div>
+                <div className="text-[9px]" style={{ color: AW.t3 }}>Members <b style={{ color: AW.blue }}>${fmtPrice(s.memberPrice)}</b></div>
               </div>
               <button className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border"
                 style={{ background: AW.dim, borderColor: AW.dbdr, color: AW.blue }}
@@ -306,7 +311,7 @@ function AboutSection({ setBooking, sports = [], courtCounts = {} }) {
                   style={{ background: 'linear-gradient(to top,rgba(10,20,40,.80) 0%,transparent 60%)' }} />
                 <div className="absolute bottom-2 left-0 right-0 text-center">
                   <div className="text-[10px] font-bold text-white">{s.name}</div>
-                  <div className="text-[9px] text-white/60">${s.price}/session</div>
+                  <div className="text-[9px] text-white/60">${fmtPrice(s.price)}/session</div>
                 </div>
               </div>
             ))}
@@ -485,16 +490,22 @@ export default function LandingPage() {
   }
 
 useEffect(() => {
-  publicAPI.courts().then(r => {
-    const counts = { CRICKET_LANE: 0, BOX_CRICKET: 0, PICKLEBALL: 0 }
-    r.data.forEach(c => { if (counts[c.type] !== undefined) counts[c.type]++ })
-    setCourtCounts(counts)
-  }).catch(() => {})
-  publicAPI.pricing().then(r => {
-    const map = {}
-    r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
-    setPricing(map)
-  }).catch(() => {})
+  const loadLiveData = () => {
+    publicAPI.courts().then(r => {
+      const counts = { CRICKET_LANE: 0, BOX_CRICKET: 0, PICKLEBALL: 0 }
+      r.data.forEach(c => { if (counts[c.type] !== undefined) counts[c.type]++ })
+      setCourtCounts(counts)
+    }).catch(() => {})
+    publicAPI.pricing().then(r => {
+      const map = {}
+      r.data.forEach(p => { map[p.ruleKey] = parseFloat(p.price) })
+      setPricing(map)
+    }).catch(() => {})
+  }
+  loadLiveData()
+  // Picks up admin-side price/court changes without needing a manual refresh.
+  const poll = setInterval(loadLiveData, 30000)
+  return () => clearInterval(poll)
 }, [])
 
   const SPORTS = makeSports(courtCounts, pricing)

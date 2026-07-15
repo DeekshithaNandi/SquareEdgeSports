@@ -1,5 +1,6 @@
 const MAP = {
   CONFIRMED:   'badge-green',
+  AWAITING_PAYMENT: 'badge-yellow',
   ACTIVE:      'badge-green',
   active:      'badge-green',
   PAID:        'badge-green',

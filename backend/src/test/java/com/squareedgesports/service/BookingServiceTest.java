@@ -401,7 +401,7 @@ class BookingServiceTest {
     }
 
     @Test
-    void create_initialStatusIsConfirmed() {
+    void create_initialStatusIsAwaitingPayment() {
         LocalDate date = LocalDate.now().plusDays(1);
         when(userRepo.findById(1L)).thenReturn(Optional.of(nonMemberUser));
         when(pricingRepo.findByRuleKey("CRICKET_LANE")).thenReturn(Optional.of(rule("CRICKET_LANE", 500)));
@@ -413,7 +413,8 @@ class BookingServiceTest {
 
         bookingService.create(1L, req("CRICKET_LANE", "09:00"));
 
-        assertThat(captor.getValue().getStatus()).isEqualTo(Booking.BookingStatus.CONFIRMED);
+        // Not CONFIRMED until payment actually succeeds - see confirmPayment_*.
+        assertThat(captor.getValue().getStatus()).isEqualTo(Booking.BookingStatus.AWAITING_PAYMENT);
         assertThat(captor.getValue().getPaymentStatus()).isEqualTo("PENDING");
     }
 
@@ -452,6 +453,22 @@ class BookingServiceTest {
         assertThat(p.getStatus()).isEqualTo(Payment.PaymentStatus.PAID);
         assertThat(p.getGatewayPaymentId()).isEqualTo("pay_xyz");
         assertThat(p.getPaidAt()).isNotNull();
+    }
+
+    @Test
+    void confirmPayment_awaitingPayment_promotesStatusToConfirmed() {
+        Booking b = Booking.builder()
+                .id(10L).user(nonMemberUser).bookingType("CRICKET_LANE")
+                .bookingDate(LocalDate.now()).startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(9, 55))
+                .amountPaid(BigDecimal.valueOf(500)).paymentStatus("PENDING")
+                .status(Booking.BookingStatus.AWAITING_PAYMENT).build();
+        when(bookingRepo.findById(10L)).thenReturn(Optional.of(b));
+        when(bookingRepo.save(any())).thenReturn(b);
+        when(paymentRepo.findByBookingId(10L)).thenReturn(Optional.empty());
+
+        bookingService.confirmPayment(10L, "pay_xyz", "RAZORPAY");
+
+        assertThat(b.getStatus()).isEqualTo(Booking.BookingStatus.CONFIRMED);
     }
 
     @Test
@@ -936,6 +953,7 @@ class BookingServiceTest {
                 .id(10L).user(nonMemberUser).bookingType("PICKLEBALL")
                 .bookingDate(futureDate).startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(9, 55))
                 .amountPaid(BigDecimal.valueOf(300))
+                .paymentStatus("PAID")
                 .status(Booking.BookingStatus.CANCELLED)
                 .cancelledAt(LocalDateTime.now()) // cancelled now, session in 3 days
                 .build();
@@ -944,6 +962,25 @@ class BookingServiceTest {
 
         assertThat(dto.getRefundPolicy()).isEqualTo("FULL");
         assertThat(dto.getRefundAmount()).isEqualByComparingTo("300.00");
+    }
+
+    @Test
+    void toDto_cancelledButNeverPaid_refundPolicyIsNull() {
+        // e.g. auto-expired AWAITING_PAYMENT, or a desk DUE booking that was cancelled -
+        // there's no real money to refund, so no refund badge should be shown.
+        Booking b = Booking.builder()
+                .id(11L).user(nonMemberUser).bookingType("PICKLEBALL")
+                .bookingDate(LocalDate.now().plusDays(3)).startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(9, 55))
+                .amountPaid(BigDecimal.valueOf(300))
+                .paymentStatus("PENDING")
+                .status(Booking.BookingStatus.CANCELLED)
+                .cancelledAt(LocalDateTime.now())
+                .build();
+
+        BookingDto dto = bookingService.toDto(b);
+
+        assertThat(dto.getRefundPolicy()).isNull();
+        assertThat(dto.getRefundAmount()).isNull();
     }
 
     @Test

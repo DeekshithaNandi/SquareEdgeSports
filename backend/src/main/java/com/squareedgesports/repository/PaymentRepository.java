@@ -17,9 +17,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT p FROM Payment p JOIN FETCH p.user WHERE p.booking.id = :bookingId")
     Optional<Payment> findByBookingId(@Param("bookingId") Long bookingId);
-
-    @org.springframework.data.jpa.repository.Modifying
-    @org.springframework.transaction.annotation.Transactional
-    @Query("DELETE FROM Payment p WHERE p.booking.id = :bookingId")
-    void deleteByBookingId(@Param("bookingId") Long bookingId);
 }

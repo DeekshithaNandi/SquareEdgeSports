@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -32,29 +34,32 @@ public class BookingReminderScheduler {
     }
 
     /**
-     * Every 5 minutes: email a reminder for bookings whose slot starts in the
-     * next [24h, 24h + poll interval) window. Since the window only ever looks
-     * forward from "now", a booking made less than 24h before its own slot will
-     * have already crossed that window before it exists, so it's naturally
-     * skipped - no separate "booked far enough in advance" check is needed.
+     * Every 5 minutes: email a reminder for any booking whose 24-hour mark has
+     * now been crossed (slot start is under 24h away) but hasn't started yet,
+     * was itself made at least 24h ahead of its own slot, and hasn't already
+     * been reminded. Deliberately catch-up-friendly rather than an exact
+     * sliding window: on a host that can go idle and cold-start (e.g. Render's
+     * free tier), a narrow "only this exact 5-minute slice" check would
+     * silently and permanently miss any reminder whose window fell during a
+     * gap where the scheduler simply wasn't running. Scanning "has the 24h
+     * mark already passed" instead means a late-running tick still catches
+     * and sends everything it missed, rather than losing it forever.
      */
     @Scheduled(fixedDelay = POLL_INTERVAL_MINUTES * 60_000)
     @Transactional
     public void sendUpcomingReminders() {
         LocalDateTime now = LocalDateTime.now(clock);
-        LocalDateTime windowStart = now.plusHours(24);
-        LocalDateTime windowEnd = windowStart.plusMinutes(POLL_INTERVAL_MINUTES);
-
-        List<Booking> candidates = bookingRepo.findReminderCandidates(windowStart.toLocalDate(),
-                windowEnd.toLocalDate());
+        List<Booking> candidates = bookingRepo.findReminderCandidates(now.toLocalDate(), now.toLocalDate().plusDays(2));
 
         for (Booking b : candidates) {
             LocalDateTime slotStart = LocalDateTime.of(b.getBookingDate(), b.getStartTime());
-            if (slotStart.isBefore(windowStart) || !slotStart.isBefore(windowEnd)) {
+            boolean withinReminderWindow = slotStart.isAfter(now) && Duration.between(now, slotStart).toHours() < 24;
+            boolean bookedFarEnoughAhead = Duration.between(b.getCreatedAt(), slotStart).toHours() >= 24;
+            if (!withinReminderWindow || !bookedFarEnoughAhead) {
                 continue;
             }
             emailService.sendBookingReminder(b.getUser().getEmail(), b.getUser().getFullName(), b.getBookingType(),
-                    b.getBookingDate().toString(), b.getStartTime().toString().substring(0, 5));
+                    b.getBookingDate().toString(), b.getStartTime().format(DateTimeFormatter.ofPattern("h:mm a")));
             b.setReminderSent(true);
             bookingRepo.save(b);
         }

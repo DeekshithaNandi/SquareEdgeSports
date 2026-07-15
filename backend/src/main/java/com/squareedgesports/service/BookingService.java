@@ -77,7 +77,7 @@ public class BookingService {
                 .memberDiscountApplied(isMember)
                 .paymentStatus(Payment.PaymentStatus.PENDING.name())
                 .paymentReference("BK-" + System.currentTimeMillis())
-                .status(Booking.BookingStatus.CONFIRMED)
+                .status(Booking.BookingStatus.AWAITING_PAYMENT)
                 .build();
         bookingRepo.save(b);
 
@@ -102,6 +102,9 @@ public class BookingService {
         Booking b = bookingRepo.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
         b.setPaymentStatus(Payment.PaymentStatus.PAID.name());
         b.setPaymentReference(paymentRef != null ? paymentRef : b.getPaymentReference());
+        if (b.getStatus() == Booking.BookingStatus.AWAITING_PAYMENT) {
+            b.setStatus(Booking.BookingStatus.CONFIRMED);
+        }
         bookingRepo.save(b);
 
         paymentRepo.findByBookingId(bookingId).ifPresent(p -> {
@@ -109,6 +112,21 @@ public class BookingService {
             p.setPaymentMethod(method != null ? method : "ONLINE");
             p.setGatewayPaymentId(paymentRef);
             p.setPaidAt(LocalDateTime.now());
+            paymentRepo.save(p);
+        });
+        return toDto(b);
+    }
+
+    /** Admin desk booking marked "pay later at the venue" — confirmed immediately, no online-payment expiry applies. */
+    public BookingDto markDueAtVenue(Long bookingId) {
+        Booking b = bookingRepo.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
+        b.setPaymentStatus(Payment.PaymentStatus.DUE.name());
+        b.setStatus(Booking.BookingStatus.CONFIRMED);
+        bookingRepo.save(b);
+
+        paymentRepo.findByBookingId(bookingId).ifPresent(p -> {
+            p.setStatus(Payment.PaymentStatus.DUE);
+            p.setPaymentMethod("CASH");
             paymentRepo.save(p);
         });
         return toDto(b);
@@ -473,7 +491,12 @@ public class BookingService {
     }
 
     public BookingDto toDto(Booking b) {
-        String policy = (b.getStatus() == Booking.BookingStatus.CANCELLED) ? calcRefundPolicy(b) : null;
+        // Only a booking that was actually PAID has real money to show a refund for -
+        // e.g. an auto-expired AWAITING_PAYMENT booking or a desk DUE booking was
+        // never charged, so "refund" doesn't apply even though it's now CANCELLED.
+        boolean refundApplicable = b.getStatus() == Booking.BookingStatus.CANCELLED
+                && "PAID".equals(b.getPaymentStatus());
+        String policy = refundApplicable ? calcRefundPolicy(b) : null;
         BigDecimal refAmt = (policy != null) ? calcRefundAmount(b, policy) : null;
 
         return BookingDto.builder()

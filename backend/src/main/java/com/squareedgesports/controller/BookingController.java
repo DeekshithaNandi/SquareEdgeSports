@@ -80,12 +80,9 @@ public class BookingController {
     public ResponseEntity<?> createForCustomer(@Valid @RequestBody AdminCreateBookingRequest req) {
         BookingDto dto = bookingService.create(req.getUserId(), req);
 
-        // Error: markAwaitingPayment method does not exist in BookingService
-        // Solution: Either implement the markAwaitingPayment method in BookingService
-        // or remove this call
         dto = req.isMarkAsPaid()
                 ? bookingService.confirmPayment(dto.getId(), "DESK-" + dto.getId(), "CASH")
-                : dto;
+                : bookingService.markDueAtVenue(dto.getId());
 
         return ResponseEntity.ok(dto);
     }

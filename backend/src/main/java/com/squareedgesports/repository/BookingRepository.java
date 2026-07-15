@@ -52,10 +52,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
        List<Booking> findActiveByDate(@Param("date") java.time.LocalDate date);
 
        /**
-        * Find bookings with PENDING payment status older than the given cutoff (for
-        * cleanup)
+        * Bookings still awaiting online payment past the cutoff (for auto-expiry).
+        * Scoped to AWAITING_PAYMENT so an already-expired (CANCELLED) or desk
+        * "pay at venue" (DUE) booking is never re-matched on a later run.
         */
-       @Query("SELECT b FROM Booking b WHERE b.paymentStatus = 'PENDING' AND b.createdAt < :cutoff")
+       @Query("SELECT b FROM Booking b WHERE b.status = 'AWAITING_PAYMENT' AND b.paymentStatus = 'PENDING' " +
+                     "AND b.createdAt < :cutoff")
        List<Booking> findPendingOlderThan(@Param("cutoff") java.time.LocalDateTime cutoff);
 
        /**

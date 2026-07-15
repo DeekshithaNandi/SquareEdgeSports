@@ -93,13 +93,13 @@ export default function MyBookings() {
   }
 
   const active    = bookings.filter(b =>
-    ['CONFIRMED', 'IN_PROGRESS'].includes(b.status) &&
+    ['CONFIRMED', 'IN_PROGRESS', 'AWAITING_PAYMENT'].includes(b.status) &&
     !(b.paymentStatus === 'PENDING' && isPendingExpired(b.createdAt)) &&
     !hasEnded(b.bookingDate, b.endTime?.toString())
   )
   const history   = bookings.filter(b =>
     ['COMPLETED', 'NO_SHOW'].includes(b.status) ||
-    (['CONFIRMED', 'IN_PROGRESS'].includes(b.status) && hasEnded(b.bookingDate, b.endTime?.toString()))
+    (['CONFIRMED', 'IN_PROGRESS', 'AWAITING_PAYMENT'].includes(b.status) && hasEnded(b.bookingDate, b.endTime?.toString()))
   )
   const cancelled = bookings.filter(b => b.status === 'CANCELLED')
 
@@ -135,7 +135,7 @@ export default function MyBookings() {
           key: keyId, amount, currency, order_id: orderId,
           name: 'SquareEdgeSports',
           description: `${booking.bookingType?.replace(/_/g, ' ')} · ${booking.bookingDate}`,
-          image: '/ses-favicon.svg',
+          image: `${window.location.origin}/ses-favicon.svg`,
           handler: async (response) => {
             try {
               await bookingAPI.confirmBatchPayment({
@@ -361,26 +361,8 @@ export default function MyBookings() {
                     )}
                   </div>
                 )}
-                {/* PENDING payment — show Pay Now or Expired
-                {b.status === 'CONFIRMED' && b.paymentStatus === 'PENDING' && (
-                  isPendingExpired(b.createdAt)
-                    ? <span className="flex items-center gap-1 text-[10px] text-red-400/70 italic"><AlertTriangle size={10} /> Slot expired</span>
-                    : <button disabled={paying}
-                        onClick={() => continuePendingPayment(b)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 hover:bg-yellow-500/25 transition-all disabled:opacity-50">
-                        <CreditCard size={11} /> Pay Now
-                      </button>
-                )}
-                {/* Only show Cancel if CONFIRMED+PAID and session hasn't started yet */}
-                {/* {b.status === 'CONFIRMED' && b.paymentStatus === 'PAID' && !isPast(b.bookingDate, b.startTime?.toString()) && (
-                  <button className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all"
-                    onClick={() => setTarget(b)}>Cancel</button>
-                )}
-                {b.status === 'CONFIRMED' && b.paymentStatus === 'PAID' && isPast(b.bookingDate, b.startTime?.toString()) && (
-                  <span className="text-[10px] text-muted italic">Session ended</span>
-                )} */} 
                 {/* PENDING payment — show Pay Now or Expired */}
-                {b.status === 'CONFIRMED' && b.paymentStatus === 'PENDING' && (
+                {b.status === 'AWAITING_PAYMENT' && b.paymentStatus === 'PENDING' && (
                   isPendingExpired(b.createdAt)
                     ? <span className="flex items-center gap-1 text-[10px] text-red-400/70 italic"><AlertTriangle size={10} /> Slot expired</span>
                     : <button disabled={paying}

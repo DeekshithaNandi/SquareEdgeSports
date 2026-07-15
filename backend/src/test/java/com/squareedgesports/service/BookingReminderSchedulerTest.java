@@ -36,7 +36,7 @@ class BookingReminderSchedulerTest {
         return User.builder().id(1L).fullName("Alice Smith").email("alice@example.com").build();
     }
 
-    private Booking bookingFor(LocalDateTime slotStart) {
+    private Booking bookingFor(LocalDateTime bookedAt, LocalDateTime slotStart) {
         return Booking.builder()
                 .id(1L)
                 .user(user())
@@ -46,6 +46,7 @@ class BookingReminderSchedulerTest {
                 .status(Booking.BookingStatus.CONFIRMED)
                 .bookingType("PICKLEBALL")
                 .reminderSent(false)
+                .createdAt(bookedAt)
                 .build();
     }
 
@@ -69,7 +70,7 @@ class BookingReminderSchedulerTest {
     void bookingLessThan24hAhead_neverGetsReminder() {
         LocalDateTime bookedAt = LocalDateTime.now();
         LocalDateTime slotStart = bookedAt.plusHours(23).plusMinutes(30); // < 24h notice
-        Booking b = bookingFor(slotStart);
+        Booking b = bookingFor(bookedAt, slotStart);
         stubCandidates(b);
 
         // Simulate every 5-minute poll tick from booking time up to slot start.
@@ -85,7 +86,7 @@ class BookingReminderSchedulerTest {
     void bookingMoreThan24hAhead_getsExactlyOneReminder() {
         LocalDateTime bookedAt = LocalDateTime.now();
         LocalDateTime slotStart = bookedAt.plusHours(30); // well over 24h notice
-        Booking b = bookingFor(slotStart);
+        Booking b = bookingFor(bookedAt, slotStart);
         stubCandidates(b);
 
         for (LocalDateTime tick = bookedAt; tick.isBefore(slotStart); tick = tick.plusMinutes(5)) {
@@ -96,5 +97,46 @@ class BookingReminderSchedulerTest {
                 eq("alice@example.com"), eq("Alice Smith"), eq("PICKLEBALL"),
                 eq(slotStart.toLocalDate().toString()), any());
         assertTrue(b.isReminderSent());
+    }
+
+    @Test
+    void schedulerMissesSeveralTicks_stillCatchesUpOnNextRun() {
+        // Simulates a Render-style cold-start gap: the app is asleep while the
+        // booking's 24h-before mark passes, then wakes up 2 hours later. A
+        // naive "only this exact 5-minute slice" check would miss this
+        // reminder forever; the catch-up design must still send it.
+        LocalDateTime bookedAt = LocalDateTime.now();
+        LocalDateTime slotStart = bookedAt.plusHours(30);
+        Booking b = bookingFor(bookedAt, slotStart);
+        stubCandidates(b);
+
+        // Only two ticks total: one right after booking, then a huge gap that
+        // jumps straight to 2 hours past the 24h-before mark.
+        new BookingReminderScheduler(bookingRepo, emailService, fixedClockAt(bookedAt)).sendUpcomingReminders();
+        assertFalse(b.isReminderSent());
+
+        LocalDateTime afterGap = slotStart.minusHours(24).plusHours(2);
+        new BookingReminderScheduler(bookingRepo, emailService, fixedClockAt(afterGap)).sendUpcomingReminders();
+
+        verify(emailService, times(1)).sendBookingReminder(
+                eq("alice@example.com"), eq("Alice Smith"), eq("PICKLEBALL"),
+                eq(slotStart.toLocalDate().toString()), any());
+        assertTrue(b.isReminderSent());
+    }
+
+    @Test
+    void slotAlreadyStarted_neverGetsALateReminder() {
+        // The catch-up design must not fire for a session that's already
+        // begun (or ended) by the time a late-running tick finally executes.
+        LocalDateTime bookedAt = LocalDateTime.now();
+        LocalDateTime slotStart = bookedAt.plusHours(30);
+        Booking b = bookingFor(bookedAt, slotStart);
+        stubCandidates(b);
+
+        new BookingReminderScheduler(bookingRepo, emailService, fixedClockAt(slotStart.plusMinutes(10)))
+                .sendUpcomingReminders();
+
+        verify(emailService, never()).sendBookingReminder(any(), any(), any(), any(), any());
+        assertFalse(b.isReminderSent());
     }
 }

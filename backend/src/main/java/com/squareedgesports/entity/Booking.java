@@ -43,8 +43,11 @@ public class Booking {
     private String  paymentReference;
     private String  paymentStatus;  // PENDING | PAID | REFUNDED
 
+    // Mapped to VARCHAR (not a native DB enum) so adding new BookingStatus
+    // constants never again requires a manual column-widening migration -
+    // ddl-auto=update cannot safely alter an existing native enum's value set.
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 20, columnDefinition = "VARCHAR(20)")
     private BookingStatus status = BookingStatus.CONFIRMED;
 
     private String cancellationReason;
@@ -56,5 +59,5 @@ public class Booking {
     @PrePersist  protected void onCreate() { createdAt = updatedAt = LocalDateTime.now(); }
     @PreUpdate   protected void onUpdate() { updatedAt = LocalDateTime.now(); }
 
-    public enum BookingStatus { CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW }
+    public enum BookingStatus { AWAITING_PAYMENT, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW }
 }
