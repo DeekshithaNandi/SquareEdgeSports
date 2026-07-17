@@ -37,8 +37,9 @@ public class User {
     private String country;
     private String zipCode;
 
+    // VARCHAR, not a native DB enum - see Booking.status / Payment.status for why.
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role = Role.PLAYER;
 
     @Column(nullable = false)

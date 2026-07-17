@@ -32,7 +32,12 @@ public class Payment {
     private String paymentReference;
     private String paymentMethod; // RAZORPAY | STRIPE | TEST_MODE | CASH
 
+    // Mapped to VARCHAR (not a native DB enum) so adding new PaymentStatus
+    // constants never again requires a manual column-widening migration -
+    // ddl-auto=update cannot safely alter an existing native enum's value set.
+    // (This is exactly what caused DUE to be silently rejected by MySQL.)
     @Enumerated(EnumType.STRING)
+    @Column(length = 20, columnDefinition = "VARCHAR(20)")
     private PaymentStatus status = PaymentStatus.PENDING;
 
     private String gatewayOrderId;

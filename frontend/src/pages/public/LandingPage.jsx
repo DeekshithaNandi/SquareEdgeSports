@@ -409,7 +409,8 @@ function ContactSection() {
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-wider block mb-1" style={{ color: AW.t3 }}>Message *</label>
                 <textarea rows={4} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                  placeholder="Tell us how we can help…" className={`${inp} resize-none`} style={ist} />
+                  placeholder="Tell us how we can help…" className={`${inp} resize-none`} style={ist} maxLength={300} />
+                   <p className="text-[10px] mt-1 text-right" style={{ color: AW.t3 }}>{form.message.length}/300</p>
               </div>
               {error && <div className="rounded-xl px-4 py-3 text-xs"
                 style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#dc2626' }}>{error}</div>}

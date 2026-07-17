@@ -70,7 +70,9 @@ public class PublicController {
         if (name.isEmpty() || email.isEmpty() || message.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Name, email and message are required."));
         }
-
+        if (message.length() > 300) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Message must be 300 characters or fewer."));
+        }
         emailService.sendContactEmail(name, email, subject, message);
         return ResponseEntity.ok(Map.of("message", "Message sent successfully!"));
     }

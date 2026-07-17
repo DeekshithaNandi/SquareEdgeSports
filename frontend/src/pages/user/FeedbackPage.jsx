@@ -131,6 +131,7 @@ export default function FeedbackPage() {
               placeholder="Describe your experience…"
               value={comment}
               onChange={e => setComment(e.target.value)}
+              maxLength={300}
               required
             />
             <p className="text-xs text-muted text-right mt-1">{comment.length} characters</p>

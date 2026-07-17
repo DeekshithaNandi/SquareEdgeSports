@@ -1,0 +1,21 @@
+name: Keep Backend Alive
+
+# Render's free tier spins the backend down after ~15 minutes with no
+# incoming requests, and the next real request then has to wait for a full
+# cold start (container boot + DB reconnect) before it can respond - this is
+# what caused login to take several minutes. Pinging the health endpoint on a
+# short interval keeps the service warm so that essentially never happens.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # lets you trigger a run manually from the Actions tab to test it
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend health endpoint
+        run: |
+          curl -sf --max-time 60 https://squareedgesports-backend.onrender.com/api/public/health \
+            && echo "Backend is awake" \
+            || echo "Ping failed or backend was cold-starting - this request should have woken it up for next time"
