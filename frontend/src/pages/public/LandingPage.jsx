@@ -136,16 +136,19 @@ function HomeSection({ setBooking, user, sports = [], courtCounts = {}, onMember
                   style={{ borderColor: AW.bd }} onClick={() => onMembershipClick?.(s)}>
                   <div className="absolute inset-0">
                     <img src={SPORT_IMAGES[s.key]} alt={s.name}
-                      className="w-full h-full object-cover opacity-[0.35] group-hover:opacity-[0.55] transition-opacity duration-300" />
+                      className="w-full h-full object-cover transition-opacity duration-300"
+                      style={{ filter: 'brightness(0.55)' }}></img>
+
                   </div>
                   <div className="relative px-2 py-2.5 text-center">
                     <div className="text-base mb-0.5">{s.emoji}</div>
-                    <div className="text-[9px] font-bold mb-0.5 leading-tight" style={{ color: AW.t2 }}>{s.name}</div>
-                    <div className="text-xs font-extrabold leading-tight" style={{ color: AW.blue }}>
-                      ${fmtPrice(s.membershipFee)}<span className="text-[8px] font-normal" style={{ color: AW.t3 }}>/mo</span>
+                    <div className="text-[9px] font-bold mb-0.5 leading-tight text-white drop-shadow">{s.name}</div>
+                    <div className="text-xs font-extrabold leading-tight text-white drop-shadow">
+  ${fmtPrice(s.membershipFee)}<span className="text-[8px] font-normal text-white/70">/mo</span>
                     </div>
+
                     {s.price != null && s.memberPrice != null && (
-                      <div className="text-[8px] mt-0.5 text-green-600 font-semibold">save ${s.price - s.memberPrice}/session</div>
+                      <div className="text-[8px] mt-0.5 text-green-300 font-semibold drop-shadow">save ${s.price - s.memberPrice}/session</div>
                     )}
                   </div>
                 </button>
