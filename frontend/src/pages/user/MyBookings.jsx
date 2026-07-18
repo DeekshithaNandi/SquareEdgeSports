@@ -350,7 +350,7 @@ export default function MyBookings() {
                     b.paymentStatus === 'PAID' ? 'text-green-700' :
                     b.paymentStatus === 'REFUNDED' ? 'text-blue-400' :
                     b.paymentStatus === 'DUE' ? 'text-blue-600' : 'text-yellow-700'
-                  }`}>{b.paymentStatus === 'DUE' ? 'Pay at Venue' : b.paymentStatus}</div>
+                  }`}>{b.paymentStatus === 'DUE' ? 'Pay Now' : b.paymentStatus}</div>
                 </div>
                 {/* Cancelled — show refund info */}
                 {b.status === 'CANCELLED' && (
@@ -371,11 +371,13 @@ export default function MyBookings() {
                         <CreditCard size={11} /> Pay Now
                       </button>
                 )}
-                {/* DUE — booked by staff; customer pays at the venue (card/QR), not through the app */}
+                {/* DUE — booked by staff without collecting payment; let the customer pay online now */}
                 {b.status === 'CONFIRMED' && b.paymentStatus === 'DUE' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/10 border border-blue-500/20 text-blue-300">
-                    <CreditCard size={11} /> Pay at Venue
-                  </span>
+                  <button disabled={paying}
+                    onClick={() => continuePendingPayment(b)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/10 border border-blue-500/20 text-blue-300 hover:bg-blue-500/20 transition-all disabled:opacity-50">
+                    <CreditCard size={11} /> Pay Now
+                  </button>
                 )}
                 {/* Only show Cancel if CONFIRMED+(PAID or DUE) and session hasn't started yet */}
                 {b.status === 'CONFIRMED' && (b.paymentStatus === 'PAID' || b.paymentStatus === 'DUE') && !isPast(b.bookingDate, b.startTime?.toString()) && (
