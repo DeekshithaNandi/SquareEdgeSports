@@ -326,18 +326,34 @@ function AboutSection({ setBooking, sports = [], courtCounts = {} }) {
 }
 
 /* ── Contact Section ─────────────────────────────────────────────────────── */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+const isValidEmail = email => EMAIL_RE.test(email.trim())
+
 function ContactSection() {
   const [form,    setForm]    = useState({ name: '', email: '', subject: '', message: '' })
   const [sent,    setSent]    = useState(false)
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
+  const emailTouched = form.email.trim().length > 0
+  const emailError = emailTouched && !isValidEmail(form.email) ? 'Enter a valid email address.' : ''
+  const canSend = form.name.trim() && isValidEmail(form.email) && form.message.trim() && !loading
 
   const handleSubmit = async e => {
     e.preventDefault()
-    if (!form.name || !form.email || !form.message) return
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      subject: form.subject.trim(),
+      message: form.message.trim(),
+    }
+    if (!payload.name || !payload.email || !payload.message) return
+    if (!isValidEmail(payload.email)) {
+      setError('Please enter a valid email address.')
+      return
+    }
     setLoading(true); setError('')
     try {
-      await publicAPI.contact(form)
+      await publicAPI.contact(payload)
       setSent(true)
     } catch (err) {
       setError(err?.response?.data?.message || 'Failed to send message. Please try again.')
@@ -396,12 +412,13 @@ function ContactSection() {
                 <div>
                   <label className="text-[10px] font-bold uppercase tracking-wider block mb-1" style={{ color: AW.t3 }}>Name *</label>
                   <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                    placeholder="John Smith" className={inp} style={ist} />
+                    placeholder="John Smith" className={inp} style={ist} required />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase tracking-wider block mb-1" style={{ color: AW.t3 }}>Email *</label>
                   <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    placeholder="you@email.com" className={inp} style={ist} />
+                    placeholder="you@email.com" className={inp} style={ist} required aria-invalid={!!emailError} />
+                  {emailError && <p className="text-[10px] mt-1" style={{ color: '#dc2626' }}>{emailError}</p>}
                 </div>
               </div>
               <div>
@@ -420,7 +437,7 @@ function ContactSection() {
               <button type="submit"
                 className="group w-full flex items-center justify-center gap-2.5 py-3 rounded-2xl text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-60"
                 style={{ background: AW.blue }}
-                disabled={!form.name || !form.email || !form.message || loading}>
+                disabled={!canSend}>
                 {loading
                   ? <><Loader size={14} className="spin" /> Sending…</>
                   : <><span>Send Message</span><Send size={14} className="group-hover:translate-x-0.5 transition-transform" /></>}

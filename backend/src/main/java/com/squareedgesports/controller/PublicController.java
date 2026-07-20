@@ -10,11 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/public")
 @RequiredArgsConstructor
 public class PublicController {
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,63}$",
+            Pattern.CASE_INSENSITIVE
+    );
 
     private final CourtRepository courtRepo;
     private final PricingRuleRepository pricingRepo;
@@ -69,6 +74,9 @@ public class PublicController {
 
         if (name.isEmpty() || email.isEmpty() || message.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Name, email and message are required."));
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Please enter a valid email address."));
         }
         if (message.length() > 300) {
             return ResponseEntity.badRequest().body(Map.of("message", "Message must be 300 characters or fewer."));
