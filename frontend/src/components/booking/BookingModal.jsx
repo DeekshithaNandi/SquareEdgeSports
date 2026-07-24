@@ -59,12 +59,12 @@ function loadRazorpayScript() {
 }
 
 // Steps: 'select' | 'auth' | 4 (payment review) | 5 (done)
-export default function BookingModal({ initialType, onClose }) {
+export default function BookingModal({ initialType, initialDate, onClose }) {
   const { user, login: authLogin } = useAuth()
 
   const [step,           setStep]           = useState('select')
   const [type,           setType]           = useState(initialType || 'CRICKET_LANE')
-  const [date,           setDate]           = useState(today())
+  const [date, setDate] = useState(initialDate || today())
   const [slots,          setSlots]          = useState([])
   const [loadSlots,      setLoadSlots]      = useState(false)
   const [selSlots,       setSelSlots]       = useState([])
